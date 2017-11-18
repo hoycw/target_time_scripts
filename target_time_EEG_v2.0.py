@@ -43,6 +43,7 @@ core.rush(True)     # might give psychopy higher priority in the system (maybe..
 exp_datetime = time.strftime("%Y%m%d%H%M%S")
 paradigm_name = 'target_time'
 
+#!!! Ideal order: log to get the param name, param module to pull the right version, then varaibles to use that to set everything up
 #============================================================
 # EXPERIMENT PARAMETERS
 #============================================================
