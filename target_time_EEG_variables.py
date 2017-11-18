@@ -105,6 +105,7 @@ windows = {True: visual.Rect(win, width=window_width, height=interval_height*(1-
                         pos=(0,target_y-interval_height/2),
                         fillColor='black', lineColor=None,
                         opacity=0.5, name='window')}
+#!!! rename this shitty thing
 window_tops = {True: target_y-(interval_height*covered_portion),
                 False: target_y}
 assert not bullseyes['easy'][-1].contains(x=0,y=window_tops[True])     # top of window doesn't hit the bullseye

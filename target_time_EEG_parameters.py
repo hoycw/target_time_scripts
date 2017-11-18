@@ -19,11 +19,11 @@ paradigm_name = 'target_time'
 #============================================================
 
 
-n_examples = 5                     # number of EASY examples to start (large tolerance, full window)
-n_training = 15                     # number of training trials PER CONDITION
-n_blocks = 4                        # number of blocks of trials PER CONDITION
-n_trials = 75                       # number of trials PER BLOCK
-break_min_dur = 30                  # minimum length (in s) for the break between blocks
+n_fullvis = 1#5                     # number of EASY examples to start (large tolerance, full window)
+n_training = 2#15                     # number of training trials PER CONDITION
+n_blocks = 1#4                        # number of blocks of trials PER CONDITION
+n_trials = 2#75                       # number of trials PER BLOCK
+break_min_dur = 1#30                  # minimum length (in s) for the break between blocks
 
 interval_dur = 1                    # duration (in sec) of target time interval
 feedback_delay = 0.8                # duration (in s) of delay between end of interval and feedback onset
@@ -47,8 +47,7 @@ screen_units = 'cm'                 # Set visual object sizes in cm (constant ac
 game_height = 20                    # amount of screen for plotting
 interval_height = 0.7*game_height   # % of game_height over which interval_dur occurs
 target_y = 5                        # position of target in y coordinates
-#use_window = True                   # if False, all ball positions are visible (e.g., goes on top of bullseye)
-covered_portion = 0.6               # % of interval height obscured by the window when use_window=True
+covered_portion = 0.6               # % of interval height obscured by the window when covered=True
 tower_width = 0.4*interval_height   # Width of the tower containing the window (with target at top)
 ball_radius = 0.35                  # Radius of the moving ball stimulus
 window_width = 0.8                  # Width of the window around the ball (ideally > ball_radius)

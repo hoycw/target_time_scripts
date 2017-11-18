@@ -8,6 +8,7 @@ from psychopy import parallel
 import numpy as np
 import math, time, random, shelve
 
+#!!! shouldn't need these, but it doesn't run if they aren't here... can we toss them before the final?
 from target_time_EEG_parameters import*
 import target_time_EEG_log
 from target_time_EEG_variables import*
@@ -67,7 +68,7 @@ def set_trial_timing(trial_clock=trial_clock, interval_dur=interval_dur, trial_t
 def moving_ball(bullseye=None, use_window=None, n_int_flips=n_int_flips, window=None, responses=None, trial_clock=trial_clock, key=key, block=None, trial=None, win=win, exp_type=False):
     for pos_ix in range(n_int_flips-sum(hidden_pos[use_window])):
         # Drawing Order (back-to-front): (outlines?), tower, window, ball, bullseye 
-        tower.draw()
+        tower.draw() #!!! can become tower_draw_fn
         window.draw()
         for eye in reversed(bullseye):  #draw them all in reverse order
             eye.draw()
@@ -94,9 +95,10 @@ def moving_ball(bullseye=None, use_window=None, n_int_flips=n_int_flips, window=
 #============================
 
 def feedback_delay_func(bullseye=None, responses=None, block=None, window=None, trial_clock=trial_clock, trial_start=None, key=key, trial=None, exp_type=False, interval_dur=interval_dur, feedback_start=None, feedback_delay=feedback_delay):
-    tower.draw()
+    tower.draw() #!!! can become tower_draw_fn
     window.draw()
-    offset_error = trial_clock.getTime()-interval_dur-feedback_delay-trial_start
+    # should below line be after flip? does that matter?
+    offset_error = trial_clock.getTime()-interval_dur-feedback_delay-trial_start #this should tell us how accurate the timing of the feedback_delay and total trial was
     for eye in reversed(bullseye):  #draw them all in reverse order
         eye.draw()
     if exp_type:
@@ -107,7 +109,7 @@ def feedback_delay_func(bullseye=None, responses=None, block=None, window=None, 
                                                 trial,exp_clock.getTime(),trial_clock.getTime()),logging.INFO)
     win.flip()
     #        port.setData(0)
-    while trial_clock.getTime() < feedback_start:
+    while trial_clock.getTime() < feedback_start:# shouldn't this be feedback_end?
         response = event.getKeys(keyList=key, timeStamped=trial_clock)
         if len(response)>0:
             responses.append(response)
@@ -204,6 +206,7 @@ def staircase(trial_type=trial_type, interval_height=interval_height, tolerances
     for eye_ix, eye in enumerate(bullseyes[trial_type]):
         eye.radius = bullseye_radii[trial_type][eye_ix]
     
+    #!!! this can go back in the outer loop
     while trial_clock.getTime() < feedback_end + ITI:
         for press in event.getKeys(keyList=[key,'escape','q']):
             if press in ['escape','q']:

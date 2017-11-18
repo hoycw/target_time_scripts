@@ -51,12 +51,11 @@ win.setRecordFrameIntervals(True)                                    #capture fr
 win.saveFrameIntervals(fileName=log_filename, clear=False)           #write frame intervals to log_filename
 
 #Vars to log:
-#key,full_screen,screen_to_show,screen_units,use_window,xhr_thickness
 win.logOnFlip('paradigm_name = '+str(paradigm_name), logging.DATA)
 win.logOnFlip('paradigm_version = '+str(paradigm_version), logging.DATA)
 win.logOnFlip('n_blocks = '+str(n_blocks), logging.DATA)
 win.logOnFlip('n_trials = '+str(n_trials), logging.DATA)
-win.logOnFlip('n_examples = '+str(n_examples), logging.DATA)
+win.logOnFlip('n_fullvis = '+str(n_fullvis), logging.DATA)
 win.logOnFlip('n_training = '+str(n_training), logging.DATA)
 win.logOnFlip('interval_dur = '+str(interval_dur), logging.DATA)
 win.logOnFlip('feedback_delay = '+str(feedback_delay), logging.DATA)
