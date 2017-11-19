@@ -45,14 +45,14 @@ paradigm_name = 'target_time'
 
 #!!! Ideal order: log to get the param name, param module to pull the right version, then varaibles to use that to set everything up
 #============================================================
-# EXPERIMENT PARAMETERS
-#============================================================
-from target_time_EEG_parameters import*
-#============================================================
 # SET UP LOG FILE
 #============================================================
 import target_time_EEG_log
 
+#============================================================
+# EXPERIMENT PARAMETERS
+#============================================================
+from target_time_EEG_parameters import*
 
 #============================================================
 # SET EXPERIMENTAL VARIABLES
@@ -96,7 +96,7 @@ def instruction_loop(instrs, intro=False):#instr_strs=instr_strs, key=key):
 # Trial timer function
 #============================
 
-def set_trial_timing(block_n, trial_type, trial_n, tolerances, training=False):#, trial_clock=trial_clock, interval_dur=interval_dur, feedback_delay=feedback_delay, feedback_dur=feedback_dur, ITIs=ITIs):
+def set_trial_timing(trial_clock, block_n, trial_type, trial_n, training=False):
     # for training mode, input block_n=None
     # !!! can we get rid of train? If so, drop loop below
     trial_clock.reset()
@@ -115,13 +115,10 @@ def set_trial_timing(block_n, trial_type, trial_n, tolerances, training=False):#
 # Moving ball function
 #===========================
 
-def moving_ball(block_n=None, trial_n=None, training=False):#bullseye=None, covered=None, n_int_flips=n_int_flips, window=None, responses=None, trial_clock=trial_clock, key=key, win=win, 
+def moving_ball(block_n=None, trial_n=None, training=False):
     for pos_ix in range(n_int_flips-sum(hidden_pos[covered])):
         # Drawing Order (back-to-front): (outlines?), tower, window, ball, bullseye 
-        tower.draw() #!!! can become tower_draw_fn
-        window.draw()
-        for eye in reversed(bullseye):  #draw them all in reverse order
-            eye.draw()
+        tower_ball_draw(bullseye)
         balls[pos_ix].draw()
         #if trial_clock.getTime() < trigger_dur:
             #trigger_rect.draw()
@@ -140,14 +137,10 @@ def moving_ball(block_n=None, trial_n=None, training=False):#bullseye=None, cove
 #============================
 #  Feedback Delay 
 #============================
-#!!! start back here
-def feedback_delay_func(bullseye=None, responses=None, block_n=None, window=None, trial_clock=trial_clock, trial_start=None, key=key, trial_n=None, training=False, interval_dur=interval_dur, feedback_start=None, feedback_delay=feedback_delay):
-    tower.draw() #!!! can become tower_draw_fn
-    window.draw()
-    # should below line be after flip? does that matter?
-    offset_error = trial_clock.getTime()-interval_dur-feedback_delay-trial_start #this should tell us how accurate the timing of the feedback_delay and total trial was
-    for eye in reversed(bullseye):  #draw them all in reverse order
-        eye.draw()
+
+def feedback_delay_func(responses, block_n, trial_n, training=False):
+    tower_ball_draw(bullseye)
+    
     if not training:
         win.logOnFlip('B{0}_T{1} feedback_delay starts: total time = {2:.3f}, trial time = {3:.3f}'.format(
                                     block_n,trial_n,exp_clock.getTime(),trial_clock.getTime()),logging.INFO)
@@ -165,6 +158,8 @@ def feedback_delay_func(bullseye=None, responses=None, block_n=None, window=None
             else:
                 win.logOnFlip('TRAINING T{0} Response: {1}, FRAME TIME = {2}'.format(trial_n,response,win.lastFrameT),logging.DATA)
             response = []
+            
+    offset_error = trial_clock.getTime()-interval_dur-feedback_delay-trial_start #this should tell us how accurate the timing of the feedback_delay and total trial was
     if not training:
         win.logOnFlip('B{0}_T{1} feedback delay end: {2:.5f}; offset error = {3:.5f}'.format(block_n,trial_n,trial_clock.getTime(),
                                                             offset_error),logging.INFO)
@@ -177,8 +172,8 @@ def feedback_delay_func(bullseye=None, responses=None, block_n=None, window=None
 #  Feedback Calculator
 #===========================
 
-def calc_feedback(bullseye=None, window=None, responses=None, block_n=None, exper=False, trial_n=None, trial_clock=trial_clock, trial_type=None, trial_start=None, resp_marker_width=resp_marker_width, interval_vlim=interval_vlim, feedback_end=None, key=key):
-    tower_ball_draw(bullseye, window)
+def calc_feedback(block_n, trial_type, trial_n, training=False):
+    tower_ball_draw(bullseye)
     if len(responses)>0:
         if len(responses)>1:
             win.logOnFlip('WARNING!!! More than one response detected (taking first) on B{0}_T{1}: repsonses = {2}'.format(
@@ -202,7 +197,7 @@ def calc_feedback(bullseye=None, window=None, responses=None, block_n=None, expe
         resp_marker.setEnd((resp_marker_width/2, interval_vlim[1]-error_height))
         resp_marker.draw()
         
-        if exper:
+        if not training:
             points[block_n]+= point_fn[tolerance_step_ix]
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
         else:
@@ -237,7 +232,7 @@ def calc_feedback(bullseye=None, window=None, responses=None, block_n=None, expe
 # Tower, Bullseye, ball Draw
 #==============================
 
-def tower_ball_draw(bullseye, window):
+def tower_ball_draw(bullseye):
     tower.draw()
     window.draw()
     for eye in reversed(bullseye):  #draw them all in reverse order
@@ -247,24 +242,18 @@ def tower_ball_draw(bullseye, window):
 # Difficulty Staircase Function
 #==============================
 
-def staircase(trial_type=trial_type, interval_height=interval_height, tolerances=tolerances, interval_dur=interval_dur, min_bullseye_radius=min_bullseye_radius, trial_clock=trial_clock, feedback_end=None, key=key, ITI=None):
+def staircase(trial_type): 
     bullseye_height[trial_type] = interval_height*tolerances[trial_type]/interval_dur
     bullseye_radii[trial_type] = np.linspace(min_bullseye_radius, bullseye_height[trial_type], num=n_rings[trial_type])
     for eye_ix, eye in enumerate(bullseyes[trial_type]):
         eye.radius = bullseye_radii[trial_type][eye_ix]
-    
-    #!!! this can go back in the outer loop
-    while trial_clock.getTime() < feedback_end + ITI:
-        for press in event.getKeys(keyList=[key,'escape','q']):
-            if press in ['escape','q']:
-                win.close();
-                core.quit();
+      
                     
 #==============================
 # Break Between Trial Blocks
 #==============================
 
-def block_break(block_n=None, trial_types=trial_types, n_blocks=n_blocks, break_min_dur=break_min_dur, key=key):
+def block_break(block_n): #trial_types, n_blocks=n_blocks, break_min_dur=break_min_dur, key=key):
     block_point_txt.text = block_point_str.format(block_n+1,points[block_n])
     if points[block_n]>=0:
         block_point_txt.color = 'green'
@@ -305,7 +294,7 @@ adv = event.waitKeys(keyList=[key, 'escape', 'q'])
 if adv[0] in ['escape', 'q']:
         win.close()
         core.quit()
-fnc.instruction_loop(intro=True)
+instruction_loop(None, intro=True)
 win.flip()
 #============================================================
 # TRAINING
@@ -332,7 +321,7 @@ for trial_n in range(n_fullvis+2*n_training):
     
     # Instructions
     if (trial_n==n_fullvis) or (trial_n==n_fullvis+n_training):                    # First Easy/Hard Training
-        fnc.instruction_loop(train_str[trial_type])
+        instruction_loop(train_str[trial_type])
     #========================================================
     # Set Trial Timing
     trial_clock.reset()                                                       # In loop as temp variables, may export to variable file
@@ -344,29 +333,34 @@ for trial_n in range(n_fullvis+2*n_training):
     ITI = np.max(ITIs)       #!!! probably want specific random sequences to be determined ahead of time
     win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,win.lastFrameT),logging.INFO)
     # Below shouldn't need params because they're all defaults, but if you don't have them here it somehow logs the wrong thing (both if/else statements??)
-    fnc.set_trial_timing(trial_clock, interval_dur, trial_type, tolerances, feedback_delay, feedback_dur, ITIs, trial_n, None, True)    # Trial time function Call 
+#    set_trial_timing(trial_clock, None, trial_type, trial_n, training=True)    # Trial time function Call, not needed because of previous lines
     #========================================================
     # Moving Ball
-    fnc.moving_ball(bullseye, covered, n_int_flips, window, responses, trial_clock, key, None, trial_n, win, training=False)
+    moving_ball(None, trial_n, training=True)
     #========================================================
     # Feedback Delay
-    fnc.feedback_delay_func(bullseye, responses, None, window, trial_clock, trial_start, key, trial_n, False, interval_dur, feedback_start, feedback_delay)
+    feedback_delay_func(responses, None, trial_n, training=True)
     #========================================================
     # Feedback
     # Calculate Feedback
-    fnc.calc_feedback(bullseye, window, responses, None, False, trial_n, trial_clock, trial_type, trial_start, resp_marker_width, interval_vlim, feedback_end, key)
+    calc_feedback(None, trial_type, trial_n, training=True)
     #========================================================
     # ITI
     win.logOnFlip('B{0}_T{1} ITI={2}; FRAME TIME = {3}'.format('T',trial_n,ITI,win.lastFrameT),logging.INFO)
     win.flip()
 #    port.setData(0)
     # Staircase Tolerance
-    fnc.staircase(trial_type, interval_height, tolerances, interval_dur, min_bullseye_radius, trial_clock, feedback_end, key, ITI)
+    staircase(trial_type)
+    while trial_clock.getTime() < feedback_end + ITI:
+        for press in event.getKeys(keyList=[key,'escape','q']):
+            if press in ['escape','q']:
+                win.close();
+                core.quit();
 #============================================================
 # EXPERIMENT
 #============================================================
 
-fnc.instruction_loop(None, main_str, key, False)                    # Main instruction call 
+instruction_loop(main_str)                    # Main instruction call 
 # Constant Reward Function (switch to points)
 outcome_win.text = '+{0}'.format(point_fn[0])
 outcome_loss.text = '{0}'.format(point_fn[1])
@@ -390,26 +384,31 @@ for block_n, block_type in enumerate(block_order):
         resp_pos = []
         #========================================================
         # Set Trial Timing
-        fnc.set_trial_timing(trial_clock, interval_dur, trial_type, tolerances, feedback_delay, feedback_dur, ITIs, trial_n, block_n, False)
+        set_trial_timing(trial_clock, block_n, trial_type, trial_n)
         #========================================================
         # Moving Ball
-        fnc.moving_ball(bullseye, covered, n_int_flips, window, responses, trial_clock, key, block_n, trial_n, win, True)
+        moving_ball(block_n, trial_n, training=False)
         #========================================================
         # Feedback Delay
-        fnc.feedback_delay_func(bullseye, responses, block_n, window, trial_clock, trial_start, key, trial_n, True, interval_dur, feedback_start, feedback_delay)
+        feedback_delay_func(responses, block_n, trial_n, training=False)
         #========================================================
         # Feedback
         # Calculate Feedback
-        fnc.calc_feedback(bullseye, window, responses, block_n, True, trial_n, trial_clock, trial_type, trial_start, resp_marker_width, interval_vlim, feedback_end, key)
+        calc_feedback(block_n, trial_type, trial_n, False)
         #========================================================
         # ITI
-        win.logOnFlip('B{0}_T{1} ITI={2}; FRAME TIME = {3}'.format(block,trial_n,ITI,win.lastFrameT),logging.INFO)
+        win.logOnFlip('B{0}_T{1} ITI={2}; FRAME TIME = {3}'.format(block_n,trial_n,ITI,win.lastFrameT),logging.INFO)
         win.flip()
-        fnc.staircase(trial_type, interval_height, tolerances, interval_dur, min_bullseye_radius, trial_clock, feedback_end, key, ITI)
+        staircase(trial_type)
+        while trial_clock.getTime() < feedback_end + ITI:
+            for press in event.getKeys(keyList=[key,'escape','q']):
+                if press in ['escape','q']:
+                    win.close();
+                    core.quit();
         # wait for ITI code here
     #========================================================
     # Break Between Blocks
-    fnc. block_break(block_n, trial_types, n_blocks, break_min_dur, key)
+    block_break(block_n)
 endgame_txt.draw()
 win.flip()
 core.wait(10)
