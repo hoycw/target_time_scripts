@@ -66,7 +66,7 @@ from target_time_EEG_variables import*
 # displays instructions for current trial type
 #==============================================
 
-def instruction_loop(instrs, intro=False):#instr_strs=instr_strs, key=key):
+def instruction_loop(instrs, intro=False):
     # If intro=True, instrs won't be used (can just be '') 
     if intro:
         for instr_str in instr_strs:
@@ -115,7 +115,7 @@ def set_trial_timing(trial_clock, block_n, trial_type, trial_n, training=False):
 # Moving ball function
 #===========================
 
-def moving_ball(block_n=None, trial_n=None, training=False):
+def moving_ball(block_n, trial_n, training=False):
     for pos_ix in range(n_int_flips-sum(hidden_pos[covered])):
         # Drawing Order (back-to-front): (outlines?), tower, window, ball, bullseye 
         tower_ball_draw(bullseye)
