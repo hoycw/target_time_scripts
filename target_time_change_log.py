@@ -4,6 +4,8 @@
 
 
 
+# 2.1: added some comments, changed name to fix git version problems
+# 2.0: functions brought back into main script
 
 # 1.9.2.test: modularized parameters, log, and variables to cut down on file length 
 # 1.9.2: different trigger codes for stim (1) and feedback (2); stim trigger lasts until feedback_delay; adv_scr_txt moved down to avoid overlap

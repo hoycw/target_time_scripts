@@ -1,41 +1,36 @@
 # target_time log suite
-#for import with target_time_1.9.2
-paradigm_version = '1.9.2'
+paradigm_name = 'target_time'
+paradigm_version = '2.1'
 
 from psychopy import visual, event, core, gui, logging, data
-#from psychopy import parallel
 import numpy as np
-import math, time, random, shelve
-from target_time_EEG_parameters import*
-  
+import math, time, random
 
-#random.seed()
-#core.wait(0.5)      # give the system time to settle
-#core.rush(True)     # might give psychopy higher priority in the system (maybe...)
 exp_datetime = time.strftime("%Y%m%d%H%M%S")
-paradigm_name = 'target_time'
-
-
 
 #============================================================
 # SET UP LOG FILE
 #============================================================
 file_dlg = gui.Dlg(title="Run Information")
 file_dlg.addField('SBJ Code:')
+file_dlg.addField('Parameter Version:')
 #file_dlg.addField('Response Key:') # Ideally space bar? something more accurate?
 
 file_dlg.show()
 if gui.OK:
     dlg_resp = file_dlg.data
     log_prefix = dlg_resp[0]
+    param_ver = dlg_resp[1]
     #key = dlg_resp[1] !!! fix this!!!
-    log_filename = '../{0}_response_log_{1}.txt'.format(log_prefix,exp_datetime) #'../logs/{0}_response_log_{1}.txt'.format(log_prefix,exp_datetime)
+    log_filename = '../logs/{0}_response_log_{1}.txt'.format(log_prefix,exp_datetime)
 else: 
     print 'User Cancelled'
     win.close()
     core.quit()
 
-
+from target_time_EEG_parameters import*
+#try: key = pradimg_ver
+#actual= var_chanign[key]
 
 from target_time_EEG_variables import*
 
