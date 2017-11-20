@@ -18,12 +18,26 @@ paradigm_name = 'target_time'
 # EXPERIMENT PARAMETERS
 #============================================================
 
-
+# probably need debug y/n and eeg/ecog input from the log file, which will then determine the values below
+#   eeg/ecog is needed even if in debug mode, because you need to avoid calls to the parallel port for ECoG and trigger rectangle should appear in ECoG version
 n_fullvis = 1#5                     # number of EASY examples to start (large tolerance, full window)
+    debug = 1
+    eeg = 5
+    ecog = 5
 n_training = 2#15                     # number of training trials PER CONDITION
+    debug = 2
+    eeg/ecog = 15
 n_blocks = 1#4                        # number of blocks of trials PER CONDITION
+    debug = 1
+    eeg = 4
+    ecog = 2
 n_trials = 2#75                       # number of trials PER BLOCK
+    debug = 2
+    eeg = 75
+    ecog = 75
 break_min_dur = 1#30                  # minimum length (in s) for the break between blocks
+    debug = 1
+    eeg/ecog = 30
 
 interval_dur = 1                    # duration (in sec) of target time interval
 feedback_delay = 0.8                # duration (in s) of delay between end of interval and feedback onset
@@ -45,6 +59,8 @@ screen_units = 'cm'                 # Set visual object sizes in cm (constant ac
 
 # Stimulus Parameters
 game_height = 20                    # amount of screen for plotting
+    eeg = 20
+    ecog = 25
 interval_height = 0.7*game_height   # % of game_height over which interval_dur occurs
 target_y = 5                        # position of target in y coordinates
 covered_portion = 0.6               # % of interval height obscured by the window when covered=True
