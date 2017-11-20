@@ -123,7 +123,7 @@ def moving_ball(block_n, trial_n, training=False):
         #if trial_clock.getTime() < trigger_dur:
             #trigger_rect.draw()
         win.flip()
-    #            if pos_ix==1:
+    #            if pos_ix==1:  #!!! add: and exp_type=='EEG'
     #                port.setData(1)  # sets just this pin to be high
         response = event.getKeys(keyList=key, timeStamped=trial_clock)  #!!! responses here still tied to flips?
         if len(response)>0:
@@ -140,16 +140,17 @@ def moving_ball(block_n, trial_n, training=False):
 
 def feedback_delay_func(responses, block_n, trial_n, training=False):
     tower_ball_draw(bullseye)
-    
-    if not training:
-        win.logOnFlip('B{0}_T{1} feedback_delay starts: total time = {2:.3f}, trial time = {3:.3f}'.format(
-                                    block_n,trial_n,exp_clock.getTime(),trial_clock.getTime()),logging.INFO)
-    else:
-        win.logOnFlip('TRAINING T{0} feedback_delay starts: total time = {1:.3f}, trial time = {2:.3f}'.format(
-                                                trial_n,exp_clock.getTime(),trial_clock.getTime()),logging.INFO)
+    # !!! Do we need these delay starts? If we're not testing timing, no...
+#    if not training:
+#        win.logOnFlip('B{0}_T{1} feedback_delay starts: total time = {2:.3f}, trial time = {3:.3f}'.format(
+#                                    block_n,trial_n,exp_clock.getTime(),trial_clock.getTime()),logging.INFO)
+#    else:
+#        win.logOnFlip('TRAINING T{0} feedback_delay starts: total time = {1:.3f}, trial time = {2:.3f}'.format(
+#                                                trial_n,exp_clock.getTime(),trial_clock.getTime()),logging.INFO)
     win.flip()
-    #        port.setData(0)
-    while trial_clock.getTime() < feedback_start:# shouldn't this be feedback_end?
+    #        port.setData(0)    #!!! if exp_type=='EEG'
+    # Catch responses during delay before feedback onset
+    while trial_clock.getTime() < feedback_start:
         response = event.getKeys(keyList=key, timeStamped=trial_clock)
         if len(response)>0:
             responses.append(response)
@@ -159,13 +160,14 @@ def feedback_delay_func(responses, block_n, trial_n, training=False):
                 win.logOnFlip('TRAINING T{0} Response: {1}, FRAME TIME = {2}'.format(trial_n,response,win.lastFrameT),logging.DATA)
             response = []
             
-    offset_error = trial_clock.getTime()-interval_dur-feedback_delay-trial_start #this should tell us how accurate the timing of the feedback_delay and total trial was
-    if not training:
-        win.logOnFlip('B{0}_T{1} feedback delay end: {2:.5f}; offset error = {3:.5f}'.format(block_n,trial_n,trial_clock.getTime(),
-                                                            offset_error),logging.INFO)
-    else:                                                    
-        win.logOnFlip('TRAINING T{0} feedback delay end: {1:.5f}; offset error = {2:.5f}'.format(trial_n,trial_clock.getTime(),
-                                                            offset_error),logging.INFO)
+    # !!! Timing test, can be removed later
+#    offset_error = trial_clock.getTime()-interval_dur-feedback_delay-trial_start #this should tell us how accurate the timing of the feedback_delay and total trial was
+#    if not training:
+#        win.logOnFlip('B{0}_T{1} feedback delay end: {2:.5f}; offset error = {3:.5f}'.format(block_n,trial_n,trial_clock.getTime(),
+#                                                            offset_error),logging.INFO)
+#    else:                                                    
+#        win.logOnFlip('TRAINING T{0} feedback delay end: {1:.5f}; offset error = {2:.5f}'.format(trial_n,trial_clock.getTime(),
+#                                                            offset_error),logging.INFO)
 
 
 #===========================
@@ -187,41 +189,42 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
             outcome_win.draw()
             resp_marker.setLineColor('green')
             outcome_str = 'WIN!'
-            tolerance_step_ix = 0
+            win_flag = 0
         else:                                   # LOSS
             outcome_loss.draw()
             resp_marker.setLineColor('red')
             outcome_str = 'LOSE!'
-            tolerance_step_ix = 1
+            win_flag = 1
         resp_marker.setStart((-resp_marker_width/2, interval_vlim[1]-error_height))
         resp_marker.setEnd((resp_marker_width/2, interval_vlim[1]-error_height))
         resp_marker.draw()
         
         if not training:
-            points[block_n]+= point_fn[tolerance_step_ix]
+            points[block_n]+= point_fn[win_flag]
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
         else:
             win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
 
-        tolerances[trial_type]+= tolerance_step[trial_type][tolerance_step_ix]
+        tolerances[trial_type]+= tolerance_step[trial_type][win_flag]
         if tolerances[trial_type] > tolerance_lim[0]:
             tolerances[trial_type] = tolerance_lim[0]
         elif tolerances[trial_type] < tolerance_lim[1]:
             tolerances[trial_type] = tolerance_lim[1]
 
 
-    else:
+    else:   # No response detected
         outcome_loss.draw()
         outcome_str = 'None'
-        #!!! adjust tolerance for this type of trial?
+        # Not adjusting tolerance for this type of trial...
         if block_n:
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,-1,trial_type,tolerances[trial_type]),logging.DATA)
             win.logOnFlip('B{0}_T{1} feedback start: FRAME TIME = {2}'.format(block_n,trial_n,win.lastFrameT),logging.INFO)
         else:
-            win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,-1,trial_type,tolerances[trial_type]),logging.DATA)                    #trigger_rect.draw()
+            win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,-1,trial_type,tolerances[trial_type]),logging.DATA)
             win.logOnFlip('B{0}_T{1} feedback start: FRAME TIME = {2}'.format('T',trial_n,win.lastFrameT),logging.INFO)
+    #if exp_type=='ECoG': trigger_rect.draw()
     win.flip()
-#        port.setData(2)
+#        port.setData(2)    #!!! if exp_type=='EEG'
     while trial_clock.getTime() < feedback_end:
         for press in event.getKeys(keyList=[key,'escape','q']):
             if press in ['escape','q']:
@@ -229,7 +232,7 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
                 core.quit();
 
 #==============================
-# Tower, Bullseye, ball Draw
+# Tower, Bullseye Draw
 #==============================
 
 def tower_ball_draw(bullseye):
@@ -247,8 +250,7 @@ def staircase(trial_type):
     bullseye_radii[trial_type] = np.linspace(min_bullseye_radius, bullseye_height[trial_type], num=n_rings[trial_type])
     for eye_ix, eye in enumerate(bullseyes[trial_type]):
         eye.radius = bullseye_radii[trial_type][eye_ix]
-      
-                    
+
 #==============================
 # Break Between Trial Blocks
 #==============================
@@ -266,6 +268,7 @@ def block_break(block_n): #trial_types, n_blocks=n_blocks, break_min_dur=break_m
         total_point_txt.color = 'red'
     block_point_txt.draw()
     total_point_txt.draw()
+    # If not the last block, print feedback
     if block_n<n_blocks*len(trial_types)-1:
         instr_txt.text = break_str.format(n_blocks*len(trial_types)-block_n-1,break_min_dur)
         instr_txt.draw()
@@ -284,9 +287,9 @@ def block_break(block_n): #trial_types, n_blocks=n_blocks, break_min_dur=break_m
 #============================================================
 # INSTRUCTIONS
 #============================================================
+#!!! if exp_type=='EEG'
 #port = parallel.ParallelPort(address=53504)
 
-#win.logOnFlip('Instructions FRAME TIME = {0}'.format(win.lastFrameT),logging.DATA)
 welcome_txt.draw()
 adv_screen_txt.draw()
 win.flip()
@@ -296,9 +299,11 @@ if adv[0] in ['escape', 'q']:
         core.quit()
 instruction_loop(None, intro=True)
 win.flip()
+
 #============================================================
 # TRAINING
 #============================================================
+#!!! if exp_type=='EEG'
 #port.setData(0) # sets all pins low
 for trial_n in range(n_fullvis+2*n_training):
     #========================================================
@@ -324,13 +329,14 @@ for trial_n in range(n_fullvis+2*n_training):
         instruction_loop(train_str[trial_type])
     #========================================================
     # Set Trial Timing
+    #   NOTE: need to run this outside the function the first time to initialize
     trial_clock.reset()                                                       # In loop as temp variables, may export to variable file
     trial_start = trial_clock.getTime()
     target_time = trial_start + interval_dur
     target_tlim = [target_time-tolerances[trial_type], target_time+tolerances[trial_type]]
     feedback_start = trial_start + interval_dur + feedback_delay
     feedback_end = feedback_start + feedback_dur
-    ITI = np.max(ITIs)       #!!! probably want specific random sequences to be determined ahead of time
+    ITI = np.max(ITIs)
     win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,win.lastFrameT),logging.INFO)
     # Below shouldn't need params because they're all defaults, but if you don't have them here it somehow logs the wrong thing (both if/else statements??)
 #    set_trial_timing(trial_clock, None, trial_type, trial_n, training=True)    # Trial time function Call, not needed because of previous lines
@@ -348,6 +354,7 @@ for trial_n in range(n_fullvis+2*n_training):
     # ITI
     win.logOnFlip('B{0}_T{1} ITI={2}; FRAME TIME = {3}'.format('T',trial_n,ITI,win.lastFrameT),logging.INFO)
     win.flip()
+#!!! if exp_type=='EEG'
 #    port.setData(0)
     # Staircase Tolerance
     staircase(trial_type)
