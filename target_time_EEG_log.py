@@ -14,13 +14,15 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 file_dlg = gui.Dlg(title="Run Information")
 file_dlg.addField('SBJ Code:')
 file_dlg.addField('Parameter Version:')
+file_dlg.addField('Debug Mode? (Y/N):')
 #file_dlg.addField('Response Key:') # Ideally space bar? something more accurate?
 
 file_dlg.show()
 if gui.OK:
-    dlg_resp = file_dlg.data
+    dlg_resp   = file_dlg.data
     log_prefix = dlg_resp[0]
-    param_ver = dlg_resp[1]
+    param_ver  = dlg_resp[1]
+    debug_mode = dlg_resp[2]    #!!! need a logic check that this is y/Y/n/N value
     #key = dlg_resp[1] !!! fix this!!!
     log_filename = '../logs/{0}_response_log_{1}.txt'.format(log_prefix,exp_datetime)
 else: 
