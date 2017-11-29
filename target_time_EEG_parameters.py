@@ -1,43 +1,49 @@
 #target_time parameter file 
 #part of modularization 
-paradigm_version = '1.9.2'
-
+paradigm_version = '2.1'
 
 from psychopy import visual, event, core, gui, logging, data
 #from psychopy import parallel
 import numpy as np
 import math, time, random, shelve
-#random.seed()
-#core.wait(0.5)      # give the system time to settle
-#core.rush(True)     # might give psychopy higher priority in the system (maybe...)
+
 exp_datetime = time.strftime("%Y%m%d%H%M%S")
 paradigm_name = 'target_time'
-
+paradigm_type = 'debug'                        # Choose either 'debug' 'eeg' or 'ecog' depending on desired 
+                                               # duration parameters for trials.  
 
 #============================================================
 # EXPERIMENT PARAMETERS
 #============================================================
 
+
+def experiment_parameters(type):                        #function that selects correct parameter from corresponding dicts 
+    if type == 'debug':
+        return n_fullvis[type], n_training[type], n_blocks[type], n_trials[type], break_min_dur[type], game_height['eeg']
+    return n_fullvis[type], n_training[type], n_blocks[type], n_trials[type], break_min_dur[type], game_height[type]
+
+
+
+#==============================
+#  TRIAL DURATION PARAMETERS  
+#==============================
+
 # probably need debug y/n and eeg/ecog input from the log file, which will then determine the values below
 #   eeg/ecog is needed even if in debug mode, because you need to avoid calls to the parallel port for ECoG and trigger rectangle should appear in ECoG version
-n_fullvis = 1#5                     # number of EASY examples to start (large tolerance, full window)
-    debug = 1
-    eeg = 5
-    ecog = 5
-n_training = 2#15                     # number of training trials PER CONDITION
-    debug = 2
-    eeg/ecog = 15
-n_blocks = 1#4                        # number of blocks of trials PER CONDITION
-    debug = 1
-    eeg = 4
-    ecog = 2
-n_trials = 2#75                       # number of trials PER BLOCK
-    debug = 2
-    eeg = 75
-    ecog = 75
-break_min_dur = 1#30                  # minimum length (in s) for the break between blocks
-    debug = 1
-    eeg/ecog = 30
+n_fullvis = {'debug':1, 'eeg':5, 'ecog':5}                     # number of EASY examples to start (large tolerance, full window)
+    
+n_training = {'debug':2, 'eeg':15, 'ecog':15}                     # number of training trials PER CONDITION
+    
+n_blocks = {'debug':1, 'eeg':4, 'ecog':2}                        # number of blocks of trials PER CONDITION
+    
+n_trials = {'debug':2, 'eeg':75, 'ecog':75}                       # number of trials PER BLOCK
+    
+break_min_dur = {'debug':1, 'eeg':30, 'ecog':30}                  # minimum length (in s) for the break between blocks
+    # Switch these to if else conditions.  Have debug, then ecog/eeg
+#======================================
+#  TOLERANCE AND INTERVAL PARAMETERS  
+#======================================
+
 
 interval_dur = 1                    # duration (in sec) of target time interval
 feedback_delay = 0.8                # duration (in s) of delay between end of interval and feedback onset
@@ -57,10 +63,16 @@ full_screen = True                 # Make the window full screen? (True/False)
 #screen_to_show = 1                 # Select which screen to display the window on
 screen_units = 'cm'                 # Set visual object sizes in cm (constant across all screens)
 
-# Stimulus Parameters
-game_height = 20                    # amount of screen for plotting
-    eeg = 20
-    ecog = 25
+#======================
+# STIMULUS PARAMETERS  
+#======================
+
+
+game_height = {'eeg':20, 'ecog':25}                    # amount of screen for plotting
+
+n_fullvis, n_training, n_blocks, n_trials, break_min_dur, game_height = experiment_parameters(paradigm_type)
+            #!!! Must be called here so game_height is an int for interval_height
+
 interval_height = 0.7*game_height   # % of game_height over which interval_dur occurs
 target_y = 5                        # position of target in y coordinates
 covered_portion = 0.6               # % of interval height obscured by the window when covered=True
