@@ -47,8 +47,8 @@ break_min_dur = {'debug':1, 'eeg':30, 'ecog':30}                  # minimum leng
 
 
 interval_dur = 1                    # duration (in sec) of target time interval
-feedback_delay = 0.8                # duration (in s) of delay between end of interval and feedback onset
-feedback_dur = 0.8                    # duration (in s) of feedback presentation
+feedback_delay = 2                # duration (in s) of delay between end of interval and feedback onset
+feedback_dur = 2                    # duration (in s) of feedback presentation
 ITIs = [0.2, 0.4, 0.7, 1.0]         # length of inter-trial intervals (in s)
 post_instr_delay = 1                # duration of delay (in s) after instructions/break to make sure they're ready
 block_start_dur = 2                 # duration (in s) to display block start text (e.g., "Level _: type")
