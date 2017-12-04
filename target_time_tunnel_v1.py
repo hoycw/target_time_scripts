@@ -105,8 +105,7 @@ def moving_ball(block_n, trial_n, training=False):
                     core.quit();
                 else:
                     response = [press]
-                    print response
-                
+                #!!! Responses captured here were not getting registered.  Initiallized response at top of function to capture response in this loop. 
 #            if pos_ix==1:  #!!! add: and exp_type=='EEG'
     #                port.setData(1)  # sets just this pin to be high
     if not response:
@@ -186,7 +185,7 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
         resp_marker.setEnd(pol2cart(error_angle+270, loop_radius+resp_marker_width/2))
         resp_marker.draw()
 #        print resp_marker.start, resp_marker.end, loop_radius-resp_marker_width/2, error_angle+270, loop_radius+resp_marker_width/2, error_angle+270
-#        print error, error_angle, response, RT
+        print error, error_angle, response, RT
         if not training:
             points[block_n]+= point_fn[win_flag]
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
@@ -241,11 +240,14 @@ def staircase(trial_type):
 #    bullseye_radii[trial_type] = np.linspace(min_bullseye_radius, bullseye_height[trial_type], num=n_rings[trial_type])
 #    for eye_ix, eye in enumerate(bullseyes[trial_type]):
 #        eye.radius = bullseye_radii[trial_type][eye_ix]
-    target_upper_bound[trial_type] = target_upper_bound[trial_type] - tolerances[trial_type]#*360/interval_dur
-    target_origin[trial_type] = target_origin[trial_type] + tolerances[trial_type]#*360/interval_dur
+    target_origin[trial_type] = 180 - (tolerances[trial_type] * angle_ratio)
+    target_upper_bound[trial_type] =  2*tolerances[trial_type]*angle_ratio
     target_zone.visibleWedge = [0, target_upper_bound[trial_type]]
     target_zone.ori = target_origin[trial_type]
-    print target_origin[trial_type], target_upper_bound[trial_type], tolerances[trial_type]*360/interval_dur
+    print 'origin = ', target_origin[trial_type], 'upper =' ,target_upper_bound[trial_type], 'origin+upper=',target_origin[trial_type]+target_upper_bound[trial_type]
+    print 'tolerances = ' ,tolerances[trial_type], '180+(tolerances*angle)=', 180+(tolerances[trial_type]*angle_ratio)
+    print 'visibleWEdge = ', target_zone.visibleWedge, 'tz.ori = ', target_zone.ori
+
 #==============================
 # Break Between Trial Blocks
 #==============================
@@ -320,7 +322,8 @@ for trial_n in range(n_fullvis+2*n_training):
     responses = []
     resp_pos = []
     outcome_str = ''
-#   
+    print 'origin = ', target_origin[trial_type], 'upper =' ,target_upper_bound[trial_type], 'tolerances = ' ,tolerances[trial_type]
+
     # Instructions
     if (trial_n==n_fullvis) or (trial_n==n_fullvis+n_training):                    # First Easy/Hard Training
         instruction_loop(train_str[trial_type])

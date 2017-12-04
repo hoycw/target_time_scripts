@@ -71,15 +71,15 @@ screen_units = 'cm'                 # Set visual object sizes in cm (constant ac
 # STIMULUS PARAMETERS  
 #======================
 
-easy_size = angle_ratio * ((tolerances['easy'] - interval_dur) + (tolerances['easy'] + interval_dur))  # Get angle of +/- tolerance from interval_dur
-hard_size = angle_ratio * ((tolerances['hard'] - interval_dur) + (tolerances['hard'] + interval_dur))
-easy_origin = (360 - (tolerances['easy'] * angle_ratio)) + 180   # zero starts at 12 oclock for radial stim.  
-hard_origin = (360 - (tolerances['hard'] * angle_ratio)) + 180
-target_upper_bound = {'easy':easy_size, 
-                    'hard':hard_size}
+easy_upper_init = angle_ratio * (tolerances['easy']*2)  # Get angle of +/- tolerance from interval_dur
+hard_upper_init = angle_ratio * (tolerances['hard']*2) 
+easy_origin = 180 - (tolerances['easy'] * angle_ratio)   # zero starts at 12 oclock for radial stim.  
+hard_origin = 180 - (tolerances['hard'] * angle_ratio) 
+target_upper_bound = {'easy':easy_upper_init, 
+                    'hard':hard_upper_init}
 target_origin = {'easy':easy_origin, 
                 'hard':hard_origin} #!!! Strange indexing, -0 ending sets too far to right
-print hard_size, hard_origin, easy_size, easy_origin
+print 'hard bound = ', hard_upper_init, 'origin' , hard_origin,' easy bound = ',  easy_upper_init, 'origin =',easy_origin
 
 
 game_height = {'eeg':20, 'ecog':25}                    # amount of screen for plotting

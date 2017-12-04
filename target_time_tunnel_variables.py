@@ -88,7 +88,7 @@ resp_marker = visual.Line(win, start=(-resp_marker_width/2, 0),
 #===================================================
 
 target_zone = visual.RadialStim(win, tex='sqrXsqr', color='green', size=(loop_radius*2) + target_width,  #!!! size = diameter
-    visibleWedge=[0, target_upper_bound['easy']], radialCycles=0, angularCycles=0, interpolate=False,
+    visibleWedge=[0, target_upper_bound['easy']], radialCycles=1, angularCycles=1, interpolate=False,
     autoLog=False, units='cm')  
 
 #trial_cover = visual.RadialStim(win, tex='sqrXsqr', color=0, size=19,
@@ -103,7 +103,7 @@ target_zone_cover = visual.Circle(win, radius = loop_radius - target_width/2, ed
 
 # Light Stimuli
 
-circ_angles = np.array([float(pos_ix)*(360/float(n_circ))-90 for pos_ix in range(n_circ)])
+circ_angles = np.linspace(-90,270,n_circ) #np.array([float(pos_ix)*(360/float(n_circ))-90 for pos_ix in range(n_circ)])
 circ_radius = [loop_radius] * n_circ
 circ_X, circ_Y = pol2cart(circ_angles,circ_radius)
 circ_colors = [(-1,-1,-1)] * n_circ
