@@ -31,6 +31,8 @@ from target_time_EEG_variables import*
 # displays instructions for current trial type
 #==============================================
 
+
+
 def instruction_loop(instrs, intro=False):
     # If intro=True, instrs won't be used (can just be '') 
     if intro:
@@ -181,7 +183,7 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
         outcome_loss.draw()
         outcome_str = 'None'
         # Not adjusting tolerance for this type of trial...
-        if block_n:
+        if not training:
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,-1,trial_type,tolerances[trial_type]),logging.DATA)
             win.logOnFlip('B{0}_T{1} feedback start: FRAME TIME = {2}'.format(block_n,trial_n,win.lastFrameT),logging.INFO)
         else:

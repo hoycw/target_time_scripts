@@ -52,19 +52,19 @@ while len(result_list[result_list >= 3]) != 0:      #checks for 3 or more consec
 print 'block_order = ', block_order
 
 # Feedback Stimuli
-bullseyes       = {}
-bullseye_height = {}   # height of target+/- tolerance in screen_units
-bullseye_radii  = {}
-min_bullseye_radius = tolerance_lim[1]*interval_height/interval_dur
-bullseye_colors = [color_list[np.mod(ix,2)] for ix in range(n_rings['easy'])]   # use longer list for both
-for trial_type in trial_types:
-    bullseye_height[trial_type] = interval_height*tolerances[trial_type]/interval_dur
-    bullseye_radii[trial_type] = np.linspace(min_bullseye_radius, bullseye_height[trial_type], num=n_rings[trial_type])
-    print trial_type, ' bullseye: ', zip(bullseye_radii[trial_type],bullseye_colors)
-    bullseyes[trial_type] = [visual.Circle(win, radius=radius, pos=[0,target_y],
-                            fillColor=color, lineColor=None,
-                            name='bullseye_{0}'.format(trial_type))\
-                            for radius, color in zip(bullseye_radii[trial_type],bullseye_colors)]
+#bullseyes       = {}
+#bullseye_height = {}   # height of target+/- tolerance in screen_units
+#bullseye_radii  = {}
+#min_bullseye_radius = tolerance_lim[1]*interval_height/interval_dur
+#bullseye_colors = [color_list[np.mod(ix,2)] for ix in range(n_rings['easy'])]   # use longer list for both
+#for trial_type in trial_types:
+#    bullseye_height[trial_type] = interval_height*tolerances[trial_type]/interval_dur
+#    bullseye_radii[trial_type] = np.linspace(min_bullseye_radius, bullseye_height[trial_type], num=n_rings[trial_type])
+#    print trial_type, ' bullseye: ', zip(bullseye_radii[trial_type],bullseye_colors)
+#    bullseyes[trial_type] = [visual.Circle(win, radius=radius, pos=[0,target_y],
+#                            fillColor=color, lineColor=None,
+#                            name='bullseye_{0}'.format(trial_type))\
+#                            for radius, color in zip(bullseye_radii[trial_type],bullseye_colors)]
 
 
 
@@ -78,35 +78,32 @@ outcome_loss = visual.TextStim(win,text='Lose!',height=2,units='cm',
 feedback_str = 'B{0}_T{1}: Outcome={2}; RT = {3}; trial_type = {4}; tolerance = {5}'
 feedback_txt = visual.TextStim(win,text='',height=1,units='cm',
                                 name='feedback_timing', color='black',pos=(0,-3),wrapWidth=14)
-resp_marker = visual.Line(win, start=(-resp_marker_width/2, target_y),
-                                end=(resp_marker_width/2, target_y),
+resp_marker = visual.Line(win, start=(-resp_marker_width/2, 0),
+                                end=(resp_marker_width/2, 0),
                                 lineColor='blue', lineWidth=resp_marker_thickness)
 
 
 #===================================================
-# Tunnel, Track, Cover, and Target Zone Parameters
+# Circle and Target Zone Parameters
 #===================================================
 
-target_zone = visual.RadialStim(win, tex='sqrXsqr', color=(50,205,50), size=20.0,
-    visibleWedge=[0, 30], radialCycles=0, angularCycles=0, interpolate=False,
-    autoLog=False)  
+target_zone = visual.RadialStim(win, tex='sqrXsqr', color='green', size=(loop_radius*2) + target_width,  #!!! size = diameter
+    visibleWedge=[0, target_upper_bound['easy']], radialCycles=0, angularCycles=0, interpolate=False,
+    autoLog=False, units='cm')  
 
-trial_cover = visual.RadialStim(win, tex='sqrXsqr', color=0, size=19,
-    visibleWedge=[0, 220], radialCycles=0, angularCycles=0, interpolate=False,
-    autoLog=False)  
+#trial_cover = visual.RadialStim(win, tex='sqrXsqr', color=0, size=19,
+#    visibleWedge=[0, 220], radialCycles=0, angularCycles=0, interpolate=False,
+#    autoLog=False)  
 
-circle_cover = visual.Circle(win, radius = 8.1, edges=100, lineColor=None, fillColor=[0, 0, 0]) # Covers center of wedges used to draw tunnel and taret zone
-
- 
-
-trial_cover.ori = 200          # Right aligned starting point of wedges in degrees
-target_zone.ori = 166
+target_zone_cover = visual.Circle(win, radius = loop_radius - target_width/2, edges=100, lineColor=None, fillColor=[0, 0, 0]) # Covers center of wedges used to draw tunnel and taret zone
+#trial_cover.ori = 200          # Right aligned starting point of wedges in degrees
+#target_zone.ori = target_origin['easy']  #!!! softcode later
 
 
 
 # Light Stimuli
-circ_speed = 0.4  # in 0.1s, used with core wait to pause rotation loop 
-circ_angles = np.array([pos_ix*(360/n_circ)-90 for pos_ix in range(n_circ)])
+
+circ_angles = np.array([float(pos_ix)*(360/float(n_circ))-90 for pos_ix in range(n_circ)])
 circ_radius = [loop_radius] * n_circ
 circ_X, circ_Y = pol2cart(circ_angles,circ_radius)
 circ_colors = [(-1,-1,-1)] * n_circ
@@ -115,18 +112,18 @@ circles = visual.ElementArrayStim(win, nElements=n_circ,sizes=circ_size,xys = zi
                            colors=circ_colors)
 
 # Window into tower
-windows = {True: visual.Rect(win, width=window_width, height=interval_height*(1-covered_portion),
-                        pos=(0,target_y-(interval_height*covered_portion)-(interval_height*(1-covered_portion)/2)),
-                        fillColor='black', lineColor=None,
-                        opacity=0.5, name='window'),
-           False: visual.Rect(win, width=window_width, height=interval_height,
-                        pos=(0,target_y-interval_height/2),
-                        fillColor='black', lineColor=None,
-                        opacity=0.5, name='window')}
+#windows = {True: visual.Rect(win, width=window_width, height=interval_height*(1-covered_portion),
+#                        pos=(0,target_y-(interval_height*covered_portion)-(interval_height*(1-covered_portion)/2)),
+#                        fillColor='black', lineColor=None,
+#                        opacity=0.5, name='window'),
+#           False: visual.Rect(win, width=window_width, height=interval_height,
+#                        pos=(0,target_y-interval_height/2),
+#                        fillColor='black', lineColor=None,
+#                        opacity=0.5, name='window')}
 #!!! rename this shitty thing
-window_tops = {True: target_y-(interval_height*covered_portion),
-                False: target_y}
-assert not bullseyes['easy'][-1].contains(x=0,y=window_tops[True])     # top of window doesn't hit the bullseye
+#window_tops = {True: target_y-(interval_height*covered_portion),
+#                False: target_y}
+#assert not bullseyes['easy'][-1].contains(x=0,y=window_tops[True])     # top of window doesn't hit the bullseye
 
 #================
 #  Ball Timing
@@ -138,14 +135,14 @@ print 'Visual interval  = {0}; n_interval_flips = {1}'.format(n_int_flips*frame_
 #!!! check if n_trials/N-blocks==integer
 
 # Ball Stimuli
-interval_lim = [120, 360]        #!!!! Hardcoded Degree limits of the interval in screen units
-assert interval_lim[0] >= -game_height/2                   # make sure interval is within the game screen
+#interval_lim = [120, 360]        #!!!! Hardcoded Degree limits of the interval in screen units
+#assert interval_lim[0] >= -game_height/2                   # make sure interval is within the game screen
 
-ball_ys, ball_step = np.linspace(interval_lim[0], interval_lim[1], n_int_flips, retstep=True)
-balls = [visual.Circle(win, radius=ball_radius, fillColor='blue', lineColor='white',
-                        pos=[0,ball_y], autoDraw=False) for ball_y in ball_ys]
-hidden_pos = {True: [(ball_y > window_tops[True]-ball_radius/2) for ball_y in ball_ys],
-              False: [(ball_y > window_tops[False]-ball_radius/2) for ball_y in ball_ys]}
+#ball_ys, ball_step = np.linspace(interval_lim[0], interval_lim[1], n_int_flips, retstep=True)
+#balls = [visual.Circle(win, radius=ball_radius, fillColor='blue', lineColor='white',
+#                        pos=[0,ball_y], autoDraw=False) for ball_y in ball_ys]
+hidden_pos = {True: [(circ_start[circ_xi] > (1-covered_portion)*interval_dur) for circ_xi in range(n_circ)],
+              False: [(False) for circ_xi in range(n_circ)]}
 
 # Photodiode Trigger Rectangle
 trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_height, units='pix',

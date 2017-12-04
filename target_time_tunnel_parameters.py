@@ -45,6 +45,9 @@ break_min_dur = {'debug':1, 'eeg':30, 'ecog':30}                  # minimum leng
 #  TOLERANCE AND INTERVAL PARAMETERS  
 #======================================
 
+n_circ = 50
+circ_size = .3
+
 
 interval_dur = 1                    # duration (in sec) of target time interval
 feedback_delay = 2                # duration (in s) of delay between end of interval and feedback onset
@@ -52,7 +55,7 @@ feedback_dur = 2                    # duration (in s) of feedback presentation
 ITIs = [0.2, 0.4, 0.7, 1.0]         # length of inter-trial intervals (in s)
 post_instr_delay = 1                # duration of delay (in s) after instructions/break to make sure they're ready
 block_start_dur = 2                 # duration (in s) to display block start text (e.g., "Level _: type")
-
+angle_ratio = 360/float(interval_dur)
 tolerances = {'easy':0.125,           # Tolerance (in s) on either side of the target interval 
              'hard':0.05}            # e.g., interval-tolerance < correct_RT < interval+ tolerance
 tolerance_step = {'easy': [-0.003,0.012],
@@ -68,29 +71,34 @@ screen_units = 'cm'                 # Set visual object sizes in cm (constant ac
 # STIMULUS PARAMETERS  
 #======================
 
-#CIRCLE PARAMETERS
+easy_size = angle_ratio * ((tolerances['easy'] - interval_dur) + (tolerances['easy'] + interval_dur))  # Get angle of +/- tolerance from interval_dur
+hard_size = angle_ratio * ((tolerances['hard'] - interval_dur) + (tolerances['hard'] + interval_dur))
+easy_origin = (360 - (tolerances['easy'] * angle_ratio)) + 180   # zero starts at 12 oclock for radial stim.  
+hard_origin = (360 - (tolerances['hard'] * angle_ratio)) + 180
+target_upper_bound = {'easy':easy_size, 
+                    'hard':hard_size}
+target_origin = {'easy':easy_origin, 
+                'hard':hard_origin} #!!! Strange indexing, -0 ending sets too far to right
+print hard_size, hard_origin, easy_size, easy_origin
 
-n_circ = 10
-circ_size = 1
-loop_radius = 9
-loop_circum = 7
 
 game_height = {'eeg':20, 'ecog':25}                    # amount of screen for plotting
-
+loop_radius = 10
+target_width = 1.5  # in cm 
 n_fullvis, n_training, n_blocks, n_trials, break_min_dur, game_height = experiment_parameters(paradigm_type)
             #!!! Must be called here so game_height is an int for interval_height
+circ_start = [circ_ix * (interval_dur/float(n_circ)) for circ_ix in range(n_circ)]
 
 interval_height = 0.7*game_height   # % of game_height over which interval_dur occurs
-target_y = 5                        # position of target in y coordinates
 covered_portion = 0.6               # % of interval height obscured by the window when covered=True
-tower_width = 0.4*interval_height   # Width of the tower containing the window (with target at top)
-ball_radius = 0.35                  # Radius of the moving ball stimulus
-window_width = 0.8                  # Width of the window around the ball (ideally > ball_radius)
+#tower_width = 0.4*interval_height   # Width of the tower containing the window (with target at top)
+#ball_radius = 0.35                  # Radius of the moving ball stimulus
+#window_width = 0.8                  # Width of the window around the ball (ideally > ball_radius)
 #xhr_thickness = 5                  # Thickness of the crosshair on top of the bullseye
-resp_marker_width = ball_radius*3   # Width of the response marker (marks where they pressed the button)
+resp_marker_width = 2.5   # Width of the response marker (marks where they pressed the button)
 resp_marker_thickness = 4           # Thickness of the response marker
-n_rings = {'easy': 7,               # number of rings in the bullseye for each condition
-           'hard': 5}
+#n_rings = {'easy': 7,               # number of rings in the bullseye for each condition
+#           'hard': 5}
 trial_types = ['easy', 'hard']      # labels of the trial conditions
 color_list = ['white','black']      # alternating colors of the bullseye: [center, next_level, center, ...]
 trigger_rect_height = 150           # height of the photodiode trigger rectangle IN PIXELS (based on 1920x1080 screen)

@@ -1,5 +1,7 @@
 from psychopy import visual, event, core, gui, logging, data
 from psychopy import parallel
+from psychopy.tools.coordinatetools import pol2cart
+
 import numpy as np
 import math, time, random
 #from psychopy.tools.coordinatetools import pol2cart
@@ -22,7 +24,6 @@ from target_time_tunnel_parameters import*
 # SET EXPERIMENTAL VARIABLES
 #============================================================
 from target_time_tunnel_variables import*
-
 #============================
 # DEFINE PARADIGM FUNCTIONS
 #============================
@@ -83,6 +84,7 @@ def set_trial_timing(trial_clock, block_n, trial_type, trial_n, training=False):
 #===========================
 
 def moving_ball(block_n, trial_n, training=False):
+    response = False
     for circ_xi in range(n_circ):#-sum(hidden_pos[covered])):
     # Drawing Order (back-to-front): (outlines?), tower, window, ball, bullseye 
         tower_ball_draw()
@@ -91,25 +93,32 @@ def moving_ball(block_n, trial_n, training=False):
         circ_colors[circ_xi] = (1,1,1)
         circles.colors = circ_colors
         circles.draw()
-        if covered:
-            trial_cover.draw()
+#        if covered:
+#            trial_cover.draw()
         win.flip()
         circ_colors[circ_xi] = (-1,-1,-1)
         circles.colors = circ_colors
-        core.wait(circ_speed)
-        if event.getKeys('escape'):
-            win.close()
-            core.quit()
+        while trial_clock.getTime() < trial_start + circ_start[circ_xi]:
+            for press in event.getKeys(keyList=[key,'escape','q'], timeStamped=trial_clock):
+                if press in ['escape','q']:
+                    win.close();
+                    core.quit();
+                else:
+                    response = [press]
+                    print response
+                
 #            if pos_ix==1:  #!!! add: and exp_type=='EEG'
     #                port.setData(1)  # sets just this pin to be high
+    if not response:
         response = event.getKeys(keyList=key, timeStamped=trial_clock)  #!!! responses here still tied to flips?
-        if len(response)>0:
-            responses.append(response)
-            if not training:
-                win.logOnFlip('B{0}_T{1} Response: {2}, FRAME TIME = {3}'.format(block_n,trial_n,response,win.lastFrameT),logging.DATA)
-            else:
-                win.logOnFlip('TRAINING T{0} Response: {1}, FRAME TIME = {2}'.format(trial_n,response,win.lastFrameT),logging.DATA)
-            response = []
+
+    if len(response)>0:
+        responses.append(response)
+        if not training:
+            win.logOnFlip('B{0}_T{1} Response: {2}, FRAME TIME = {3}'.format(block_n,trial_n,response,win.lastFrameT),logging.DATA)
+        else:
+            win.logOnFlip('TRAINING T{0} Response: {1}, FRAME TIME = {2}'.format(trial_n,response,win.lastFrameT),logging.DATA)
+        response = []
         
 #============================
 #  Feedback Delay 
@@ -161,9 +170,8 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
                             block_n, trial_n, responses),logging.WARNING)
         response = responses[0]         # take the first response
         RT = response[0][1]-trial_start
-        error = interval_dur-RT
-        error_height = error*interval_height/interval_dur
-
+        error =  RT - interval_dur 
+        error_angle = error*angle_ratio
         if np.abs(error)<tolerances[trial_type]:             # WIN
             outcome_win.draw()
             resp_marker.setLineColor('green')
@@ -174,10 +182,11 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
             resp_marker.setLineColor('red')
             outcome_str = 'LOSE!'
             win_flag = 1
-        resp_marker.setStart((-resp_marker_width/2, interval_lim[1]-error_height))
-        resp_marker.setEnd((resp_marker_width/2, interval_lim[1]-error_height))
+        resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
+        resp_marker.setEnd(pol2cart(error_angle+270, loop_radius+resp_marker_width/2))
         resp_marker.draw()
-        
+#        print resp_marker.start, resp_marker.end, loop_radius-resp_marker_width/2, error_angle+270, loop_radius+resp_marker_width/2, error_angle+270
+#        print error, error_angle, response, RT
         if not training:
             points[block_n]+= point_fn[win_flag]
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
@@ -209,6 +218,7 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
             if press in ['escape','q']:
                 win.close();
                 core.quit();
+    
 
 #==============================
 # Tower, Bullseye Draw
@@ -220,18 +230,22 @@ def tower_ball_draw():#):
 #    for eye in reversed(bullseye):  #draw them all in reverse order
 #        eye.draw()
     target_zone.draw()
-    circle_cover.draw()
+    target_zone_cover.draw()
 #        
 #==============================
 # Difficulty Staircase Function
 #==============================
 
 def staircase(trial_type): 
-    bullseye_height[trial_type] = interval_height*tolerances[trial_type]/interval_dur
-    bullseye_radii[trial_type] = np.linspace(min_bullseye_radius, bullseye_height[trial_type], num=n_rings[trial_type])
-    for eye_ix, eye in enumerate(bullseyes[trial_type]):
-        eye.radius = bullseye_radii[trial_type][eye_ix]
-
+#    bullseye_height[trial_type] = interval_height*tolerances[trial_type]/interval_dur
+#    bullseye_radii[trial_type] = np.linspace(min_bullseye_radius, bullseye_height[trial_type], num=n_rings[trial_type])
+#    for eye_ix, eye in enumerate(bullseyes[trial_type]):
+#        eye.radius = bullseye_radii[trial_type][eye_ix]
+    target_upper_bound[trial_type] = target_upper_bound[trial_type] - tolerances[trial_type]#*360/interval_dur
+    target_origin[trial_type] = target_origin[trial_type] + tolerances[trial_type]#*360/interval_dur
+    target_zone.visibleWedge = [0, target_upper_bound[trial_type]]
+    target_zone.ori = target_origin[trial_type]
+    print target_origin[trial_type], target_upper_bound[trial_type], tolerances[trial_type]*360/interval_dur
 #==============================
 # Break Between Trial Blocks
 #==============================
@@ -299,12 +313,14 @@ for trial_n in range(n_fullvis+2*n_training):
         trial_type = 'hard'
     win.logOnFlip('TRAINING T{0}: window={1}; type={2}'.format(trial_n,covered,trial_type),logging.INFO)
     event.clearEvents()
-    bullseye = bullseyes[trial_type]
-    window = windows[covered]
+    target_zone.visibleWedge = [0, target_upper_bound[trial_type]]
+    target_zone.ori = target_origin[trial_type]
+#    bullseye = bullseyes[trial_type]
+#    window = windows[covered]
     responses = []
     resp_pos = []
     outcome_str = ''
-    
+#   
     # Instructions
     if (trial_n==n_fullvis) or (trial_n==n_fullvis+n_training):                    # First Easy/Hard Training
         instruction_loop(train_str[trial_type])
@@ -354,8 +370,8 @@ outcome_win.text = '+{0}'.format(point_fn[0])
 outcome_loss.text = '{0}'.format(point_fn[1])
 for block_n, block_type in enumerate(block_order):
     trial_type = trial_types[block_type]
-    bullseye = bullseyes[trial_type]
-    window = windows[covered]
+#    bullseye = bullseyes[trial_type]
+#    window = windows[covered]
     block_start_txt.text = block_start_str.format(block_n+1, n_blocks*len(trial_types), trial_type)
     block_start_txt.draw()
     win.logOnFlip('B{0} ({1}) Start Text: FRAMETIME = {2}'.format(block_n,trial_type,win.lastFrameT),logging.INFO)
