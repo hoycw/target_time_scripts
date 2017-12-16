@@ -6,6 +6,7 @@ from psychopy import visual, event, core, gui, logging, data
 #from psychopy import parallel
 import numpy as np
 import math, time, random
+from itertools import groupby
 #import target_time_EEG_log
 from target_time_cyclone_parameters import*
 
@@ -26,24 +27,15 @@ if paradigm_type == 'ecog':
     block_order = np.array([0, 0, 1, 1])
 else:
     block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])   #!!! consider counterbalancing future participants
-def count_check(some_array):    #function that takes an array as argument and returns an array with the count of 
-    result_list = np.array([])  #consecutive numbers that are same. For eg [0,0,0,1,0,1,1] would return [3,1,1,2]
-    current = some_array[0]
-    count = 0 
-    for value in some_array:
-        if value == current:
-            count += 1
-        else:
-            result_list = np.append(result_list, count)
-            current = value
-            count = 1 
-    result_list = np.append(result_list,count)
-    return result_list
+def repeat_cnt(sequence):
+    # count the number of equivalent neighbors in a sequence
+    # e.g., repeat_cnt([4 2 3 3 6 10 7 7 7]) = [1 1 2 1 1 3]
+    return [sum(1 for _ in group) for _, group in groupby(sequence)]
 
-result_list = count_check(block_order)
-while len(result_list[result_list >= 3]) != 0:      #checks for 3 or more consecutive same numbers. If present, will recompute permutation till less than 3 present
-            block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])
-            result_list = count_check(block_order)
+block_repeat_cnt = repeat_cnt(block_order)
+while len(block_repeat_cnt[block_repeat_cnt >= 3]) != 0:      #checks for 3 or more consecutive same numbers. If present, will recompute permutation till less than 3 present
+    block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])
+    block_repeat_cnt = repeat_cnt(block_order)
 print 'block_order = ', block_order
 
 
