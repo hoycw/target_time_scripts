@@ -26,7 +26,7 @@ n_fullvis     = {'debug':1, 'eeg':5,  'ecog':5}                   # number of EA
 n_training    = {'debug':2, 'eeg':15, 'ecog':15}                  # number of training trials PER CONDITION
 n_blocks      = {'debug':1, 'eeg':4,  'ecog':2}                   # number of blocks of trials PER CONDITION
 n_trials      = {'debug':2, 'eeg':75, 'ecog':75}                  # number of trials PER BLOCK
-break_min_dur = {'debug':1, 'eeg':30, 'ecog':30}                  # minimum length (in s) for the break between blocks
+break_min_dur = {'debug':1, 'eeg':20, 'ecog':20}                  # minimum length (in s) for the break between blocks
 n_fullvis, n_training, n_blocks, n_trials, break_min_dur = experiment_parameters(paradigm_type)
 #!!! check if n_trials/N-blocks==integer
 

@@ -20,7 +20,7 @@ win = visual.Window(size=(1920, 1200), fullscr=True, color=(0,0,0),
                     monitor='testMonitor',
                     allowGUI=False, units='cm')#, waitBlanking=False); # !!! check on this waitBlank parameter!
 target_zone = visual.RadialStim(win, tex='sqrXsqr', color='green', size=(loop_radius*2) + target_width,  # size = diameter
-    visibleWedge=[0, target_upper_bound], radialCycles=1, angularCycles=0, interpolate=False,
+    visibleWedge=[0, target_upper_bound], radialCycles=1, angularCycles=0, angularRes=500, interpolate=False,
     autoLog=False, units='cm')  
 target_zone.visibleWedge = [0, target_upper_bound]
 target_zone.ori = target_origin
@@ -39,7 +39,7 @@ circles = visual.ElementArrayStim(win, nElements=n_circ,sizes=.3,xys = zip(circ_
 
 # Plot first time
 target_zone.draw()
-target_zone_cover.draw()
+#target_zone_cover.draw()
 circles.draw()
 win.flip()
 print 'origin = ', target_origin, 'upper =' ,target_upper_bound, 'origin+upper=',target_origin+target_upper_bound
@@ -56,7 +56,7 @@ core.wait(3)
 
 # Plot again, check for asymmetry
 target_zone.draw()
-target_zone_cover.draw()
+#target_zone_cover.draw()
 circles.draw()
 win.flip()
 print 'origin = ', target_origin, 'upper =' ,target_upper_bound, 'origin+upper=',target_origin+target_upper_bound
