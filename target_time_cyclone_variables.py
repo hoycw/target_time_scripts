@@ -33,7 +33,7 @@ def repeat_cnt(sequence):
     return [sum(1 for _ in group) for _, group in groupby(sequence)]
 
 block_repeat_cnt = repeat_cnt(block_order)
-while len(block_repeat_cnt[block_repeat_cnt >= 3]) != 0:      #checks for 3 or more consecutive same numbers. If present, will recompute permutation till less than 3 present
+while any([cnt>=3 for cnt in block_repeat_cnt]):      #checks for 3 or more consecutive same numbers. If present, will recompute permutation till less than 3 present
     block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])
     block_repeat_cnt = repeat_cnt(block_order)
 print 'block_order = ', block_order
