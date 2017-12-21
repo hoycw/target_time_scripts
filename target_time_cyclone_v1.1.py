@@ -61,17 +61,19 @@ def set_trial_timing(trial_clock, block_n, trial_type, trial_n, training=False):
 #===================================================
 def moving_ball(block_n, trial_n, training=False):
     response = False
-    for circ_xi in range(n_circ):#-sum(hidden_pos[covered])):
+    
+    for circ_xi in range(n_circ):# - sum(hidden_pos[covered])):
         # Draw stimuli
         target_zone_draw()
+       
         #if trial_clock.getTime() < trigger_dur:
             #trigger_rect.draw()
         circ_colors[circ_xi] = (1,1,1)      # Turn light on
         circles.colors = circ_colors
         circles.draw()
         win.flip()
-        
-        circ_colors[circ_xi] = (-1,-1,-1)   # Turn light back off
+        circ_colors[circ_xi] = flip_list[circ_xi]  # Turn light back off
+#        print covered, circ_xi, circ_colors[circ_xi],re_flip_color[covered][circ_xi]
         circles.colors = circ_colors
         while trial_clock.getTime() < trial_start + circ_start[circ_xi]:
             for press in event.getKeys(keyList=[key,'escape','q'], timeStamped=trial_clock):
@@ -232,6 +234,7 @@ def block_break(block_n): #trial_types, n_blocks=n_blocks, break_min_dur=break_m
 def target_zone_draw():
     target_zone.draw()
     target_zone_cover.draw()
+    sockets.draw()
 
 
 #============================================================
@@ -275,7 +278,12 @@ for trial_n in range(n_fullvis+2*n_training):
     target_zone.visibleWedge = [0, target_upper_bound[trial_type]]
     target_zone.ori = target_origin[trial_type]
     print 'origin = ', target_origin[trial_type], 'upper =' ,target_upper_bound[trial_type], 'tolerances = ' ,tolerances[trial_type]
-    
+    if covered:
+        circ_colors = [i for i in circ_cover_list]
+        circles.colors = circ_colors
+    flip_list = re_flip_color[covered]
+    print flip_list
+        
     # Instructions
     if (trial_n==n_fullvis) or (trial_n==n_fullvis+n_training):                    # First Easy/Hard Training
         instruction_loop(train_str[trial_type])

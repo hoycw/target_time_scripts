@@ -56,7 +56,8 @@ full_screen = True                 # Make the window full screen? (True/False)
 screen_units = 'cm'                 # Set visual object sizes in cm (constant across all screens)
 
 n_circ = 30
-circ_size = .5
+circ_size = .3
+socket_size = .5
 loop_radius = 10
 target_width = 1.5  # in cm 
 

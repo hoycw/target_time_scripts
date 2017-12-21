@@ -65,13 +65,27 @@ angle_ratio = 360/float(interval_dur)
 circ_angles = np.linspace(-90,270,n_circ) #np.array([float(pos_ix)*(360/float(n_circ))-90 for pos_ix in range(n_circ)])
 circ_radius = [loop_radius] * n_circ
 circ_X, circ_Y = pol2cart(circ_angles,circ_radius)
-circ_colors = [(-1,-1,-1)] * n_circ
-circles = visual.ElementArrayStim(win, nElements=n_circ,sizes=circ_size,xys = zip(circ_X, circ_Y),
-                           elementTex = None, elementMask = "circle",
-                           colors=circ_colors)
 circ_start = [circ_ix * (interval_dur/float(n_circ)) for circ_ix in range(n_circ)]  # onset time of each light
 hidden_pos = {True: [(circ_start[circ_xi] > (1-covered_portion)*interval_dur) for circ_xi in range(n_circ)],
               False: [(False) for circ_xi in range(n_circ)]}
+circ_default = [(-1,-1,-1)] * n_circ
+circ_colors = [i for i in circ_default]
+circ_covers = [(0,0,0)] *(n_circ - (n_circ - sum(hidden_pos[True])))
+circ_cover_list = []
+circ_cover_list[:(n_circ - sum(hidden_pos[True]))] = circ_default
+circ_cover_list[(n_circ - sum(hidden_pos[True])):] = circ_covers
+re_flip_color = {False:circ_default, True:circ_cover_list}
+print re_flip_color[False], re_flip_color[True]
+#circ_colors = {True:circ_cover_list, False:circ_default} 
+#print len(circ_cover_list), (n_circ - sum(hidden_pos[True])), len(circ_covers)
+
+socket_colors = circ_colors
+circles = visual.ElementArrayStim(win, nElements=n_circ,sizes=circ_size,xys = zip(circ_X, circ_Y),
+                           elementTex = None, elementMask = "circle",
+                           colors=circ_colors)
+sockets = visual.ElementArrayStim(win, nElements=n_circ,sizes=socket_size,xys = zip(circ_X, circ_Y),
+                           elementTex = None, elementMask = "circle",
+                           colors=socket_colors)
 
 #---------------------------------------------------
 # Target Zone
@@ -84,7 +98,7 @@ print 'easy bound = ', target_upper_bound['easy'], 'origin' , target_origin['eas
 
 target_zone = visual.RadialStim(win, tex='sqrXsqr', color='green', size=(loop_radius*2) + target_width, # size = diameter
     visibleWedge=[0, target_upper_bound['easy']], radialCycles=1, angularCycles=0, interpolate=False,   # radialCycles=1 to avoid color flip
-    autoLog=False, units='cm')
+    autoLog=False, units='cm', angularRes=500)
 target_zone_cover = visual.Circle(win, radius = loop_radius - target_width/2, edges=100,
                 lineColor=None, fillColor=[0, 0, 0]) # Covers center of wedge used to draw taret zone
 # target_zone.ori = target_origin['easy']  # Right edge starting point of wedge in degrees
