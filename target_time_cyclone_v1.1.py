@@ -68,7 +68,10 @@ def moving_ball(block_n, trial_n, training=False):
        
         #if trial_clock.getTime() < trigger_dur:
             #trigger_rect.draw()
-        circ_colors[circ_xi] = (1,1,1)      # Turn light on
+        if circ_xi >= (n_circ - sum(hidden_pos[covered])):
+            circ_colors[circ_xi] = (0,0,0)
+        else:
+            circ_colors[circ_xi] = (1,1,1)      # Turn light on
         circles.colors = circ_colors
         circles.draw()
         win.flip()
@@ -144,11 +147,13 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
         error_angle = error*angle_ratio
         if np.abs(error)<tolerances[trial_type]:             # WIN
             outcome_win.draw()
+            outcome_win_pic.draw()
             resp_marker.setLineColor('green')
             outcome_str = 'WIN!'
             win_flag = 0
         else:                                   # LOSS
             outcome_loss.draw()
+            outcome_loss_pic.draw()
             resp_marker.setLineColor('red')
             outcome_str = 'LOSE!'
             win_flag = 1
@@ -281,6 +286,7 @@ for trial_n in range(n_fullvis+2*n_training):
     if covered:
         circ_colors = [i for i in circ_cover_list]
         circles.colors = circ_colors
+    fill_list = re_fill_color[covered]
     flip_list = re_flip_color[covered]
     print flip_list
         

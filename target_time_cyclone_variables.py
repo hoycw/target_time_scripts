@@ -53,6 +53,13 @@ outcome_loss = visual.TextStim(win,text='Lose!',height=2,units='cm',
 feedback_str = 'B{0}_T{1}: Outcome={2}; RT = {3}; trial_type = {4}; tolerance = {5}'
 feedback_txt = visual.TextStim(win,text='',height=1,units='cm',
                                 name='feedback_timing', color='black',pos=(0,-3),wrapWidth=14)
+surprise_pic_list = ['surprise001.jpg', 'surprise003.jpg', 'surprise004.jpg', 'surprise006.jpg', 'surprise010.jpg',
+                      'surprise012.jpg', 'surprise014.jpg', 'surprise015.jpg', 'surprise016.jpg', 'surprise017.jpg',
+                       'surprise023.jpg', 'surprise025.jpg', 'surprise026.jpg', 'surprise028.jpg', 'surprise029.jpg',
+                        'surprise031.jpg']
+outcome_win_pic = visual.ImageStim(win, image='stimuli/bucket_win.jpg', flipHoriz=True, pos=(0,0), units='cm')
+outcome_loss_pic = visual.ImageStim(win, image='stimuli/bucket_lose.jpg', flipHoriz=True, pos=(0, 0), units='cm')
+outcome_surprise_pic = visual.ImageStim(win, image='stimuli/{0}'.format(surprise_pic_list[0]), flipHoriz=True, pos=(0, 0), units='cm')
 
 
 #===================================================
@@ -68,23 +75,29 @@ circ_X, circ_Y = pol2cart(circ_angles,circ_radius)
 circ_start = [circ_ix * (interval_dur/float(n_circ)) for circ_ix in range(n_circ)]  # onset time of each light
 hidden_pos = {True: [(circ_start[circ_xi] > (1-covered_portion)*interval_dur) for circ_xi in range(n_circ)],
               False: [(False) for circ_xi in range(n_circ)]}
-circ_default = [(-1,-1,-1)] * n_circ
-circ_colors = [i for i in circ_default]
+
+circ_default = [(-1,-1,-1)] * n_circ          # Sets black circles
+fill_default = [(1,1,1)] * n_circ              # Sets white fillColor
+circ_colors = [i for i in circ_default]       # Coppies default to prevent mutability issues
 circ_covers = [(0,0,0)] *(n_circ - (n_circ - sum(hidden_pos[True])))
 circ_cover_list = []
-circ_cover_list[:(n_circ - sum(hidden_pos[True]))] = circ_default
+circ_fill_list = []
+circ_cover_list[:(n_circ - sum(hidden_pos[True]))] = circ_default         # Sets up list of black and grey inner dots for "empty socket" effect
 circ_cover_list[(n_circ - sum(hidden_pos[True])):] = circ_covers
-re_flip_color = {False:circ_default, True:circ_cover_list}
-print re_flip_color[False], re_flip_color[True]
+circ_fill_list[:(n_circ - sum(hidden_pos[True]))] = fill_default
+circ_fill_list[(n_circ - sum(hidden_pos[True])):] = circ_covers 
+re_fill_color = {False:fill_default, True:circ_fill_list}                 # Sets up fill colors for covered/uncovered trial
+re_flip_color = {False:circ_default, True:circ_cover_list}                # Sets up flip colors for covered/uncovered trial 
+socket_colors = circ_colors
+
+#print re_flip_color[False], re_flip_color[True]
 #circ_colors = {True:circ_cover_list, False:circ_default} 
 #print len(circ_cover_list), (n_circ - sum(hidden_pos[True])), len(circ_covers)
-
-socket_colors = circ_colors
-circles = visual.ElementArrayStim(win, nElements=n_circ,sizes=circ_size,xys = zip(circ_X, circ_Y),
+circles = visual.ElementArrayStim(win, nElements=n_circ,sizes=circ_size,xys = zip(circ_X, circ_Y),       # Circle object inset ontop of sockets 
                            elementTex = None, elementMask = "circle",
                            colors=circ_colors)
-sockets = visual.ElementArrayStim(win, nElements=n_circ,sizes=socket_size,xys = zip(circ_X, circ_Y),
-                           elementTex = None, elementMask = "circle",
+sockets = visual.ElementArrayStim(win, nElements=n_circ,sizes=socket_size,xys = zip(circ_X, circ_Y),     # "Sockets" providing outter black ring for circles.
+                           elementTex = None, elementMask = "circle",                                   # always present behind circle stim
                            colors=socket_colors)
 
 #---------------------------------------------------

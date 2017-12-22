@@ -70,4 +70,22 @@ trigger_rect_height = 150           # height of the photodiode trigger rectangle
 trigger_dur = 0.3
 point_fn = [100, -100]              # reward function determining points awarded for [correct, incorrect]
 
+#========================
+#  SURPRISE PARAMETERS
+#========================
+
+# Design Parameters
+n_r_blocks = 8    # number of random sequences to generate (1 per block)
+n_r_trials = 75   # number of trials PER BLOCK
+n_surp = 9      # 9/75 = 12% surprising outcomes
+
+# Randomization Constraints
+first_possible = 10    # first trial that can be surprise
+min_gap = 4            # minimum trials between surprising outcomes
+min_uniq = 6           # minimum number of unique gaps to avoid predictability of surprise
+max_repeat_spacing = 1 # max number of times the same spacing can be sued back-to-back
+
+if paradigm_type != 'debug':
+    assert first_possible < n_trials-(n_surp*min_gap)
+
 
