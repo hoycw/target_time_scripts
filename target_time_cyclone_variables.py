@@ -36,8 +36,20 @@ block_repeat_cnt = repeat_cnt(block_order)
 while any([cnt>=3 for cnt in block_repeat_cnt]):      #checks for 3 or more consecutive same numbers. If present, will recompute permutation till less than 3 present
     block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])
     block_repeat_cnt = repeat_cnt(block_order)
-print 'block_order = ', block_order
+print 'block_order = ', block_order, 'repeat_cnt = ', block_repeat_cnt
 
+trial_ix = np.array(range(first_possible,n_trials))#possible trial numbers starting on the tenth one
+surp_trl = np.zeros([n_rand_blocks,n_surp])
+
+print ' surp_trl = ', surp_trl, "trial_ix = ", trial_ix
+
+for ix in range(n_rand_blocks):
+    surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp))
+    while min(np.diff(surp_trl[ix,:])) < min_gap or \
+            len(np.unique(np.diff(surp_trl[ix,:])))<min_uniq or \
+            max(repeat_cnt(surp_trl[ix,:])) > max_repeat_spacing:
+        surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp))
+print ' surp_trl = ', surp_trl, "trial_ix = ", trial_ix
 
 #============================================================
 # FEEDBACK STIMULI
