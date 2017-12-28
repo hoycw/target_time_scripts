@@ -137,6 +137,7 @@ def feedback_delay_func(responses, block_n, trial_n, training=False):
 def calc_feedback(block_n, trial_type, trial_n, training=False):
     target_zone_draw()
     circles.draw()
+    surp_cnt = 1
     if len(responses)>0:
         if len(responses)>1:
             win.logOnFlip('WARNING!!! More than one response detected (taking first) on B{0}_T{1}: repsonses = {2}'.format(
@@ -145,7 +146,11 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
         RT = response[0][1]-trial_start
         error =  RT - interval_dur 
         error_angle = error*angle_ratio
-        if np.abs(error)<tolerances[trial_type]:             # WIN
+        if trial_n in surp_trl[0]:
+            surprise_trial()
+            resp_marker.setLineColor(None)
+            outcome_str = 'SURPRISE!'
+        elif np.abs(error)<tolerances[trial_type]:             # WIN
             outcome_win.draw()
             outcome_win_pic.draw()
             resp_marker.setLineColor('green')
@@ -241,6 +246,12 @@ def target_zone_draw():
     target_zone_cover.draw()
     sockets.draw()
 
+#===================================================
+def surprise_trial():
+    pic_cnt = np.random.randint(0, len(surprise_pic_list))
+    outcome_surprise_pic.draw()
+    outcome_surprise_pic.image = 'stimuli/{0}'.format(surprise_pic_list[pic_cnt])
+
 
 #============================================================
 # INSTRUCTIONS
@@ -306,7 +317,7 @@ for trial_n in range(n_fullvis+2*n_training):
     win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,win.lastFrameT),logging.INFO)
     # Below shouldn't need params because they're all defaults, but if you don't have them here it somehow logs the wrong thing (both if/else statements??)
 #    set_trial_timing(trial_clock, None, trial_type, trial_n, training=True)    # Trial time function Call, not needed because of previous lines
-    
+   
     #========================================================
     # Moving Ball
     moving_ball(None, trial_n, training=True)
@@ -360,7 +371,6 @@ for block_n, block_type in enumerate(block_order):
         event.clearEvents()
         responses = []
         resp_pos = []
-        
         #========================================================
         # Set Trial Timing
         set_trial_timing(trial_clock, block_n, trial_type, trial_n)
