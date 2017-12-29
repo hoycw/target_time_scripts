@@ -1,10 +1,10 @@
 # target_time log suite
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '1.1'
+paradigm_version = '2.1'
 
 from psychopy import visual, event, core, gui, logging, data
 import numpy as np
-import math, time, random
+import math, time, random, os
 
 exp_datetime = time.strftime("%Y%m%d%H%M%S")
 
@@ -35,6 +35,18 @@ from target_time_cyclone_parameters import*
 #actual= var_chanign[key]
 
 from target_time_cyclone_variables import*
+
+
+#=====================================
+# CHECK VERSION NUMBER CONSISTENCY
+#=====================================
+files = [f for f in os.listdir('.') if f[-3:]=='.py' and f.startswith(paradigm_name+'_main')]
+# Check for clean directory with only 1 main script
+assert len(files)==1
+# Check that all file names match paradigm_version
+for f in files:
+    file_ver = f[f.rfind('_v')+2:-3]
+    assert file_ver==paradigm_version
 
 
 #============================

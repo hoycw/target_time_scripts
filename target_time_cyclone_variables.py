@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '1.1'
+paradigm_version = '2.1'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import visual, event, core, gui, logging, data
 #from psychopy import parallel
@@ -41,15 +41,13 @@ print 'block_order = ', block_order, 'repeat_cnt = ', block_repeat_cnt
 trial_ix = np.array(range(first_possible,n_trials))#possible trial numbers starting on the tenth one
 surp_trl = np.zeros([n_rand_blocks,n_surp])
 
-print ' surp_trl = ', surp_trl, "trial_ix = ", trial_ix
-
 for ix in range(n_rand_blocks):
     surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp))
     while min(np.diff(surp_trl[ix,:])) < min_gap or \
             len(np.unique(np.diff(surp_trl[ix,:])))<min_uniq or \
             max(repeat_cnt(surp_trl[ix,:])) > max_repeat_spacing:
         surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp))
-print ' surp_trl = ', surp_trl, "trial_ix = ", trial_ix
+print ' surp_trl = ', surp_trl, 'trial_ix = ', trial_ix
 
 #============================================================
 # FEEDBACK STIMULI
