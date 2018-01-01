@@ -40,6 +40,7 @@ print 'block_order = ', block_order, 'repeat_cnt = ', block_repeat_cnt
 
 trial_ix = np.array(range(first_possible,n_trials))#possible trial numbers starting on the tenth one
 surp_trl = np.zeros([n_rand_blocks,n_surp])
+print ' surp_trl = ', surp_trl, 'trial_ix = ', trial_ix
 
 for ix in range(n_rand_blocks):
     surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp))
@@ -47,7 +48,6 @@ for ix in range(n_rand_blocks):
             len(np.unique(np.diff(surp_trl[ix,:])))<min_uniq or \
             max(repeat_cnt(surp_trl[ix,:])) > max_repeat_spacing:
         surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp))
-print ' surp_trl = ', surp_trl, 'trial_ix = ', trial_ix
 
 #============================================================
 # FEEDBACK STIMULI
@@ -70,7 +70,6 @@ surprise_pic_list = ['surprise001.jpg', 'surprise003.jpg', 'surprise004.jpg', 's
 outcome_win_pic = visual.ImageStim(win, image='stimuli/bucket_win.jpg', flipHoriz=True, pos=(0,0), units='cm')
 outcome_loss_pic = visual.ImageStim(win, image='stimuli/bucket_lose.jpg', flipHoriz=True, pos=(0, 0), units='cm')
 outcome_surprise_pic = visual.ImageStim(win, image='stimuli/{0}'.format(surprise_pic_list[0]), flipHoriz=True, pos=(0, 0), units='cm')
-
 
 #===================================================
 # CIRCLE & TARGET ZONE PARAMETERS
@@ -130,6 +129,9 @@ target_zone_cover = visual.Circle(win, radius = loop_radius - target_width/2, ed
 # Photodiode Trigger Rectangle
 trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_height, units='pix',  #pos based on 1920x1080 pixel screen
                             fillColor='white', pos=(trigger_rect_height/2-win.size[0]/2,trigger_rect_height/2-win.size[1]/2))
+#---------------------------------------------------
+# Crosshair Stimuli
+crosshair = visual.GratingStim(win, mask='cross', size=xhr_thickness, pos=[0,0], sf=0, rgb=-1)
 
 #===================================================
 # INSTRUCTIONS

@@ -137,7 +137,7 @@ def feedback_delay_func(responses, block_n, trial_n, training=False):
 def calc_feedback(block_n, trial_type, trial_n, training=False):
     target_zone_draw()
     circles.draw()
-    surp_cnt = 1
+    surp_cnt = 0 
     if len(responses)>0:
         if len(responses)>1:
             win.logOnFlip('WARNING!!! More than one response detected (taking first) on B{0}_T{1}: repsonses = {2}'.format(
@@ -146,10 +146,11 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
         RT = response[0][1]-trial_start
         error =  RT - interval_dur 
         error_angle = error*angle_ratio
-        if trial_n in surp_trl[0]:
+        if not training and trial_n in surp_trl[surp_cnt]:          # Surprise on if not in training and if in list of surprise trials  
             surprise_trial()
             resp_marker.setLineColor(None)
             outcome_str = 'SURPRISE!'
+            surp_cnt += 1 
         elif np.abs(error)<tolerances[trial_type]:             # WIN
             outcome_win.draw()
             outcome_win_pic.draw()
@@ -172,6 +173,14 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
         else:
             win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
+            
+            
+        tolerances[trial_type]+= tolerance_step[trial_type][win_flag]      # Update tolerances based on feedback. Needs to be here.   
+        if tolerances[trial_type] > tolerance_lim[0]:                      #!!! Won't work if moved to staircase. Would need new implementation.
+            tolerances[trial_type] = tolerance_lim[0]
+        elif tolerances[trial_type] < tolerance_lim[1]:
+            tolerances[trial_type] = tolerance_lim[1]
+
     else:   # No response detected
         outcome_loss.draw()
         outcome_str = 'None'
@@ -194,12 +203,13 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
 
 #===================================================
 def staircase(trial_type): 
-    tolerances[trial_type]+= tolerance_step[trial_type][win_flag]
-    if tolerances[trial_type] > tolerance_lim[0]:
-        tolerances[trial_type] = tolerance_lim[0]
-    elif tolerances[trial_type] < tolerance_lim[1]:
-        tolerances[trial_type] = tolerance_lim[1]
-    
+#    tolerances[trial_type]+= tolerance_step[trial_type][win_flag]
+#    if tolerances[trial_type] > tolerance_lim[0]:
+#        tolerances[trial_type] = tolerance_lim[0]
+#    elif tolerances[trial_type] < tolerance_lim[1]:
+#        tolerances[trial_type] = tolerance_lim[1]
+#    print 'win_flag = ', win_flag, 'tolerances = ', tolerances[trial_type]
+
     target_origin[trial_type] = 180 - (tolerances[trial_type] * angle_ratio)
     target_upper_bound[trial_type] =  2*tolerances[trial_type]*angle_ratio
     target_zone.visibleWedge = [0, target_upper_bound[trial_type]]
@@ -245,6 +255,7 @@ def target_zone_draw():
     target_zone.draw()
     target_zone_cover.draw()
     sockets.draw()
+    crosshair.draw()
 
 #===================================================
 def surprise_trial():
@@ -274,7 +285,7 @@ win.flip()
 #============================================================
 # if experiment_type=='EEG':
 #   port.setData(0) # sets all pins low
-win_flag = 0
+#win_flag = 0
 for trial_n in range(n_fullvis+2*n_training):
     #========================================================
     # Initialize Trial
