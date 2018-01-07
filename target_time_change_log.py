@@ -3,6 +3,9 @@
 #===================================
 
 
+# Cyclone.v.2.2: fully implemented crosshair, cyclone light stimuli, picture feedback, and surprise trials using CSVs.  
+
+
 
 # 2.1: added some comments, changed name to fix git version problems
 # 2.0: functions brought back into main script
