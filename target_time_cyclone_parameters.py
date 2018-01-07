@@ -23,7 +23,7 @@ def experiment_parameters(type):                        #function that selects c
 n_fullvis     = {'debug':1, 'eeg':5,  'ecog':5}                   # number of EASY examples to start (large tolerance, full window)
 n_training    = {'debug':2, 'eeg':15, 'ecog':15}                  # number of training trials PER CONDITION
 n_blocks      = {'debug':2, 'eeg':4,  'ecog':2}                   # number of blocks of trials PER CONDITION
-n_trials      = {'debug':10, 'eeg':60, 'ecog':30}                  # number of trials PER BLOCK
+n_trials      = {'debug':5, 'eeg':75, 'ecog':30}                  # number of trials PER BLOCK
 break_min_dur = {'debug':1, 'eeg':20, 'ecog':20}                  # minimum length (in s) for the break between blocks
 n_fullvis, n_training, n_blocks, n_trials, break_min_dur = experiment_parameters(paradigm_type)
 #!!! check if n_trials/N-blocks==integer

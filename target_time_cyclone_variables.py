@@ -5,7 +5,7 @@ from psychopy.tools.coordinatetools import pol2cart
 from psychopy import visual, event, core, gui, logging, data
 #from psychopy import parallel
 import numpy as np
-import math, time, random
+import math, time, random, csv
 from itertools import groupby
 #import target_time_EEG_log
 from target_time_cyclone_parameters import*
@@ -39,16 +39,26 @@ while any([cnt>=3 for cnt in block_repeat_cnt]):      #checks for 3 or more cons
 print 'block_order = ', block_order, 'repeat_cnt = ', block_repeat_cnt
 
 trial_ix = np.array(range(first_possible,n_trials))#possible trial numbers starting on the tenth one
-surp_trl = np.zeros([n_rand_blocks,n_surp])
-print ' surp_trl = ', surp_trl, 'trial_ix = ', trial_ix
 
-for ix in range(n_rand_blocks):
-    surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp))
-    while min(np.diff(surp_trl[ix,:])) < min_gap or \
-            len(np.unique(np.diff(surp_trl[ix,:])))<min_uniq or \
-            max(repeat_cnt(surp_trl[ix,:])) > max_repeat_spacing:
-        surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp))
+#for ix in range(n_rand_blocks):
+#    surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp))
+#    while min(np.diff(surp_trl[ix,:])) < min_gap or \
+#            len(np.unique(np.diff(surp_trl[ix,:])))<min_uniq or \
+#            max(repeat_cnt(surp_trl[ix,:])) > max_repeat_spacing:
+#        surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp)
 
+
+#-------------------------------------------------------------------
+#  Drawing surprise trial numbers from CSVs
+
+surprise_sequence = set(random.sample(range(3*n_blocks), n_rand_blocks))
+with open("surp_csvs/{0}_randomized_list.csv".format(paradigm_type), 'r') as read:
+    reader = csv.reader(read)
+    desired_rows = [row for row_number, row in enumerate(reader)
+                    if row_number in surprise_sequence]
+surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
+print surprise_trials
+    
 #============================================================
 # FEEDBACK STIMULI
 #============================================================

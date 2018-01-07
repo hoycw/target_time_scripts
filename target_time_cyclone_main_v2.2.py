@@ -139,7 +139,6 @@ def feedback_delay_func(responses, block_n, trial_n, training=False):
 def calc_feedback(block_n, trial_type, trial_n, training=False):
     target_zone_draw()
     circles.draw()
-    surp_cnt = 0 
     if len(responses)>0:
         if len(responses)>1:
             win.logOnFlip('WARNING!!! More than one response detected (taking first) on B{0}_T{1}: repsonses = {2}'.format(
@@ -148,19 +147,18 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
         RT = response[0][1]-trial_start
         error =  RT - interval_dur 
         error_angle = error*angle_ratio
-        if not training and trial_n in surp_trl[surp_cnt]:          # Surprise on if not in training and if in list of surprise trials  
+        if not training and trial_n in surprise_trials[surp_cnt]:          # Surprise on if not in training and if in list of surprise trials  
             surprise_trial()
             resp_marker.setLineColor(None)
             outcome_str = 'SURPRISE!'
-            surp_cnt += 1 
         elif np.abs(error)<tolerances[trial_type]:             # WIN
-            outcome_win.draw()
+#            outcome_win.draw()
             outcome_win_pic.draw()
             resp_marker.setLineColor('green')
             outcome_str = 'WIN!'
             win_flag = 0
         else:                                   # LOSS
-            outcome_loss.draw()
+#            outcome_loss.draw()
             outcome_loss_pic.draw()
             resp_marker.setLineColor('red')
             outcome_str = 'LOSE!'
@@ -170,13 +168,13 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
         resp_marker.draw()
 #        print resp_marker.start, resp_marker.end, loop_radius-resp_marker_width/2, error_angle+270, loop_radius+resp_marker_width/2, error_angle+270
 #        print error, error_angle, response, RT
-        if not training and trial_n not in surp_trl:
+        if not training and trial_n not in surprise_trials[surp_cnt]:
             points[block_n]+= point_fn[win_flag]
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
         else:
             win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
             
-        if trial_n not in surp_trl:
+        if trial_n not in surprise_trials[surp_cnt]:
             tolerances[trial_type]+= tolerance_step[trial_type][win_flag]      # Update tolerances based on feedback. Needs to be here.   
             if tolerances[trial_type] > tolerance_lim[0]:                      #!!! Won't work if moved to staircase. Would need new implementation.
                 tolerances[trial_type] = tolerance_lim[0]
@@ -184,7 +182,8 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
                 tolerances[trial_type] = tolerance_lim[1]
 
     else:   # No response detected
-        outcome_loss.draw()
+#        outcome_loss.draw()
+        outcome_loss_pic.draw()
         outcome_str = 'None'
         # Not adjusting tolerance for this type of trial...
         if not training:
@@ -358,6 +357,8 @@ instruction_loop(main_str)                    # Main instruction call
 # Constant Reward Function (start awarding points)
 outcome_win.text = '+{0}'.format(point_fn[0])
 outcome_loss.text = '{0}'.format(point_fn[1])
+surp_cnt = 0 
+
 for block_n, block_type in enumerate(block_order):
     trial_type = trial_types[block_type]
     target_zone.visibleWedge = [0, target_upper_bound[trial_type]]
@@ -376,6 +377,7 @@ for block_n, block_type in enumerate(block_order):
         event.clearEvents()
         responses = []
         resp_pos = []
+
         #========================================================
         # Set Trial Timing
         set_trial_timing(trial_clock, block_n, trial_type, trial_n)
@@ -407,6 +409,7 @@ for block_n, block_type in enumerate(block_order):
     #========================================================
     # Break Between Blocks
     block_break(block_n)
+    surp_cnt += 1 
 
 endgame_txt.draw()
 win.flip()

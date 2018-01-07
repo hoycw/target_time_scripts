@@ -62,10 +62,11 @@ def set_trial_timing(trial_clock, block_n, trial_type, trial_n, training=False):
 def moving_ball(block_n, trial_n, training=False):
     response = False
     
-    for circ_xi in range(n_circ):# - sum(hidden_pos[covered])):
+    for circ_xi in range(n_circ-1):# - sum(hidden_pos[covered])):
         # Draw stimuli
         target_zone_draw()
-       
+        if circ_xi == 0:
+            circ_colors[n_circ-1] = (1,1,1)
         #if trial_clock.getTime() < trigger_dur:
             #trigger_rect.draw()
         if circ_xi >= (n_circ - sum(hidden_pos[covered])):
@@ -75,6 +76,7 @@ def moving_ball(block_n, trial_n, training=False):
         circles.colors = circ_colors
         circles.draw()
         win.flip()
+        circ_colors[n_circ-1] = (-1,-1,-1)
         circ_colors[circ_xi] = flip_list[circ_xi]  # Turn light back off
 #        print covered, circ_xi, circ_colors[circ_xi],re_flip_color[covered][circ_xi]
         circles.colors = circ_colors
@@ -168,18 +170,18 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
         resp_marker.draw()
 #        print resp_marker.start, resp_marker.end, loop_radius-resp_marker_width/2, error_angle+270, loop_radius+resp_marker_width/2, error_angle+270
 #        print error, error_angle, response, RT
-        if not training:
+        if not training and trial_n not in surp_trl:
             points[block_n]+= point_fn[win_flag]
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
         else:
             win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,RT,trial_type,tolerances[trial_type]),logging.DATA)
             
-            
-        tolerances[trial_type]+= tolerance_step[trial_type][win_flag]      # Update tolerances based on feedback. Needs to be here.   
-        if tolerances[trial_type] > tolerance_lim[0]:                      #!!! Won't work if moved to staircase. Would need new implementation.
-            tolerances[trial_type] = tolerance_lim[0]
-        elif tolerances[trial_type] < tolerance_lim[1]:
-            tolerances[trial_type] = tolerance_lim[1]
+        if trial_n not in surp_trl:
+            tolerances[trial_type]+= tolerance_step[trial_type][win_flag]      # Update tolerances based on feedback. Needs to be here.   
+            if tolerances[trial_type] > tolerance_lim[0]:                      #!!! Won't work if moved to staircase. Would need new implementation.
+                tolerances[trial_type] = tolerance_lim[0]
+            elif tolerances[trial_type] < tolerance_lim[1]:
+                tolerances[trial_type] = tolerance_lim[1]
 
     else:   # No response detected
         outcome_loss.draw()
@@ -203,13 +205,6 @@ def calc_feedback(block_n, trial_type, trial_n, training=False):
 
 #===================================================
 def staircase(trial_type): 
-#    tolerances[trial_type]+= tolerance_step[trial_type][win_flag]
-#    if tolerances[trial_type] > tolerance_lim[0]:
-#        tolerances[trial_type] = tolerance_lim[0]
-#    elif tolerances[trial_type] < tolerance_lim[1]:
-#        tolerances[trial_type] = tolerance_lim[1]
-#    print 'win_flag = ', win_flag, 'tolerances = ', tolerances[trial_type]
-
     target_origin[trial_type] = 180 - (tolerances[trial_type] * angle_ratio)
     target_upper_bound[trial_type] =  2*tolerances[trial_type]*angle_ratio
     target_zone.visibleWedge = [0, target_upper_bound[trial_type]]
@@ -285,7 +280,6 @@ win.flip()
 #============================================================
 # if experiment_type=='EEG':
 #   port.setData(0) # sets all pins low
-#win_flag = 0
 for trial_n in range(n_fullvis+2*n_training):
     #========================================================
     # Initialize Trial
