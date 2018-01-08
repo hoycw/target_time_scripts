@@ -9,7 +9,7 @@ import math, time, random
 
 exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #!!! implement resonses from dialogue box here
-paradigm_type = 'debug'                        # Choose either 'debug' 'eeg' or 'ecog' depending on desired 
+paradigm_type = 'ecog'                        # Choose either 'debug' 'eeg' or 'ecog' depending on desired 
                                                # duration parameters for trials.  
 
 #============================================================
