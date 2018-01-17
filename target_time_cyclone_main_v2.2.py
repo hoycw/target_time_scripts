@@ -24,6 +24,7 @@ def instruction_loop(instrs, intro=False):
     if intro:
         for instr_str in instr_strs:
             instr_txt.text = instr_str
+            instr_img.draw()
             instr_txt.draw()
             adv_screen_txt.draw()
             win.flip()
@@ -32,6 +33,8 @@ def instruction_loop(instrs, intro=False):
                 win.close()
                 core.quit()
     else:
+        if instrs != main_str:
+            train_img.draw()
         instr_txt.text = instrs
         instr_txt.draw()
         adv_screen_txt.draw()

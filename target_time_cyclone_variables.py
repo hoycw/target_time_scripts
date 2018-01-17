@@ -36,7 +36,7 @@ block_repeat_cnt = repeat_cnt(block_order)
 while any([cnt>=3 for cnt in block_repeat_cnt]):      #checks for 3 or more consecutive same numbers. If present, will recompute permutation till less than 3 present
     block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])
     block_repeat_cnt = repeat_cnt(block_order)
-print 'block_order = ', block_order, 'repeat_cnt = ', block_repeat_cnt
+#print 'block_order = ', block_order, 'repeat_cnt = ', block_repeat_cnt
 
 trial_ix = np.array(range(first_possible,n_trials))#possible trial numbers starting on the tenth one
 
@@ -57,7 +57,7 @@ with open("surp_csvs/{0}_randomized_list.csv".format(paradigm_type), 'r') as rea
     desired_rows = [row for row_number, row in enumerate(reader)
                     if row_number in surprise_sequence]
 surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
-print surprise_trials
+#print surprise_trials
     
 #============================================================
 # FEEDBACK STIMULI
@@ -125,8 +125,8 @@ target_upper_bound = {'easy': angle_ratio * (tolerances['easy']*2),  # Get angle
                       'hard': angle_ratio * (tolerances['hard']*2)}
 target_origin = {'easy': 180 - (tolerances['easy'] * angle_ratio),   # zero starts at 12 oclock for radial stim.  
                  'hard': 180 - (tolerances['hard'] * angle_ratio)}   #!!! Ian comment: Strange indexing, -0 ending sets too far to right
-print 'hard bound = ', target_upper_bound['hard'], 'origin' , target_origin['hard']
-print 'easy bound = ', target_upper_bound['easy'], 'origin' , target_origin['easy']
+#print 'hard bound = ', target_upper_bound['hard'], 'origin' , target_origin['hard']
+#print 'easy bound = ', target_upper_bound['easy'], 'origin' , target_origin['easy']
 
 target_zone = visual.RadialStim(win, tex='sqrXsqr', color='green', size=(loop_radius*2) + target_width, # size = diameter
     visibleWedge=[0, target_upper_bound['easy']], radialCycles=1, angularCycles=0, interpolate=False,   # radialCycles=1 to avoid color flip
@@ -147,6 +147,7 @@ crosshair = visual.GratingStim(win, mask='cross', size=xhr_thickness, pos=[0,0],
 # INSTRUCTIONS
 #===================================================
 instr_strs = ['This game starts with a ball moving up the tower towards a bullseye target.\n'+\
+#                   '                                                               '+\
                'Your goal is to respond at the exact moment when the ball hits the middle of the target.',
                "The time from the ball's start to the center of the target is always the same, "+\
                'so the perfect response will always be at that exact time: the Target Time!',
@@ -172,7 +173,7 @@ total_point_str = 'Total Score: {0}'
 welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=4,units='cm',alignHoriz='center',alignVert='center',
                                 name='welcome', color='black', bold=True, pos=(0,2),wrapWidth=30)
 instr_txt = visual.TextStim(win,text=instr_strs[0],height=2,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(0,0),wrapWidth=30)
+                                name='instr', color='black',pos=(0,1),wrapWidth=30)
 adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(key),
                                 height=1.5,units='cm',name='adv_screen', color='black', pos=(0,-10),wrapWidth=40)
 block_start_txt = visual.TextStim(win,text=block_start_str,height=3,units='cm',alignHoriz='center',alignVert='center',
@@ -184,3 +185,7 @@ total_point_txt = visual.TextStim(win,text=total_point_str,height=1.5,units='cm'
 endgame_txt = visual.TextStim(win,text="Fantastic!!! You're all done. Thank you so much for participating in this experiment!",
                             height=2,units='cm',alignHoriz='center',alignVert='center',
                             name='endgame', color='black', bold=False, pos=(0,-4),wrapWidth=30)
+instr_img = visual.ImageStim(win, image='cyclone_pics/cyclone.jpg', flipHoriz=False, 
+                                pos=instr_img_pos, size=instr_img_size, units='cm')
+train_img = visual.ImageStim(win, image='cyclone_pics/blank_sockets.jpg', flipHoriz=False, 
+                                pos=instr_img_pos, size=instr_img_size, units='cm')

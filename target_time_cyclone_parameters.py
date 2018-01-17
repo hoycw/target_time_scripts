@@ -9,7 +9,7 @@ import math, time, random
 
 exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #!!! implement resonses from dialogue box here
-paradigm_type = 'ecog'                        # Choose either 'debug' 'eeg' or 'ecog' depending on desired 
+paradigm_type = 'debug'                        # Choose either 'debug' 'eeg' or 'ecog' depending on desired 
                                                # duration parameters for trials.  
 
 #============================================================
@@ -47,6 +47,8 @@ tolerance_step = {'easy': [-0.003,0.012],
                     'hard': [-0.012,0.003]} # adjustment (in s) for [correct,incorrect] responses
 tolerance_lim = [0.2, 0.015]
 
+instr_img_size = (13,10)
+instr_img_pos = (5, -2)
 #======================
 # STIMULUS PARAMETERS  
 #======================
