@@ -24,7 +24,7 @@ for f in files:
 # SET UP LOG FILE
 #============================================================
 file_dlg = gui.Dlg(title="Run Information")
-file_dlg.addText(label='Paradigm Version: '+paradigm_version, color='Blue')
+file_dlg.addText('Paradigm Version: '+paradigm_version, color='Blue')
 file_dlg.addField(label='SBJ Code:')
 file_dlg.addField(label='Parameter Version:',choices=['ecog','eeg'])
 file_dlg.addField(label='Debug Mode:',initial=False)
