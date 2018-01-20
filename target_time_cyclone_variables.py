@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.1'
+paradigm_version = '2.2.1'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import visual, event, core, gui, logging, data
 #from psychopy import parallel
@@ -32,14 +32,24 @@ def repeat_cnt(sequence):
     # e.g., repeat_cnt([4 2 3 3 6 10 7 7 7]) = [1 1 2 1 1 3]
     return [sum(1 for _ in group) for _, group in groupby(sequence)]
 
+# Check for 3 or more consecutive same numbers; if present, recompute permutation until less than 3 present
 block_repeat_cnt = repeat_cnt(block_order)
-while any([cnt>=3 for cnt in block_repeat_cnt]):      #checks for 3 or more consecutive same numbers. If present, will recompute permutation till less than 3 present
+while any([cnt>=3 for cnt in block_repeat_cnt]):
     block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])
     block_repeat_cnt = repeat_cnt(block_order)
-#print 'block_order = ', block_order, 'repeat_cnt = ', block_repeat_cnt
 
-trial_ix = np.array(range(first_possible,n_trials))#possible trial numbers starting on the tenth one
+#-------------------------------------------------------------------
+# Determine surprise trial numbers
+# Draw surprise trial numbers from CSVs
+surprise_sequence = set(random.sample(range(3*n_blocks), n_rand_blocks))
+with open("surp_csvs/{0}_randomized_list.csv".format(paradigm_type), 'r') as read:
+    reader = csv.reader(read)
+    desired_rows = [row for row_number, row in enumerate(reader)
+                    if row_number in surprise_sequence]
+surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
 
+# OLD WAY: compute on the fly
+#trial_ix = np.array(range(first_possible,n_trials))#possible trial numbers starting on the tenth one
 #for ix in range(n_rand_blocks):
 #    surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp))
 #    while min(np.diff(surp_trl[ix,:])) < min_gap or \
@@ -48,21 +58,10 @@ trial_ix = np.array(range(first_possible,n_trials))#possible trial numbers start
 #        surp_trl[ix,:] = np.sort(np.random.choice(trial_ix,size=n_surp)
 
 
-#-------------------------------------------------------------------
-#  Drawing surprise trial numbers from CSVs
-
-surprise_sequence = set(random.sample(range(3*n_blocks), n_rand_blocks))
-with open("surp_csvs/{0}_randomized_list.csv".format(paradigm_type), 'r') as read:
-    reader = csv.reader(read)
-    desired_rows = [row for row_number, row in enumerate(reader)
-                    if row_number in surprise_sequence]
-surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
-#print surprise_trials
-    
 #============================================================
 # FEEDBACK STIMULI
 #============================================================
-points = np.zeros(n_blocks*len(trial_types))       # point total for each block
+points = np.zeros(n_blocks*len(conditions))       # point total for each block
 resp_marker = visual.Line(win, start=(-resp_marker_width/2, 0),
                                 end=(resp_marker_width/2, 0),
                                 lineColor='blue', lineWidth=resp_marker_thickness)
@@ -70,7 +69,7 @@ outcome_win = visual.TextStim(win,text='Win!',height=2,units='cm',
                                 name='feedback_win', color='green',pos=(0,0))
 outcome_loss = visual.TextStim(win,text='Lose!',height=2,units='cm',
                                 name='feedback_loss', color='red',pos=(0,0))#wrapWidth=550,
-feedback_str = 'B{0}_T{1}: Outcome={2}; RT = {3}; trial_type = {4}; tolerance = {5}'
+feedback_str = 'B{0}_T{1}: Outcome={2}; RT = {3}; condition = {4}; tolerance = {5}'
 feedback_txt = visual.TextStim(win,text='',height=1,units='cm',
                                 name='feedback_timing', color='black',pos=(0,-3),wrapWidth=14)
 surprise_pic_list = ['surprise001.jpg', 'surprise003.jpg', 'surprise004.jpg', 'surprise006.jpg', 'surprise010.jpg',
@@ -146,16 +145,17 @@ crosshair = visual.GratingStim(win, mask='cross', size=xhr_thickness, pos=[0,0],
 #===================================================
 # INSTRUCTIONS
 #===================================================
-instr_strs = ['This game starts with a ball moving up the tower towards a bullseye target.\n'+\
+instr_strs = ['In this simple timing game, a light moves around this circle.\n'+\
+               'Your goal is to respond at the exact moment when it hits the middle of the target.',
+               "The light always starts at the bottom and moves at the same speed, "+\
+               'so the perfect response will always be at the same time: the Target Time!',
 #                   '                                                               '+\
-               'Your goal is to respond at the exact moment when the ball hits the middle of the target.',
-               "The time from the ball's start to the center of the target is always the same, "+\
-               'so the perfect response will always be at that exact time: the Target Time!',
-               'You win points if you respond when the ball is on the target.\n',#+\
+               'The gray bar at the bottom is the target zone.',
+               'You win if you respond when the ball is on the target.\n',#+\
 #               'Responding closer to the target time gets you more points!',
                'You lose points if you respond too early or too late and the ball misses the target.',
                "Let's get started with a few examples..."]
-train_str = {'easy': "Good job! From now on, the last part of the ball's movement will be hidden.\n"+\
+train_str = {'easy': "Good job! From now on, only the first part of the circle will light up.\n"+\
                     "That means you need to respond at the target time without seeing the ball go all the way up.\n"+\
                     "Let's try some more examples...",
              'hard': "Great, now you're ready to try the hard level!\n"+\
