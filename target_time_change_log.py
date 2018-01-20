@@ -1,7 +1,7 @@
 #===================================
 #  Log of alterations to experiment
 #===================================
-
+# cyclone v2.2.1: updated GUI with dropdown menu and check box, logs paradigm_type and debug_mode which are now handled separately, renamed trial_types to conditions
 
 # Cyclone.v.2.2: fully implemented crosshair, cyclone light stimuli, picture feedback, and surprise trials using CSVs.  
 
