@@ -173,8 +173,9 @@ def calc_feedback(block_n, condition, trial_n, training=False):
         resp_marker.draw()
 #        print resp_marker.start, resp_marker.end, loop_radius-resp_marker_width/2, error_angle+270, loop_radius+resp_marker_width/2, error_angle+270
 #        print error, error_angle, response, RT
-        if not training and not surp:
-            points[block_n]+= point_fn[win_flag]
+        if not training:
+            if not surp:
+                points[block_n]+= point_fn[win_flag]
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
         else:
             win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)

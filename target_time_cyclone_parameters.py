@@ -1,8 +1,9 @@
 #target_time parameter file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.2.1'
+paradigm_version = '2.2.2'
 
 from psychopy import visual, event, core, gui, logging, data
+from target_time_cyclone_log import*
 #from psychopy import parallel
 import numpy as np
 import math, time, random

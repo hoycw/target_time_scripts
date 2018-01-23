@@ -1,17 +1,17 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.2.1'
+paradigm_version = '2.2.2'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import visual, event, core, gui, logging, data
 #from psychopy import parallel
 import numpy as np
 import math, time, random, csv
 from itertools import groupby
-#import target_time_EEG_log
+from target_time_cyclone_log import * 
 from target_time_cyclone_parameters import*
 
-exp_datetime = time.strftime("%Y%m%d%H%M%S")
 
+exp_datetime = time.strftime("%Y%m%d%H%M%S")
 
 #============================================================
 # EXPERIMENTAL VARIABLES
@@ -41,13 +41,16 @@ while any([cnt>=3 for cnt in block_repeat_cnt]):
 #-------------------------------------------------------------------
 # Determine surprise trial numbers
 # Draw surprise trial numbers from CSVs
-surprise_sequence = set(random.sample(range(3*n_blocks), n_rand_blocks))
-with open("surp_csvs/{0}_randomized_list.csv".format(paradigm_type), 'r') as read:
+surprise_sequence = set(random.sample(range(2*n_blocks), n_rand_blocks))
+surp_csv =  "surp_csvs/{0}_{1}_randomized_list.csv".format(paradigm_type, str(n_trials))
+if debug_mode:
+    surp_csv = "surp_csvs/debug_randomized_list.csv"
+with open(surp_csv, 'r') as read:
     reader = csv.reader(read)
     desired_rows = [row for row_number, row in enumerate(reader)
                     if row_number in surprise_sequence]
-surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
-
+surprise_trials = [[int(trl) for trl in row] for row in desired_rows]
+print surprise_trials
 # OLD WAY: compute on the fly
 #trial_ix = np.array(range(first_possible,n_trials))#possible trial numbers starting on the tenth one
 #for ix in range(n_rand_blocks):
