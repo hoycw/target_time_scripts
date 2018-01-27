@@ -83,6 +83,9 @@ outcome_win_pic = visual.ImageStim(win, image='stimuli/bucket_win.jpg', flipHori
 outcome_loss_pic = visual.ImageStim(win, image='stimuli/bucket_lose.jpg', flipHoriz=True, pos=(0, 0), units='cm')
 outcome_surprise_pic = visual.ImageStim(win, image='stimuli/{0}'.format(surprise_pic_list[0]), flipHoriz=True, pos=(0, 0), units='cm')
 
+training_score = {0:0 , 1:0}
+
+
 #===================================================
 # CIRCLE & TARGET ZONE PARAMETERS
 #===================================================
@@ -172,6 +175,11 @@ block_start_str = 'Level {0}/{1}: {2}'
 break_str = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
 block_point_str = 'Level {0} Score: {1}'
 total_point_str = 'Total Score: {0}'
+win_demo_str = "You won {0} points"
+loss_demo_str ="You lost {0} points"
+score_demo_str = "At the end of each block, you'll see how you did like this!\n"+\
+                 "Your points will be green if you win and red if you lose." 
+times_demo_called = 1
 
 welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=4,units='cm',alignHoriz='center',alignVert='center',
                                 name='welcome', color='black', bold=True, pos=(0,2),wrapWidth=30)
@@ -183,8 +191,14 @@ block_start_txt = visual.TextStim(win,text=block_start_str,height=3,units='cm',a
                                 name='block_start', color='black', bold=True, pos=(0,2),wrapWidth=30)
 block_point_txt = visual.TextStim(win,text=block_point_str,height=1.5,units='cm', alignVert='center',
                                 name='block_points', color='black',pos=(0,8),wrapWidth=20)
+win_score_demo_txt = visual.TextStim(win,text=win_demo_str,height=1.5,units='cm', alignVert='center',
+                                name='win_demo', color='green',pos=(0,8),wrapWidth=20)
+loss_score_demo_txt = visual.TextStim(win,text=loss_demo_str,height=1.5,units='cm', alignVert='center',
+                                name='loss_demo', color='red',pos=(0,5),wrapWidth=20)
+score_demo_txt = visual.TextStim(win,text=score_demo_str,height=1.5,units='cm', alignVert='center',
+                                name='score_demo', color='black',pos=(0,-4),wrapWidth=30)
 total_point_txt = visual.TextStim(win,text=total_point_str,height=1.5,units='cm', alignVert='center',
-                                name='total_points', color='black',pos=(0,4),wrapWidth=20)
+                                name='total_points', color='black',pos=(0,2),wrapWidth=20)
 endgame_txt = visual.TextStim(win,text="Fantastic!!! You're all done. Thank you so much for participating in this experiment!",
                             height=2,units='cm',alignHoriz='center',alignVert='center',
                             name='endgame', color='black', bold=False, pos=(0,-4),wrapWidth=30)

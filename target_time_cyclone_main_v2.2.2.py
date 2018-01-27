@@ -173,8 +173,10 @@ def calc_feedback(block_n, condition, trial_n, training=False):
         resp_marker.draw()
 #        print resp_marker.start, resp_marker.end, loop_radius-resp_marker_width/2, error_angle+270, loop_radius+resp_marker_width/2, error_angle+270
 #        print error, error_angle, response, RT
-        if not training:
-            if not surp:
+        if not surp:
+            if training and trial_n>=n_fullvis:
+                training_score[win_flag] += point_fn[win_flag]
+            else:
                 points[block_n]+= point_fn[win_flag]
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
         else:
@@ -220,19 +222,8 @@ def staircase(condition):
 
 
 #===================================================
-def block_break(block_n): #conditions, n_blocks=n_blocks, break_min_dur=break_min_dur, key=key):
-    block_point_txt.text = block_point_str.format(block_n+1,points[block_n])
-    if points[block_n]>=0:
-        block_point_txt.color = 'green'
-    else:
-        block_point_txt.color = 'red'
-    total_point_txt.text = total_point_str.format(np.sum(points))
-    if np.sum(points)>=0:
-        total_point_txt.color = 'green'
-    else:
-        total_point_txt.color = 'red'
-    block_point_txt.draw()
-    total_point_txt.draw()
+def block_break(block_n, training=False): #conditions, n_blocks=n_blocks, break_min_dur=break_min_dur, key=key):
+    point_calc(block_n)
     # If not the last block, print feedback
     if block_n<n_blocks*len(conditions)-1:
         instr_txt.text = break_str.format(n_blocks*len(conditions)-block_n-1,break_min_dur)
@@ -249,7 +240,37 @@ def block_break(block_n): #conditions, n_blocks=n_blocks, break_min_dur=break_mi
             win.close()
             core.quit()
 
-
+#===============================================
+def point_calc(block_n):
+    block_point_txt.text = block_point_str.format(block_n+1,points[block_n])
+    if points[block_n]>=0:
+        block_point_txt.color = 'green'
+    else:
+        block_point_txt.color = 'red'
+    total_point_txt.text = total_point_str.format(np.sum(points))
+    if np.sum(points)>=0:
+        total_point_txt.color = 'green'
+    else:
+        total_point_txt.color = 'red'
+    block_point_txt.draw()
+    total_point_txt.draw()
+#===================================================
+def score_instr():
+    
+    win_score_demo_txt.text = win_demo_str.format(training_score[0])
+    loss_score_demo_txt.text =loss_demo_str.format(training_score[1])
+    total_point_txt.text = total_point_str.format(training_score[1]+training_score[0])
+    win_score_demo_txt.draw()
+    loss_score_demo_txt.draw()
+    total_point_txt.draw()
+    if trial_n==n_fullvis+n_training-1:
+        score_demo_txt.draw()
+    adv_screen_txt.draw()
+    win.flip()
+    adv = event.waitKeys(keyList=[key, 'escape', 'q'])
+    if adv[0] in ['escape','q']:
+        win.close()
+        core.quit()
 #===================================================
 def target_zone_draw():
     target_zone.draw()
@@ -355,8 +376,10 @@ for trial_n in range(n_fullvis+2*n_training):
             if press in ['escape','q']:
                 win.close();
                 core.quit();
-
-
+    if (trial_n==n_fullvis+n_training-1) or (trial_n==n_fullvis+2*n_training-1):                    #Score instructions with score after easy training
+        score_instr()
+        
+        
 #============================================================
 # EXPERIMENT
 #============================================================
