@@ -21,10 +21,13 @@ from target_time_cyclone_variables import*
 def instruction_loop(instrs, intro=False):
 # displays instructions for current trial type
     # If intro=True, instrs won't be used (can just be '') 
-    if intro:
+    if instrs!= main_str:
         for instr_str in instr_strs:
             instr_txt.text = instr_str
-            instr_img.draw()
+            if intro:
+                instr_img.draw()
+            else:
+                train_img.draw()
             instr_txt.draw()
             adv_screen_txt.draw()
             win.flip()
@@ -33,8 +36,6 @@ def instruction_loop(instrs, intro=False):
                 win.close()
                 core.quit()
     else:
-        if instrs != main_str:
-            train_img.draw()
         instr_txt.text = instrs
         instr_txt.draw()
         adv_screen_txt.draw()
@@ -158,19 +159,23 @@ def calc_feedback(block_n, condition, trial_n, training=False):
             surp = True
         elif np.abs(error)<tolerances[condition]:             # WIN
 #            outcome_win.draw()
-            outcome_win_pic.draw()
+#            outcome_win_pic.draw()
+            target_zone.setColor('green')
             resp_marker.setLineColor('green')
             outcome_str = 'WIN!'
             win_flag = 0
         else:                                   # LOSS
 #            outcome_loss.draw()
-            outcome_loss_pic.draw()
+#            outcome_loss_pic.draw()
+            target_zone.setColor('red')
             resp_marker.setLineColor('red')
             outcome_str = 'LOSE!'
             win_flag = 1
         resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
         resp_marker.setEnd(pol2cart(error_angle+270, loop_radius+resp_marker_width/2))
+        target_zone_draw()                      # Using our defined target_zone_draw, not .draw to have correct visual.  
         resp_marker.draw()
+
 #        print resp_marker.start, resp_marker.end, loop_radius-resp_marker_width/2, error_angle+270, loop_radius+resp_marker_width/2, error_angle+270
 #        print error, error_angle, response, RT
         if not surp:
@@ -191,7 +196,9 @@ def calc_feedback(block_n, condition, trial_n, training=False):
 
     else:   # No response detected
 #        outcome_loss.draw()
-        outcome_loss_pic.draw()
+#        outcome_loss_pic.draw()
+        target_zone.setColor('red')
+        target_zone_draw()
         outcome_str = 'None'
         # Not adjusting tolerance for this type of trial...
         if not training:
@@ -202,6 +209,7 @@ def calc_feedback(block_n, condition, trial_n, training=False):
             win.logOnFlip('B{0}_T{1} feedback start: FRAME TIME = {2}'.format('T',trial_n,win.lastFrameT),logging.INFO)
     #if experiment_type=='ECoG': trigger_rect.draw()
     win.flip()
+    target_zone.setColor('dimgrey')
 #        if experiment_type=='EEG': port.setData(2)
     while trial_clock.getTime() < feedback_end:
         for press in event.getKeys(keyList=[key,'escape','q']):

@@ -79,8 +79,8 @@ surprise_pic_list = ['surprise001.jpg', 'surprise003.jpg', 'surprise004.jpg', 's
                       'surprise012.jpg', 'surprise014.jpg', 'surprise015.jpg', 'surprise016.jpg', 'surprise017.jpg',
                        'surprise023.jpg', 'surprise025.jpg', 'surprise026.jpg', 'surprise028.jpg', 'surprise029.jpg',
                         'surprise031.jpg']
-outcome_win_pic = visual.ImageStim(win, image='stimuli/bucket_win.jpg', flipHoriz=True, pos=(0,0), units='cm')
-outcome_loss_pic = visual.ImageStim(win, image='stimuli/bucket_lose.jpg', flipHoriz=True, pos=(0, 0), units='cm')
+#outcome_win_pic = visual.ImageStim(win, image='stimuli/bucket_win.jpg', flipHoriz=True, pos=(0,0), units='cm')
+#outcome_loss_pic = visual.ImageStim(win, image='stimuli/bucket_lose.jpg', flipHoriz=True, pos=(0, 0), units='cm')
 outcome_surprise_pic = visual.ImageStim(win, image='stimuli/{0}'.format(surprise_pic_list[0]), flipHoriz=True, pos=(0, 0), units='cm')
 
 training_score = {0:0 , 1:0}
@@ -133,7 +133,7 @@ target_origin = {'easy': 180 - (tolerances['easy'] * angle_ratio),   # zero star
 #print 'hard bound = ', target_upper_bound['hard'], 'origin' , target_origin['hard']
 #print 'easy bound = ', target_upper_bound['easy'], 'origin' , target_origin['easy']
 
-target_zone = visual.RadialStim(win, tex='sqrXsqr', color='green', size=(loop_radius*2) + target_width, # size = diameter
+target_zone = visual.RadialStim(win, tex='sqrXsqr', color='dimgrey', size=(loop_radius*2) + target_width, # size = diameter
     visibleWedge=[0, target_upper_bound['easy']], radialCycles=1, angularCycles=0, interpolate=False,   # radialCycles=1 to avoid color flip
     autoLog=False, units='cm', angularRes=500)
 target_zone_cover = visual.Circle(win, radius = loop_radius - target_width/2, edges=100,
@@ -151,26 +151,49 @@ crosshair = visual.GratingStim(win, mask='cross', size=xhr_thickness, pos=[0,0],
 #===================================================
 # INSTRUCTIONS
 #===================================================
-instr_strs = ['In this simple timing game, a light moves around this circle.\n'+\
-               'Your goal is to respond at the exact moment when it hits the middle of the target.',
-               "The light always starts at the bottom and moves at the same speed, "+\
+#instr_strs = ['In this simple timing game, a light moves around this circle.\n'+\
+#               'Your goal is to respond at the exact moment when it hits the middle of the target.',
+#               "The light always starts at the bottom and moves at the same speed, "+\
+#               'so the perfect response will always be at the same time: the Target Time!',
+#                   '                                                               '+\
+#               'The gray bar at the bottom is the target zone.',
+#               'You win if you respond when the ball is on the target.\n',#+\
+#               'Responding closer to the target time gets you more points!',
+#               'You lose points if you respond too early or too late and the ball misses the target.',
+#               "Let's get started with a few examples..."]
+instr_strs = ['This is a simple (but not easy!) timing game. A light will move around this circle.',
+               'Your goal is to respond at the exact moment when it completes the circle.',
+               "The light always starts at the bottom and moves at the same speed,\n"+\
                'so the perfect response will always be at the same time: the Target Time!',
 #                   '                                                               '+\
                'The gray bar at the bottom is the target zone.',
-               'You win if you respond when the ball is on the target.\n',#+\
-#               'Responding closer to the target time gets you more points!',
-               'You lose points if you respond too early or too late and the ball misses the target.',
+               'If you respond in the target zone, it will turn green and you win points!',
+               'If you miss the target zone, it will turn red and you lose points.',
                "Let's get started with a few examples..."]
-train_str = {'easy': "Good job! From now on, only the first part of the circle will light up.\n"+\
-                    "That means you need to respond at the target time without seeing the ball go all the way up.\n"+\
-                    "Let's try some more examples...",
-             'hard': "Great, now you're ready to try the hard level!\n"+\
+#
+#train_str = {'easy': "Good job! From now on, only the first part of the circle will light up.\n"+\
+#                    "That means you need to respond at the target time without seeing the ball go all the way up.\n"+\
+#                    "Let's try some more examples...",
+#             'hard': "Great, now you're ready to try the hard level!\n"+\
+#                    "Don't get discouraged - hard levels are designed to make you miss most of the time.\n"+\
+#                    "Challenge yourself to see how many you can win!\nLet's try some examples..."}
+train_str = {'easy': ["Good job! From now on, only the first part of the circle will light up.",
+                    "That means you need to time your response without seeing the light go all the way around.",
+                    "Let's try some more examples..."],
+             'hard': ["Great, now you're ready to try the hard level!",
                     "Don't get discouraged - hard levels are designed to make you miss most of the time.\n"+\
-                    "Challenge yourself to see how many you can win!\nLet's try some examples..."}
-main_str = "Ready to try the real deal and start keeping score?\n"+\
-            "You'll do {0} easy and {0} hard blocks of {1} trials each.\n".format(n_blocks,n_trials)+\
+                    "Challenge yourself to see how many you can win!",
+                    "Let's try some examples..."]}
+
+#main_str = "Ready to try the real deal and start keeping score?\n"+\
+#            "You'll do {0} easy and {0} hard blocks of {1} trials each.\n".format(n_blocks,n_trials)+\
+#            'Press Q/escape to do more practice rounds first,\n'+\
+#            'or press {0} to start playing Target Time!'.format(key)
+main_str = "Ready to try the real deal? We'll start keeping score now."+\
+            "You'll do {0} easy and {0} hard blocks, each lasting {1} trials.\n".format(n_blocks,n_trials)+\
             'Press Q/escape to do more practice rounds first,\n'+\
             'or press {0} to start playing Target Time!'.format(key)
+
 block_start_str = 'Level {0}/{1}: {2}'
 break_str = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
 block_point_str = 'Level {0} Score: {1}'
