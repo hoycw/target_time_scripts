@@ -19,15 +19,20 @@ from target_time_cyclone_variables import*
 # DEFINE PARADIGM FUNCTIONS
 #============================
 def instruction_loop(instrs, intro=False):
+    image_index = 0
 # displays instructions for current trial type
     # If intro=True, instrs won't be used (can just be '') 
     if instrs!= main_str:
-        for instr_str in instr_strs:
+        for instr_str in instrs:
             instr_txt.text = instr_str
-            if intro:
-                instr_img.draw()
-            else:
-                train_img.draw()
+            if image_index < 6 and intro:
+                instr_pic.image = 'cyclone_pics/{0}'.format(instr_pic_dict[image_index])
+                instr_pic.draw()
+                image_index += 1
+            if not intro:
+                instr_pic.image = 'cyclone_pics/{0}'.format(instr_pic_dict[condition])
+                instr_pic.draw()
+            
             instr_txt.draw()
             adv_screen_txt.draw()
             win.flip()
@@ -35,6 +40,7 @@ def instruction_loop(instrs, intro=False):
             if adv[0] in ['escape','q']:
                 win.close()
                 core.quit()
+
     else:
         instr_txt.text = instrs
         instr_txt.draw()
@@ -306,7 +312,7 @@ adv = event.waitKeys(keyList=[key, 'escape', 'q'])
 if adv[0] in ['escape', 'q']:
         win.close()
         core.quit()
-instruction_loop(None, intro=True)
+instruction_loop(instr_strs, intro=True)
 win.flip()
 
 #============================================================

@@ -79,6 +79,16 @@ surprise_pic_list = ['surprise001.jpg', 'surprise003.jpg', 'surprise004.jpg', 's
                       'surprise012.jpg', 'surprise014.jpg', 'surprise015.jpg', 'surprise016.jpg', 'surprise017.jpg',
                        'surprise023.jpg', 'surprise025.jpg', 'surprise026.jpg', 'surprise028.jpg', 'surprise029.jpg',
                         'surprise031.jpg']
+
+instr_pic_dict = {0:'grey.jpg', 
+                  1:'target_arrow.jpg',
+                  2:'direction_arrow.jpg',
+                  3:'target_arrow.jpg',
+                  4:'win_arrow.jpg', 
+                  5:'miss_arrow.jpg',
+                  'easy':'easy_mode.jpg',
+                  'hard':'hard_mode.jpg'}
+instr_pic = visual.ImageStim(win, image='cyclone_pics/{0}'.format(instr_pic_dict[0]), flipHoriz=False, pos=(0, 0), units='cm')
 #outcome_win_pic = visual.ImageStim(win, image='stimuli/bucket_win.jpg', flipHoriz=True, pos=(0,0), units='cm')
 #outcome_loss_pic = visual.ImageStim(win, image='stimuli/bucket_lose.jpg', flipHoriz=True, pos=(0, 0), units='cm')
 outcome_surprise_pic = visual.ImageStim(win, image='stimuli/{0}'.format(surprise_pic_list[0]), flipHoriz=True, pos=(0, 0), units='cm')
