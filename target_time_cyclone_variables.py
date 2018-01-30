@@ -49,7 +49,7 @@ with open(surp_csv, 'r') as read:
     reader = csv.reader(read)
     desired_rows = [row for row_number, row in enumerate(reader)
                     if row_number in surprise_sequence]
-surprise_trials = [[int(trl) for trl in row] for row in desired_rows]
+surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
 print surprise_trials
 # OLD WAY: compute on the fly
 #trial_ix = np.array(range(first_possible,n_trials))#possible trial numbers starting on the tenth one
@@ -67,7 +67,7 @@ print surprise_trials
 points = np.zeros(n_blocks*len(conditions))       # point total for each block
 resp_marker = visual.Line(win, start=(-resp_marker_width/2, 0),
                                 end=(resp_marker_width/2, 0),
-                                lineColor='blue', lineWidth=resp_marker_thickness)
+                                lineColor='black', lineWidth=resp_marker_thickness)
 outcome_win = visual.TextStim(win,text='Win!',height=2,units='cm',
                                 name='feedback_win', color='green',pos=(0,0))
 outcome_loss = visual.TextStim(win,text='Lose!',height=2,units='cm',
@@ -88,7 +88,7 @@ instr_pic_dict = {0:'grey.jpg',
                   5:'miss_arrow.jpg',
                   'easy':'easy_mode.jpg',
                   'hard':'hard_mode.jpg'}
-instr_pic = visual.ImageStim(win, image='cyclone_pics/{0}'.format(instr_pic_dict[0]), flipHoriz=False, pos=(0, 0), units='cm')
+instr_pic = visual.ImageStim(win, image='cyclone_pics/{0}'.format(instr_pic_dict[0]), flipHoriz=False, pos=(0, -2), units='cm')
 #outcome_win_pic = visual.ImageStim(win, image='stimuli/bucket_win.jpg', flipHoriz=True, pos=(0,0), units='cm')
 #outcome_loss_pic = visual.ImageStim(win, image='stimuli/bucket_lose.jpg', flipHoriz=True, pos=(0, 0), units='cm')
 outcome_surprise_pic = visual.ImageStim(win, image='stimuli/{0}'.format(surprise_pic_list[0]), flipHoriz=True, pos=(0, 0), units='cm')
@@ -216,8 +216,8 @@ times_demo_called = 1
 
 welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=4,units='cm',alignHoriz='center',alignVert='center',
                                 name='welcome', color='black', bold=True, pos=(0,2),wrapWidth=30)
-instr_txt = visual.TextStim(win,text=instr_strs[0],height=2,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(0,1),wrapWidth=30)
+instr_txt = visual.TextStim(win,text=instr_strs[0],height=1.5,units='cm', alignVert='center',
+                                name='instr', color='black',pos=(0,7),wrapWidth=30)
 adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(key),
                                 height=1.5,units='cm',name='adv_screen', color='black', pos=(0,-10),wrapWidth=40)
 block_start_txt = visual.TextStim(win,text=block_start_str,height=3,units='cm',alignHoriz='center',alignVert='center',

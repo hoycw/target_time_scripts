@@ -88,15 +88,16 @@ def moving_ball(block_n, trial_n, training=False):
         win.flip()
         circ_colors[n_circ-1] = (-1,-1,-1)
         circ_colors[circ_xi] = flip_list[circ_xi]  # Turn light back off
-#        print covered, circ_xi, circ_colors[circ_xi],re_flip_color[covered][circ_xi]
         circles.colors = circ_colors
+
         while trial_clock.getTime() < trial_start + circ_start[circ_xi]:
             for press in event.getKeys(keyList=[key,'escape','q'], timeStamped=trial_clock):
-                if press in ['escape','q']:
-                    win.close();
-                    core.quit();
-                else:
-                    response = [press]
+                print press
+                if press[0] in ['escape','q']:
+                    print press
+                    win.close()
+                    core.quit()
+                response = [press]
                 #!!! Responses captured here were not getting registered.  Initialized response at top of function to capture response in this loop. 
 #            if pos_ix==1 and experiment_type=='EEG'
     #                port.setData(1)  # sets just this pin to be high
@@ -167,14 +168,14 @@ def calc_feedback(block_n, condition, trial_n, training=False):
 #            outcome_win.draw()
 #            outcome_win_pic.draw()
             target_zone.setColor('green')
-            resp_marker.setLineColor('green')
+#            resp_marker.setLineColor('green')
             outcome_str = 'WIN!'
             win_flag = 0
         else:                                   # LOSS
 #            outcome_loss.draw()
 #            outcome_loss_pic.draw()
             target_zone.setColor('red')
-            resp_marker.setLineColor('red')
+#            resp_marker.setLineColor('red')
             outcome_str = 'LOSE!'
             win_flag = 1
         resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
@@ -220,8 +221,8 @@ def calc_feedback(block_n, condition, trial_n, training=False):
     while trial_clock.getTime() < feedback_end:
         for press in event.getKeys(keyList=[key,'escape','q']):
             if press in ['escape','q']:
-                win.close();
-                core.quit();
+                win.close()
+                core.quit()
 
 
 #===================================================
@@ -273,14 +274,13 @@ def score_instr():
     
     win_score_demo_txt.text = win_demo_str.format(training_score[0])
     loss_score_demo_txt.text =loss_demo_str.format(training_score[1])
-    total_point_txt.text = total_point_str.format(training_score[1]+training_score[0])
     win_score_demo_txt.draw()
     loss_score_demo_txt.draw()
-    total_point_txt.draw()
     if trial_n==n_fullvis+n_training-1:
         score_demo_txt.draw()
     adv_screen_txt.draw()
     win.flip()
+    training_score[0], training_score[1] = 0, 0 
     adv = event.waitKeys(keyList=[key, 'escape', 'q'])
     if adv[0] in ['escape','q']:
         win.close()
@@ -290,6 +290,7 @@ def target_zone_draw():
     target_zone.draw()
     target_zone_cover.draw()
     sockets.draw()
+    circles.draw()
     crosshair.draw()
 
 #===================================================
@@ -331,6 +332,7 @@ for trial_n in range(n_fullvis+2*n_training):
         condition = 'easy'
     else:                                   # Hard Training
         condition = 'hard'
+        
     win.logOnFlip('TRAINING T{0}: window={1}; condition={2}'.format(trial_n,covered,condition),logging.INFO)
     event.clearEvents()
     responses = []
