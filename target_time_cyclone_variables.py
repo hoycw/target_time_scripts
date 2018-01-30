@@ -161,32 +161,14 @@ crosshair = visual.GratingStim(win, mask='cross', size=xhr_thickness, pos=[0,0],
 #===================================================
 # INSTRUCTIONS
 #===================================================
-#instr_strs = ['In this simple timing game, a light moves around this circle.\n'+\
-#               'Your goal is to respond at the exact moment when it hits the middle of the target.',
-#               "The light always starts at the bottom and moves at the same speed, "+\
-#               'so the perfect response will always be at the same time: the Target Time!',
-#                   '                                                               '+\
-#               'The gray bar at the bottom is the target zone.',
-#               'You win if you respond when the ball is on the target.\n',#+\
-#               'Responding closer to the target time gets you more points!',
-#               'You lose points if you respond too early or too late and the ball misses the target.',
-#               "Let's get started with a few examples..."]
-instr_strs = ['This is a simple (but not easy!) timing game. A light will move around this circle.',
+instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move around this circle.',
                'Your goal is to respond at the exact moment when it completes the circle.',
                "The light always starts at the bottom and moves at the same speed,\n"+\
-               'so the perfect response will always be at the same time: the Target Time!',
-#                   '                                                               '+\
+               'so the perfect response is always at the same time: the Target Time!',
                'The gray bar at the bottom is the target zone.',
-               'If you respond in the target zone, it will turn green and you win points!',
-               'If you miss the target zone, it will turn red and you lose points.',
+               'If you respond in the target zone, it turns green and you win points!',
+               'If you miss the target zone, it turns red and you lose points.',
                "Let's get started with a few examples..."]
-#
-#train_str = {'easy': "Good job! From now on, only the first part of the circle will light up.\n"+\
-#                    "That means you need to respond at the target time without seeing the ball go all the way up.\n"+\
-#                    "Let's try some more examples...",
-#             'hard': "Great, now you're ready to try the hard level!\n"+\
-#                    "Don't get discouraged - hard levels are designed to make you miss most of the time.\n"+\
-#                    "Challenge yourself to see how many you can win!\nLet's try some examples..."}
 train_str = {'easy': ["Good job! From now on, only the first part of the circle will light up.",
                     "That means you need to time your response without seeing the light go all the way around.",
                     "Let's try some more examples..."],
@@ -194,11 +176,6 @@ train_str = {'easy': ["Good job! From now on, only the first part of the circle 
                     "Don't get discouraged - hard levels are designed to make you miss most of the time.\n"+\
                     "Challenge yourself to see how many you can win!",
                     "Let's try some examples..."]}
-
-#main_str = "Ready to try the real deal and start keeping score?\n"+\
-#            "You'll do {0} easy and {0} hard blocks of {1} trials each.\n".format(n_blocks,n_trials)+\
-#            'Press Q/escape to do more practice rounds first,\n'+\
-#            'or press {0} to start playing Target Time!'.format(key)
 main_str = "Ready to try the real deal? We'll start keeping score now."+\
             "You'll do {0} easy and {0} hard blocks, each lasting {1} trials.\n".format(n_blocks,n_trials)+\
             'Press Q/escape to do more practice rounds first,\n'+\
@@ -210,8 +187,8 @@ block_point_str = 'Level {0} Score: {1}'
 total_point_str = 'Total Score: {0}'
 win_demo_str = "You won {0} points"
 loss_demo_str ="You lost {0} points"
-score_demo_str = "At the end of each block, you'll see how you did like this!\n"+\
-                 "Your points will be green if you win and red if you lose." 
+score_demo_str = "At the end of each block, you'll see how you did.\n"+\
+                 "The points won are in green, and the points you lost are in red." 
 times_demo_called = 1
 
 welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=4,units='cm',alignHoriz='center',alignVert='center',
