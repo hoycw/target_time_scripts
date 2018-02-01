@@ -2,7 +2,7 @@
 paradigm_name = 'target_time_cyclone'
 paradigm_version = '2.2.2'
 from psychopy.tools.coordinatetools import pol2cart
-from psychopy import visual, event, core, gui, logging, data
+from psychopy import visual, event, core, gui, logging, data, sound
 #from psychopy import parallel
 import numpy as np
 import math, time, random, csv
@@ -94,6 +94,15 @@ instr_pic = visual.ImageStim(win, image='cyclone_pics/{0}'.format(instr_pic_dict
 outcome_surprise_pic = visual.ImageStim(win, image='stimuli/{0}'.format(surprise_pic_list[0]), flipHoriz=True, pos=(0, 0), units='cm')
 
 training_score = {0:0 , 1:0}
+
+
+#---------------------------------------------------
+# Sound Stimuli 
+
+turn_sound = {"WIN!": sound.Sound('B', octave=3, sampleRate=44100, secs=0.8, stereo=True),  # Swich sound sample once sounds present
+             "LOSE!":sound.Sound('C', octave=3, sampleRate=44100, secs=0.8, stereo=True)}
+turn_sound["WIN!"].setVolume(0.8)
+turn_sound["LOSE!"].setVolume(0.8)
 
 
 #===================================================

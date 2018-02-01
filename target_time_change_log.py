@@ -2,9 +2,9 @@
 #  Log of alterations to experiment
 #===================================
 
+# cyclone v2.2.3: Implemented sound.Sound function to provide audio feedback for win/loss.  Needs actual audio clips for trials, but will be quick fix.  
+
 # cyclone v2.2.2: Implemented score feedback following Training 
-
-
 
 # cyclone v2.2.1: debug csv trial numbers now in correct range, parameters now recieves paradigm_type from _log, csv's now reflect paradigm type and trial number, 
 #                 lines 44 and 49 have been updated (the int(float()) thing was for data type conversion but is no longer needed), block loging 'T' error corrected

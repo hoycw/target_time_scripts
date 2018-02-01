@@ -165,27 +165,22 @@ def calc_feedback(block_n, condition, trial_n, training=False):
             outcome_str = 'SURPRISE!'
             surp = True
         elif np.abs(error)<tolerances[condition]:             # WIN
-#            outcome_win.draw()
-#            outcome_win_pic.draw()
+
             target_zone.setColor('green')
-#            resp_marker.setLineColor('green')
             outcome_str = 'WIN!'
             win_flag = 0
         else:                                   # LOSS
-#            outcome_loss.draw()
-#            outcome_loss_pic.draw()
+
             target_zone.setColor('red')
-#            resp_marker.setLineColor('red')
             outcome_str = 'LOSE!'
             win_flag = 1
         resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
         resp_marker.setEnd(pol2cart(error_angle+270, loop_radius+resp_marker_width/2))
+        turn_sound[outcome_str].play()
         target_zone_draw()                      # Using our defined target_zone_draw, not .draw to have correct visual.  
         resp_marker.draw()
         
 
-#        print resp_marker.start, resp_marker.end, loop_radius-resp_marker_width/2, error_angle+270, loop_radius+resp_marker_width/2, error_angle+270
-#        print error, error_angle, response, RT
         if not surp:
             if training and trial_n>=n_fullvis:
                 training_score[win_flag] += point_fn[win_flag]
