@@ -1,3 +1,5 @@
+from psychopy import prefs
+prefs.general['audioLib'] = ['pygame']
 from psychopy import visual, event, core, gui, logging, data, sound
 #from psychopy import parallel
 from psychopy.tools.coordinatetools import pol2cart
@@ -164,16 +166,21 @@ def calc_feedback(block_n, condition, trial_n, training=False):
             resp_marker.setLineColor(None)
             outcome_str = 'SURPRISE!'
             surp = True
+            
         elif np.abs(error)<tolerances[condition]:             # WIN
-
             target_zone.setColor('green')
             outcome_str = 'WIN!'
             win_flag = 0
+#            turn_sound["WIN!"].Sound(value = 'paradigm_sounds/{0}'.format(win_sounds[np.random.randint(0, 3)]))
+            
         else:                                   # LOSS
 
             target_zone.setColor('red')
             outcome_str = 'LOSE!'
             win_flag = 1
+#            turn_sound["LOSE!"].Sound(value = 'paradigm_sounds/{0}'.format(win_sounds[np.random.randint(0, 3)]))
+
+            
         resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
         resp_marker.setEnd(pol2cart(error_angle+270, loop_radius+resp_marker_width/2))
         turn_sound[outcome_str].play()
@@ -295,7 +302,13 @@ def surprise_trial():
     outcome_surprise_pic.draw()
     outcome_surprise_pic.image = 'stimuli/{0}'.format(surprise_pic_list[pic_cnt])
 
-
+#===================================================
+def sound_count(sound_list, outcome_str):
+    if sound_list != surprise_sound:
+        index = np.random.randint(0, len(sound_list))
+    else:
+        index = 0
+    turn_sound[outcome_str].sound
 #============================================================
 # INSTRUCTIONS
 #============================================================

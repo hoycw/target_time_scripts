@@ -2,6 +2,8 @@
 paradigm_name = 'target_time_cyclone'
 paradigm_version = '2.2.2'
 from psychopy.tools.coordinatetools import pol2cart
+from psychopy import prefs
+prefs.general['audioLib'] = ['pygame']
 from psychopy import visual, event, core, gui, logging, data, sound
 #from psychopy import parallel
 import numpy as np
@@ -98,11 +100,23 @@ training_score = {0:0 , 1:0}
 
 #---------------------------------------------------
 # Sound Stimuli 
+win_sounds = [ 'cash_register_x.wav']#, 
+#               'CashRegister.wav',
+#               'coin_flip.wav']
+               
+lose_sounds = ["Homer - D'oh! (1).wav"]#, 
+#                "peeeoooop_x.wav",
+#                "womp.wav"]
 
-turn_sound = {"WIN!": sound.Sound('B', octave=3, sampleRate=44100, secs=0.8, stereo=True),  # Swich sound sample once sounds present
-             "LOSE!":sound.Sound('C', octave=3, sampleRate=44100, secs=0.8, stereo=True)}
+surprise_sound = ["floop2_x.wav"]
+
+turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sounds[0]), sampleRate=44100, secs=0.8),  # Swich sound sample once sounds present
+             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(lose_sounds[0]), sampleRate=44100, secs=0.8),
+             "SURPRISE!": sound.Sound(value='paradigm_sounds/{0}'.format(surprise_sound[0]), sampleRate=44100, secs=0.8)}
+             
 turn_sound["WIN!"].setVolume(0.8)
 turn_sound["LOSE!"].setVolume(0.8)
+turn_sound["SURPRISE!"].setVolume(0.8)
 
 
 #===================================================
