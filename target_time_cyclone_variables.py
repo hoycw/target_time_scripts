@@ -186,7 +186,7 @@ crosshair = visual.GratingStim(win, mask='cross', size=xhr_thickness, pos=[0,0],
 #===================================================
 instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move around this circle.',
                'Your goal is to respond at the exact moment when it completes the circle.',
-               "The light always starts at the bottom and moves at the same speed,\n"+\
+               "The light always starts at the bottom and moves at the same speed,"+\
                'so the perfect response is always at the same time: the Target Time!',
                'The gray bar at the bottom is the target zone.',
                'If you respond in the target zone, it turns green and you win points!',
@@ -197,11 +197,11 @@ train_str = {'easy': ["Good job! From now on, only the first part of the circle 
                     "Let's try some more examples..."],
              'hard': ["Great, now you're ready to try the hard level!",
                     "Don't get discouraged - hard levels are designed to make you miss most of the time.\n"+\
-                    "Challenge yourself to see how many you can win!",
+                    "Try your best, and win as much as you can!",
                     "Let's try some examples..."]}
 main_str = "Ready to try the real deal? We'll start keeping score now."+\
             "You'll do {0} easy and {0} hard blocks, each lasting {1} trials.\n".format(n_blocks,n_trials)+\
-            'Press Q/escape to do more practice rounds first,\n'+\
+            'Press Q/escape to do more practice rounds,\n'+\
             'or press {0} to start playing Target Time!'.format(key)
 
 block_start_str = 'Level {0}/{1}: {2}'
@@ -210,8 +210,8 @@ block_point_str = 'Level {0} Score: {1}'
 total_point_str = 'Total Score: {0}'
 win_demo_str = "You won {0} points"
 loss_demo_str ="You lost {0} points"
-score_demo_str = "At the end of each block, you'll see how you did.\n"+\
-                 "The points won are in green, and the points you lost are in red." 
+score_demo_str = "At the end of each block, you'll see your score for that block and in total.\n"+\
+                 "Positive scores are green, and negative scores are red." 
 times_demo_called = 1
 
 welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=4,units='cm',alignHoriz='center',alignVert='center',
