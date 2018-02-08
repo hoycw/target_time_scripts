@@ -186,7 +186,7 @@ trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_h
 #===================================================
 instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move around this circle.',
                'Your goal is to respond at the exact moment when it completes the circle.',
-               "The light always starts at the bottom and moves at the same speed,\n"+\
+               "The light always starts at the bottom and moves at the same speed, "+\
                'so the perfect response is always at the same time: the Target Time!',
                'The gray bar at the bottom is the target zone.',
                'If you respond in the target zone, it turns green and you win points!',
@@ -195,23 +195,22 @@ instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move 
 train_str = {'easy': ["Good job! From now on, only the first part of the circle will light up.",
                     "That means you need to time your response without seeing the light go all the way around.",
                     "Let's try some more examples..."],
-             'hard': ["Great, now you're ready to try the hard level!",
+             'hard': ["Great! Now you're ready to try the hard level.",
                     "Don't get discouraged - hard levels are designed to make you miss most of the time.\n"+\
-                    "Challenge yourself to see how many you can win!",
+                    "Try your best to see how much you can win!",
                     "Let's try some examples..."]}
-main_str = "Ready to try the real deal? We'll start keeping score now."+\
-            "You'll do {0} easy and {0} hard blocks, each lasting {1} trials.\n".format(n_blocks,n_trials)+\
-            'Press Q/escape to do more practice rounds first,\n'+\
+main_str = "Ready to try the real deal? We'll reset your score to 0 and start counting for real now. "+\
+            "You'll do {0} easy and {0} hard blocks, each lasting {1} trials.\n\n".format(n_blocks,n_trials)+\
+            'Press Q/escape to try more practice rounds, '+\
             'or press {0} to start playing Target Time!'.format(key)
 
 block_start_str = 'Level {0}/{1}: {2}'
 break_str = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
 block_point_str = 'Level {0} Score: {1}'
 total_point_str = 'Total Score: {0}'
-score_demo_str = "You Scored {0} Points"
+score_demo_str = "You scored {0} points this round."
 
-point_instr_str = "At the end of each block, you'll see how you did.\n"+\
-                 "The points you won are in green, and the points you lost are in red." 
+point_instr_str = "After each block, you'll see your score from this round. Points also add up across rounds."
 times_demo_called = 1
 
 welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=4,units='cm',alignHoriz='center',alignVert='center',
