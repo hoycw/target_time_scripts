@@ -171,14 +171,12 @@ def calc_feedback(block_n, condition, trial_n, training=False):
             target_zone.setColor('green')
             outcome_str = 'WIN!'
             win_flag = 0
-#            turn_sound["WIN!"].Sound(value = 'paradigm_sounds/{0}'.format(win_sounds[np.random.randint(0, 3)]))
             
         else:                                   # LOSS
 
             target_zone.setColor('red')
             outcome_str = 'LOSE!'
             win_flag = 1
-#            turn_sound["LOSE!"].Sound(value = 'paradigm_sounds/{0}'.format(win_sounds[np.random.randint(0, 3)]))
 
             
         resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
@@ -275,12 +273,11 @@ def point_calc(block_n):
 #===================================================
 def score_instr():
     
-    win_score_demo_txt.text = win_demo_str.format(training_score[0])
-    loss_score_demo_txt.text =loss_demo_str.format(training_score[1])
-    win_score_demo_txt.draw()
-    loss_score_demo_txt.draw()
+    score_demo_txt["WIN!"].text = win_demo_str.format(training_score[0])
+    score_demo_txt["LOSE!"].text =loss_demo_str.format(training_score[1])
+    score_demo_txt[outcome_str].draw()
     if trial_n==n_fullvis+n_training-1:
-        score_demo_txt.draw()
+        total_demo_txt.draw()
     adv_screen_txt.draw()
     win.flip()
     training_score[0], training_score[1] = 0, 0 
@@ -294,7 +291,6 @@ def target_zone_draw():
     target_zone_cover.draw()
     sockets.draw()
     circles.draw()
-    crosshair.draw()
 
 #===================================================
 def surprise_trial():

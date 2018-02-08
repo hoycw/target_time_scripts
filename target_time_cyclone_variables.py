@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.2.2'
+paradigm_version = '2.2.3'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['pygame']
@@ -86,16 +86,16 @@ instr_pic_dict = {0:'grey.jpg',
                   1:'target_arrow.jpg',
                   2:'direction_arrow.jpg',
                   3:'target_arrow.jpg',
-                  4:'win_arrow.jpg', 
-                  5:'miss_arrow.jpg',
-                  'easy':'easy_mode.jpg',
-                  'hard':'hard_mode.jpg'}
+                  4:'win.jpg', 
+                  5:'loss.jpg',
+                  'easy':'easy.jpg',
+                  'hard':'hard.jpg'}
 instr_pic = visual.ImageStim(win, image='cyclone_pics/{0}'.format(instr_pic_dict[0]), flipHoriz=False, pos=(0, -2), units='cm')
 #outcome_win_pic = visual.ImageStim(win, image='stimuli/bucket_win.jpg', flipHoriz=True, pos=(0,0), units='cm')
 #outcome_loss_pic = visual.ImageStim(win, image='stimuli/bucket_lose.jpg', flipHoriz=True, pos=(0, 0), units='cm')
 outcome_surprise_pic = visual.ImageStim(win, image='stimuli/{0}'.format(surprise_pic_list[0]), flipHoriz=True, pos=(0, 0), units='cm')
 
-training_score = {0:0 , 1:0}
+training_score = 0
 
 
 #---------------------------------------------------
@@ -179,7 +179,7 @@ trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_h
                             fillColor='white', pos=(trigger_rect_height/2-win.size[0]/2,trigger_rect_height/2-win.size[1]/2))
 #---------------------------------------------------
 # Crosshair Stimuli
-crosshair = visual.GratingStim(win, mask='cross', size=xhr_thickness, pos=[0,0], sf=0, rgb=-1)
+#crosshair = visual.GratingStim(win, mask='cross', size=xhr_thickness, pos=[0,0], sf=0, rgb=-1)
 
 #===================================================
 # INSTRUCTIONS
@@ -208,34 +208,42 @@ block_start_str = 'Level {0}/{1}: {2}'
 break_str = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
 block_point_str = 'Level {0} Score: {1}'
 total_point_str = 'Total Score: {0}'
-win_demo_str = "You won {0} points"
-loss_demo_str ="You lost {0} points"
-score_demo_str = "At the end of each block, you'll see how you did.\n"+\
-                 "The points won are in green, and the points you lost are in red." 
+score_demo_str = "You Scored {0} Points"
+
+point_instr_str = "At the end of each block, you'll see how you did.\n"+\
+                 "The points you won are in green, and the points you lost are in red." 
 times_demo_called = 1
 
 welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=4,units='cm',alignHoriz='center',alignVert='center',
                                 name='welcome', color='black', bold=True, pos=(0,2),wrapWidth=30)
+
 instr_txt = visual.TextStim(win,text=instr_strs[0],height=1.5,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(0,7),wrapWidth=30)
+
 adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(key),
                                 height=1.5,units='cm',name='adv_screen', color='black', pos=(0,-10),wrapWidth=40)
+
 block_start_txt = visual.TextStim(win,text=block_start_str,height=3,units='cm',alignHoriz='center',alignVert='center',
                                 name='block_start', color='black', bold=True, pos=(0,2),wrapWidth=30)
+
 block_point_txt = visual.TextStim(win,text=block_point_str,height=1.5,units='cm', alignVert='center',
                                 name='block_points', color='black',pos=(0,8),wrapWidth=20)
-win_score_demo_txt = visual.TextStim(win,text=win_demo_str,height=1.5,units='cm', alignVert='center',
-                                name='win_demo', color='green',pos=(0,8),wrapWidth=20)
-loss_score_demo_txt = visual.TextStim(win,text=loss_demo_str,height=1.5,units='cm', alignVert='center',
-                                name='loss_demo', color='red',pos=(0,5),wrapWidth=20)
-score_demo_txt = visual.TextStim(win,text=score_demo_str,height=1.5,units='cm', alignVert='center',
-                                name='score_demo', color='black',pos=(0,-4),wrapWidth=30)
+
+score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=1.5,units='cm', alignVert='center',
+                                name='score_demo', color='green',pos=(0,8),wrapWidth=20)
+
+point_instr_txt = visual.TextStim(win,text=point_instr_str, height=1.5,units='cm', alignVert='center',
+                                name='point_instr', color='black',pos=(0,0),wrapWidth=30)
+
 total_point_txt = visual.TextStim(win,text=total_point_str,height=1.5,units='cm', alignVert='center',
-                                name='total_points', color='black',pos=(0,2),wrapWidth=20)
+                                name='total_points', color='black',pos=(0,6),wrapWidth=20)
+
 endgame_txt = visual.TextStim(win,text="Fantastic!!! You're all done. Thank you so much for participating in this experiment!",
                             height=2,units='cm',alignHoriz='center',alignVert='center',
                             name='endgame', color='black', bold=False, pos=(0,-4),wrapWidth=30)
+
 instr_img = visual.ImageStim(win, image='cyclone_pics/cyclone.jpg', flipHoriz=False, 
                                 pos=instr_img_pos, size=instr_img_size, units='cm')
+
 train_img = visual.ImageStim(win, image='cyclone_pics/blank_sockets.jpg', flipHoriz=False, 
                                 pos=instr_img_pos, size=instr_img_size, units='cm')

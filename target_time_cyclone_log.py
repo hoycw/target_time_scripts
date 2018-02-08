@@ -1,6 +1,6 @@
 # target_time log suite
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.2.2'
+paradigm_version = '2.2.3'
 
 from psychopy import visual, event, core, gui, logging, data
 import numpy as np
@@ -31,7 +31,7 @@ file_dlg.addField(label='Debug Mode:',initial=False)
 #file_dlg.addField('Response Key:') # Ideally space bar? something more accurate?
 
 file_dlg.show()
-if gui.OK:
+if file_dlg.OK:
     dlg_resp   = file_dlg.data
     log_prefix = dlg_resp[0]
     paradigm_type  = dlg_resp[1]
@@ -40,7 +40,7 @@ if gui.OK:
     log_filename = '../logs/{0}_response_log_{1}.txt'.format(log_prefix,exp_datetime)
 else: 
     print 'User Cancelled'
-    win.close()
+#    win.close()
     core.quit()
 
 from target_time_cyclone_parameters import*

@@ -1,3 +1,5 @@
+from psychopy import prefs
+prefs.general['audioLib'] = ['pygame']
 from psychopy import visual, event, core, gui, logging, data, sound
 #from psychopy import parallel
 from psychopy.tools.coordinatetools import pol2cart
@@ -43,6 +45,7 @@ def instruction_loop(instrs, intro=False):
 
     else:
         instr_txt.text = instrs
+        instr_txt.pos = (0,2)
         instr_txt.draw()
         adv_screen_txt.draw()
         win.flip()
@@ -148,6 +151,7 @@ def feedback_delay_func(responses, block_n, trial_n, training=False):
 
 #===================================================
 def calc_feedback(block_n, condition, trial_n, training=False):
+    global training_score
     target_zone_draw()
     circles.draw()
     surp = False
@@ -159,37 +163,37 @@ def calc_feedback(block_n, condition, trial_n, training=False):
         RT = response[0][1]-trial_start
         error =  RT - interval_dur 
         error_angle = error*angle_ratio
+        print error_angle
         if not training and trial_n in surprise_trials[surp_cnt]:          # Surprise on if not in training and if in list of surprise trials  
             surprise_trial()
             resp_marker.setLineColor(None)
             outcome_str = 'SURPRISE!'
             surp = True
+            
         elif np.abs(error)<tolerances[condition]:             # WIN
-#            outcome_win.draw()
-#            outcome_win_pic.draw()
             target_zone.setColor('green')
-#            resp_marker.setLineColor('green')
             outcome_str = 'WIN!'
             win_flag = 0
+            
         else:                                   # LOSS
-#            outcome_loss.draw()
-#            outcome_loss_pic.draw()
+
             target_zone.setColor('red')
-#            resp_marker.setLineColor('red')
             outcome_str = 'LOSE!'
             win_flag = 1
+
+            
         resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
         resp_marker.setEnd(pol2cart(error_angle+270, loop_radius+resp_marker_width/2))
+        turn_sound[outcome_str].play()
         target_zone_draw()                      # Using our defined target_zone_draw, not .draw to have correct visual.  
         resp_marker.draw()
         
 
-#        print resp_marker.start, resp_marker.end, loop_radius-resp_marker_width/2, error_angle+270, loop_radius+resp_marker_width/2, error_angle+270
-#        print error, error_angle, response, RT
         if not surp:
             if training and trial_n>=n_fullvis:
-                training_score[win_flag] += point_fn[win_flag]
-            else:
+                training_score += point_fn[win_flag]
+                print training_score
+            elif not training:
                 points[block_n]+= point_fn[win_flag]
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
         else:
@@ -217,6 +221,7 @@ def calc_feedback(block_n, condition, trial_n, training=False):
             win.logOnFlip('B{0}_T{1} feedback start: FRAME TIME = {2}'.format('T',trial_n,win.lastFrameT),logging.INFO)
     #if experiment_type=='ECoG': trigger_rect.draw()
     win.flip()
+    resp_marker.setLineColor('black')
     target_zone.setColor('dimgrey')
 #        if experiment_type=='EEG': port.setData(2)
     while trial_clock.getTime() < feedback_end:
@@ -272,16 +277,23 @@ def point_calc(block_n):
     total_point_txt.draw()
 #===================================================
 def score_instr():
-    
-    win_score_demo_txt.text = win_demo_str.format(training_score[0])
-    loss_score_demo_txt.text =loss_demo_str.format(training_score[1])
-    win_score_demo_txt.draw()
-    loss_score_demo_txt.draw()
-    if trial_n==n_fullvis+n_training-1:
-        score_demo_txt.draw()
+    global training_score
+    score_demo_txt.text = score_demo_str.format(training_score)
+    total_point_txt.text = total_point_str.format(np.sum(training_score))
+    if training_score > 0:
+        score_demo_txt.color = 'green'
+        total_point_txt.color = 'green'
+
+    elif training_score <= 0:
+        score_demo_txt.color = 'red'
+        total_point_txt.color = 'red'
+
+    score_demo_txt.draw()
+    total_point_txt.draw()
+    point_instr_txt.draw()
     adv_screen_txt.draw()
     win.flip()
-    training_score[0], training_score[1] = 0, 0 
+    training_score = 0 
     adv = event.waitKeys(keyList=[key, 'escape', 'q'])
     if adv[0] in ['escape','q']:
         win.close()
@@ -292,7 +304,6 @@ def target_zone_draw():
     target_zone_cover.draw()
     sockets.draw()
     circles.draw()
-    crosshair.draw()
 
 #===================================================
 def surprise_trial():
@@ -300,7 +311,13 @@ def surprise_trial():
     outcome_surprise_pic.draw()
     outcome_surprise_pic.image = 'stimuli/{0}'.format(surprise_pic_list[pic_cnt])
 
-
+#===================================================
+def sound_count(sound_list, outcome_str):
+    if sound_list != surprise_sound:
+        index = np.random.randint(0, len(sound_list))
+    else:
+        index = 0
+    turn_sound[outcome_str].sound
 #============================================================
 # INSTRUCTIONS
 #============================================================
