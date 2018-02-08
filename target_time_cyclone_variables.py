@@ -242,8 +242,8 @@ endgame_txt = visual.TextStim(win,text="Fantastic!!! You're all done. Thank you 
                             height=2,units='cm',alignHoriz='center',alignVert='center',
                             name='endgame', color='black', bold=False, pos=(0,-4),wrapWidth=30)
 
-instr_img = visual.ImageStim(win, image='cyclone_pics/cyclone.jpg', flipHoriz=False, 
+instr_img = visual.ImageStim(win, image='cyclone_pics/grey.jpg', flipHoriz=False, 
                                 pos=instr_img_pos, size=instr_img_size, units='cm')
 
-train_img = visual.ImageStim(win, image='cyclone_pics/blank_sockets.jpg', flipHoriz=False, 
+train_img = visual.ImageStim(win, image='cyclone_pics/easy.jpg', flipHoriz=False, 
                                 pos=instr_img_pos, size=instr_img_size, units='cm')
