@@ -95,7 +95,7 @@ instr_pic = visual.ImageStim(win, image='cyclone_pics/{0}'.format(instr_pic_dict
 #outcome_loss_pic = visual.ImageStim(win, image='stimuli/bucket_lose.jpg', flipHoriz=True, pos=(0, 0), units='cm')
 outcome_surprise_pic = visual.ImageStim(win, image='stimuli/{0}'.format(surprise_pic_list[0]), flipHoriz=True, pos=(0, 0), units='cm')
 
-training_score = 0
+training_score = { "easy" : 0, "hard": 0 }
 
 
 #---------------------------------------------------
@@ -229,7 +229,7 @@ block_point_txt = visual.TextStim(win,text=block_point_str,height=1.5,units='cm'
                                 name='block_points', color='black',pos=(0,8),wrapWidth=20)
 
 score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=1.5,units='cm', alignVert='center',
-                                name='score_demo', color='green',pos=(0,8),wrapWidth=20)
+                                name='score_demo', color='green',pos=(0,8),wrapWidth=30)
 
 point_instr_txt = visual.TextStim(win,text=point_instr_str, height=1.5,units='cm', alignVert='center',
                                 name='point_instr', color='black',pos=(0,0),wrapWidth=30)

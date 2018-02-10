@@ -191,7 +191,7 @@ def calc_feedback(block_n, condition, trial_n, training=False):
 
         if not surp:
             if training and trial_n>=n_fullvis:
-                training_score += point_fn[win_flag]
+                training_score[condition] += point_fn[win_flag]
                 print training_score
             elif not training:
                 points[block_n]+= point_fn[win_flag]
@@ -278,8 +278,8 @@ def point_calc(block_n):
 #===================================================
 def score_instr():
     global training_score
-    score_demo_txt.text = score_demo_str.format(training_score)
-    total_point_txt.text = total_point_str.format(np.sum(training_score))
+    score_demo_txt.text = score_demo_str.format(training_score[condition])
+    total_point_txt.text = total_point_str.format(np.sum(training_score.values()))
     if training_score > 0:
         score_demo_txt.color = 'green'
         total_point_txt.color = 'green'
@@ -290,10 +290,10 @@ def score_instr():
 
     score_demo_txt.draw()
     total_point_txt.draw()
-    point_instr_txt.draw()
+    if trial_n==n_fullvis+n_training-1:
+        point_instr_txt.draw()
     adv_screen_txt.draw()
     win.flip()
-    training_score = 0 
     adv = event.waitKeys(keyList=[key, 'escape', 'q'])
     if adv[0] in ['escape','q']:
         win.close()
