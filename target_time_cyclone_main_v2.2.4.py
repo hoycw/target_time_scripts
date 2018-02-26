@@ -168,6 +168,7 @@ def calc_feedback(block_n, condition, trial_n, training=False):
             surprise_trial()
             resp_marker.setLineColor(None)
             outcome_str = 'SURPRISE!'
+            select_surp_sound()
             surp = True
             
         elif np.abs(error)<tolerances[condition]:             # WIN
@@ -312,12 +313,11 @@ def surprise_trial():
     outcome_surprise_pic.image = 'stimuli/{0}'.format(surprise_pic_list[pic_cnt])
 
 #===================================================
-def sound_count(sound_list, outcome_str):
-    if sound_list != surprise_sound:
-        index = np.random.randint(0, len(sound_list))
-    else:
-        index = 0
-    turn_sound[outcome_str].sound
+def select_surp_sound():
+    sound_type = np.random.choice(surprise_sounds.keys())                      # Selects the subfolder to draw sounds from (ie. 'drum_sounds').
+    sound_file = np.random.choice(surprise_sounds[sound_type])                 # Selects the specif wav file from the subfolder.
+    turn_sound['SURPRISE!'] = sound.Sound(value='surprise_sounds/{0}/{1}'.format(sound_type, sound_file),
+                                                  sampleRate=44100, secs=0.8)
 #============================================================
 # INSTRUCTIONS
 #============================================================
