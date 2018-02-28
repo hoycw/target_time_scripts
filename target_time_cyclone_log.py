@@ -1,6 +1,6 @@
 # target_time log suite
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.2.3'
+paradigm_version = '2.3'
 
 from psychopy import visual, event, core, gui, logging, data
 import numpy as np
@@ -9,8 +9,8 @@ import math, time, random, os
 exp_datetime = time.strftime("%Y%m%d%H%M%S")
 
 #=====================================
-# CHECK VERSION NUMBER CONSISTENCY
 #=====================================
+# CHECK VERSION NUMBER CONSISTENCY
 files = [f for f in os.listdir('.') if f[-3:]=='.py' and f.startswith(paradigm_name+'_main')]
 # Check for clean directory with only 1 main script
 assert len(files)==1
@@ -72,6 +72,7 @@ win.logOnFlip('n_training = '+str(n_training), logging.DATA)            # surp_r
 win.logOnFlip('surp_rate = '+str(surp_rate), logging.DATA)
 win.logOnFlip('n_surp = '+str(n_surp), logging.DATA)
 win.logOnFlip('n_rand_blocks = '+str(n_rand_blocks), logging.DATA)
+win.logOnFlip('surprise_sequence = '+str(surprise_sequence), logging.DATA)
 win.logOnFlip('interval_dur = '+str(interval_dur), logging.DATA)
 win.logOnFlip('feedback_delay = '+str(feedback_delay), logging.DATA)
 win.logOnFlip('feedback_dur = '+str(feedback_dur), logging.DATA)

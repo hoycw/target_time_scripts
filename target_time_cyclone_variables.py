@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.2.4'
+paradigm_version = '2.3'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['pygame']
@@ -105,7 +105,7 @@ win_sounds = [ 'cash_register_x.wav']#,
 #               'CashRegister.wav',
 #               'coin_flip.wav']
                
-lose_sounds = ["Homer - D'oh! (1).wav"]#, 
+lose_sounds = ["lose_tone.wav"]#, 
 #                "peeeoooop_x.wav",
 #                "womp.wav"]
 
