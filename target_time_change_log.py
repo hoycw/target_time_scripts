@@ -2,6 +2,12 @@
 #  Log of alterations to experiment
 #===================================
 
+# cyclone v2.3:   Remoeved all picture feedback. Implemented surpirse tiral sounds with 9 categories of sounds each holding 8 samples. For each block,
+#                 logic randomly selects a category for each surprise trial, then a ound from that category.  
+#                 Implemented loging with block, trial, sound and frame time variables.
+
+
+
 # cyclone v2.2.3: Implemented sound.Sound function to provide audio feedback for win/loss.  Needs actual audio clips for trials, but will be quick fix.  
 
 # cyclone v2.2.2: Implemented score feedback following Training 

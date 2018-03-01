@@ -5,7 +5,7 @@ from psychopy import visual, event, core, gui, logging, data, sound
 from psychopy.tools.coordinatetools import pol2cart
 
 import numpy as np
-import math, time, random
+import math, time, random, copy
 random.seed()
 core.wait(0.5)      # give the system time to settle
 core.rush(True)     # might give psychopy higher priority in the system (maybe...)
@@ -77,7 +77,7 @@ def moving_ball(block_n, trial_n, training=False):
     
     for circ_xi in range(n_circ-1):# - sum(hidden_pos[covered])):
         # Draw stimuli
-        target_zone_draw()
+        target_zone_draw(False)
         if circ_xi == 0:
             circ_colors[n_circ-1] = (1,1,1)
         #if trial_clock.getTime() < trigger_dur:
@@ -117,7 +117,7 @@ def moving_ball(block_n, trial_n, training=False):
 
 #===================================================
 def feedback_delay_func(responses, block_n, trial_n, training=False):
-    target_zone_draw()
+    target_zone_draw(False)
     circles.draw()
     # !!! Do we need these delay starts? If we're not testing timing, no...
 #    if not training:
@@ -152,8 +152,7 @@ def feedback_delay_func(responses, block_n, trial_n, training=False):
 #===================================================
 def calc_feedback(block_n, condition, trial_n, training=False):
     global training_score
-    target_zone_draw()
-    circles.draw()
+    target_zone_draw(False)
     surp = False
     if len(responses)>0:
         if len(responses)>1:
@@ -163,9 +162,8 @@ def calc_feedback(block_n, condition, trial_n, training=False):
         RT = response[0][1]-trial_start
         error =  RT - interval_dur 
         error_angle = error*angle_ratio
-        print error_angle
         if not training and trial_n in surprise_trials[surp_cnt]:          # Surprise on if not in training and if in list of surprise trials  
-            surprise_trial()
+            target_zone.setColor('black')
             resp_marker.setLineColor(None)
             outcome_str = 'SURPRISE!'
             select_surp_sound()
@@ -174,44 +172,53 @@ def calc_feedback(block_n, condition, trial_n, training=False):
         elif np.abs(error)<tolerances[condition]:             # WIN
             target_zone.setColor('green')
             outcome_str = 'WIN!'
+            outcome_sound = win_sound
             win_flag = 0
             
         else:                                   # LOSS
 
             target_zone.setColor('red')
             outcome_str = 'LOSE!'
+            outcome_sound = loss_sound
+
             win_flag = 1
 
             
         resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
         resp_marker.setEnd(pol2cart(error_angle+270, loop_radius+resp_marker_width/2))
         turn_sound[outcome_str].play()
-        target_zone_draw()                      # Using our defined target_zone_draw, not .draw to have correct visual.  
+        target_zone_draw(surp)                      # Using our defined target_zone_draw, not .draw to have correct visual.  
         resp_marker.draw()
+        
         
 
         if not surp:
-            if training and trial_n>=n_fullvis:
-                training_score[condition] += point_fn[win_flag]
-                print training_score
-            elif not training:
-                points[block_n]+= point_fn[win_flag]
-            win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
-        else:
-            win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
-            
-        if not surp:
+
             tolerances[condition]+= tolerance_step[condition][win_flag]      # Update tolerances based on feedback. Needs to be here.   
             if tolerances[condition] > tolerance_lim[0]:                      #!!! Won't work if moved to staircase. Would need new implementation.
                 tolerances[condition] = tolerance_lim[0]
             elif tolerances[condition] < tolerance_lim[1]:
                 tolerances[condition] = tolerance_lim[1]
 
+            if training and trial_n>=n_fullvis:
+                training_score[condition] += point_fn[win_flag]
+#                print training_score
+                
+            elif not training:
+                points[block_n]+= point_fn[win_flag]
+        if training:
+            win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
+            win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: FRAME TIME = {3}'.format('T', trial_n, outcome_sound, win.lastFrameT),logging.DATA)
+
+        else:
+            win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
+            win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: FRAME TIME = {3}'.format(block_n, trial_n, outcome_sound, win.lastFrameT),logging.DATA)
+
     else:   # No response detected
-#        outcome_loss.draw()
-#        outcome_loss_pic.draw()
+
         target_zone.setColor('red')
-        target_zone_draw()
+        turn_sound['LOSE!'].play()
+        target_zone_draw(surp)
         outcome_str = 'None'
         # Not adjusting tolerance for this type of trial...
         if not training:
@@ -238,13 +245,10 @@ def staircase(condition):
     target_upper_bound[condition] =  2*tolerances[condition]*angle_ratio
     target_zone.visibleWedge = [0, target_upper_bound[condition]]
     target_zone.ori = target_origin[condition]
-#    print 'origin = ', target_origin[condition], 'upper =' ,target_upper_bound[condition], 'origin+upper=',target_origin[condition]+target_upper_bound[condition]
-#    print 'tolerances = ' ,tolerances[condition], '180+(tolerances*angle)=', 180+(tolerances[condition]*angle_ratio)
-#    print 'visibleWEdge = ', target_zone.visibleWedge, 'tz.ori = ', target_zone.ori
 
 
 #===================================================
-def block_break(block_n, training=False): #conditions, n_blocks=n_blocks, break_min_dur=break_min_dur, key=key):
+def block_break(block_n, training=False): 
     point_calc(block_n)
     # If not the last block, print feedback
     if block_n<n_blocks*len(conditions)-1:
@@ -281,11 +285,11 @@ def score_instr():
     global training_score
     score_demo_txt.text = score_demo_str.format(training_score[condition])
     total_point_txt.text = total_point_str.format(np.sum(training_score.values()))
-    if training_score > 0:
+    if training_score[condition] > 0:
         score_demo_txt.color = 'green'
         total_point_txt.color = 'green'
 
-    elif training_score <= 0:
+    if training_score[condition] <= 0:
         score_demo_txt.color = 'red'
         total_point_txt.color = 'red'
 
@@ -300,24 +304,27 @@ def score_instr():
         win.close()
         core.quit()
 #===================================================
-def target_zone_draw():
-    target_zone.draw()
-    target_zone_cover.draw()
-    sockets.draw()
-    circles.draw()
-
-#===================================================
-def surprise_trial():
-    pic_cnt = np.random.randint(0, len(surprise_pic_list))
-    outcome_surprise_pic.draw()
-    outcome_surprise_pic.image = 'stimuli/{0}'.format(surprise_pic_list[pic_cnt])
+def target_zone_draw(surp):
+    if surp:
+        sockets.draw()
+        circles.draw()
+        target_zone.draw()
+        target_zone_cover.draw()
+    else:
+        target_zone.draw()
+        target_zone_cover.draw()
+        sockets.draw()
+        circles.draw()
+    
 
 #===================================================
 def select_surp_sound():
-    sound_type = np.random.choice(surprise_sounds.keys())                      # Selects the subfolder to draw sounds from (ie. 'drum_sounds').
-    sound_file = np.random.choice(surprise_sounds[sound_type])                 # Selects the specif wav file from the subfolder.
-    turn_sound['SURPRISE!'] = sound.Sound(value='surprise_sounds/{0}/{1}'.format(sound_type, sound_file),
-                                                  sampleRate=44100, secs=0.8)
+    sound_type = np.random.choice(block_sounds.keys())                      # Selects the subfolder to draw sounds from (ie. 'breaks').
+    sound_file = block_sounds[sound_type][surp_sound_index]                 # Selects the specif wav file from the subfolder.
+    turn_sound['SURPRISE!'] = sound.Sound(value= sound_file, sampleRate=44100, secs=0.8)
+
+    win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: FRAME TIME = {3}'.format(block_n, trial_n, sound_file, win.lastFrameT),logging.DATA)
+    block_sounds.pop(sound_type)
 #============================================================
 # INSTRUCTIONS
 #============================================================
@@ -359,13 +366,11 @@ for trial_n in range(n_fullvis+2*n_training):
     outcome_str = ''
     target_zone.visibleWedge = [0, target_upper_bound[condition]]
     target_zone.ori = target_origin[condition]
-#    print 'origin = ', target_origin[condition], 'upper =' ,target_upper_bound[condition], 'tolerances = ' ,tolerances[condition]
     if covered:
         circ_colors = [i for i in circ_cover_list]
         circles.colors = circ_colors
     fill_list = re_fill_color[covered]
     flip_list = re_flip_color[covered]
-#    print flip_list
         
     # Instructions
     if (trial_n==n_fullvis) or (trial_n==n_fullvis+n_training):                    # First Easy/Hard Training
@@ -381,8 +386,6 @@ for trial_n in range(n_fullvis+2*n_training):
     feedback_end = feedback_start + feedback_dur
     ITI = np.max(ITIs)
     win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,win.lastFrameT),logging.INFO)
-    # Below shouldn't need params because they're all defaults, but if you don't have them here it somehow logs the wrong thing (both if/else statements??)
-#    set_trial_timing(trial_clock, None, condition, trial_n, training=True)    # Trial time function Call, not needed because of previous lines
    
     #========================================================
     # Moving Ball
@@ -422,6 +425,8 @@ instruction_loop(main_str)                    # Main instruction call
 outcome_win.text = '+{0}'.format(point_fn[0])
 outcome_loss.text = '{0}'.format(point_fn[1])
 for block_n, block_type in enumerate(block_order):
+    block_sounds = surprise_sounds.copy()
+    surp_sound_index = 0
     condition = conditions[block_type]
     target_zone.visibleWedge = [0, target_upper_bound[condition]]
     target_zone.ori = target_origin[condition]
@@ -471,6 +476,7 @@ for block_n, block_type in enumerate(block_order):
     #========================================================
     # Break Between Blocks
     surp_cnt += 1
+    surp_sound_index += 1 
     block_break(block_n)
      
 
