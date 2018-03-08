@@ -102,8 +102,8 @@ def moving_ball(block_n, trial_n, training=False):
                     core.quit()
                 response = [press]
                 #!!! Responses captured here were not getting registered.  Initialized response at top of function to capture response in this loop. 
-#            if pos_ix==1 and experiment_type=='EEG'
-    #                port.setData(1)  # sets just this pin to be high
+#            if circ_xi==1 and paradigm_type=='EEG'
+#                   port.setData(1)  # sets just this pin to be high
     if not response:
         response = event.getKeys(keyList=key, timeStamped=trial_clock)  #!!! responses here still tied to flips?
     if len(response)>0:
@@ -127,7 +127,8 @@ def feedback_delay_func(responses, block_n, trial_n, training=False):
 #        win.logOnFlip('TRAINING T{0} feedback_delay starts: total time = {1:.3f}, trial time = {2:.3f}'.format(
 #                                                trial_n,exp_clock.getTime(),trial_clock.getTime()),logging.INFO)
     win.flip()
-    #        if exp_type=='EEG': port.setData(0)
+    #        if paradigm_type=='EEG': 
+#                port.setData(0)
     # Catch responses during delay before feedback onset
     while trial_clock.getTime() < feedback_start:
         response = event.getKeys(keyList=key, timeStamped=trial_clock)
@@ -227,11 +228,13 @@ def calc_feedback(block_n, condition, trial_n, training=False):
         else:
             win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,-1,condition,tolerances[condition]),logging.DATA)
             win.logOnFlip('B{0}_T{1} feedback start: FRAME TIME = {2}'.format('T',trial_n,win.lastFrameT),logging.INFO)
-    #if experiment_type=='ECoG': trigger_rect.draw()
+#    if paradigm_type=='ECoG': 
+#        trigger_rect.draw()
     win.flip()
     resp_marker.setLineColor('black')
     target_zone.setColor('dimgrey')
-#        if experiment_type=='EEG': port.setData(2)
+#        if paradigm_type=='EEG': 
+            #port.setData(2)
     while trial_clock.getTime() < feedback_end:
         for press in event.getKeys(keyList=[key,'escape','q']):
             if press in ['escape','q']:
@@ -328,7 +331,7 @@ def select_surp_sound():
 #============================================================
 # INSTRUCTIONS
 #============================================================
-# if experiment_type=='EEG'
+# if paradigm_type=='EEG'
 #   port = parallel.ParallelPort(address=53504)
 
 welcome_txt.draw()
@@ -344,7 +347,7 @@ win.flip()
 #============================================================
 # TRAINING
 #============================================================
-# if experiment_type=='EEG':
+# if paradigm_type=='EEG':
 #   port.setData(0) # sets all pins low
 for trial_n in range(n_fullvis+2*n_training):
     #========================================================
@@ -403,7 +406,7 @@ for trial_n in range(n_fullvis+2*n_training):
     # ITI
     win.logOnFlip('B{0}_T{1} ITI={2}; FRAME TIME = {3}'.format('T',trial_n,ITI,win.lastFrameT),logging.INFO)
     win.flip()
-# if experiment_type=='EEG':
+# if paradigm_type=='EEG':
 #    port.setData(0)
     
     # Staircase Tolerance
