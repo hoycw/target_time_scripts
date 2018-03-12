@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.3'
+paradigm_version = '2.3.3'
 
 from psychopy import visual, event, core, gui, logging, data
 from target_time_cyclone_log import*
@@ -94,6 +94,7 @@ if debug_mode:
     n_trials = 5
     break_min_dur = 1
     # Change surprise parameters
+    n_rand_blocks = n_blocks*2
     n_surp = 2
     first_possible = 1
     min_gap = 1

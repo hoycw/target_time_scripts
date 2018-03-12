@@ -2,7 +2,9 @@
 #  Log of alterations to experiment
 #===================================
 
-# cyclone v2.3:   Remoeved all picture feedback. Implemented surpirse tiral sounds with 9 categories of sounds each holding 8 samples. For each block,
+# cyclone v2.3.3: fixed some timing issues, a typo or two, a littel house cleaning here and there
+# cyclone v2.3.2: added EEG parallel port triggers, fixed EEG+debug loop, changed bar to black on surprise trials, fixed outcome sound logging
+# cyclone v2.3:   Removed all picture feedback. Implemented surpirse tiral sounds with 9 categories of sounds each holding 8 samples. For each block,
 #                 logic randomly selects a category for each surprise trial, then a ound from that category.  
 #                 Implemented loging with block, trial, sound and frame time variables.
 

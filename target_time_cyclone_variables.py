@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.3'
+paradigm_version = '2.3.3'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['pygame']
@@ -21,7 +21,7 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 win = visual.Window(size=(1280,1024), fullscr=full_screen, color=(0,0,0),
                     monitor='testMonitor',# screen=screen_to_show,
                     allowGUI=False, units=screen_units)#, waitBlanking=False); # !!! check on this waitBlank parameter!
-#NOTE: ECoG laptop size = 36cm wide, 20sm tall
+#NOTE: ECoG-A laptop size = 36cm wide, 20sm tall
 
 exp_clock = core.Clock()
 trial_clock = core.Clock()
@@ -43,7 +43,7 @@ while any([cnt>=3 for cnt in block_repeat_cnt]):
 #-------------------------------------------------------------------
 # Determine surprise trial numbers
 # Draw surprise trial numbers from CSVs
-surprise_sequence = set(random.sample(range(2*n_blocks), n_rand_blocks))
+surprise_sequence = set(random.sample(range(n_rand_blocks), n_rand_blocks))
 surp_csv =  "surp_csvs/{0}_{1}_randomized_list.csv".format(paradigm_type, str(n_trials))
 if debug_mode:
     surp_csv = "surp_csvs/debug_randomized_list.csv"
@@ -52,8 +52,6 @@ with open(surp_csv, 'r') as read:
     desired_rows = [row for row_number, row in enumerate(reader)
                     if row_number in surprise_sequence]
 surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
-#print surprise_trials
-
 
 
 #============================================================
@@ -147,8 +145,10 @@ sockets = visual.ElementArrayStim(win, nElements=n_circ,sizes=socket_size,xys = 
                            elementTex = None, elementMask = "circle",                                   # always present behind circle stim
                            colors=socket_colors)
 
-#---------------------------------------------------
+#=========================
 # Target Zone
+#=========================
+
 target_upper_bound = {'easy': angle_ratio * (tolerances['easy']*2),  # Get angle of +/- tolerance from interval_dur
                       'hard': angle_ratio * (tolerances['hard']*2)}
 target_origin = {'easy': 180 - (tolerances['easy'] * angle_ratio),   # zero starts at 12 oclock for radial stim.  
@@ -156,7 +156,7 @@ target_origin = {'easy': 180 - (tolerances['easy'] * angle_ratio),   # zero star
 
 target_zone = visual.RadialStim(win, tex='sqrXsqr', color='dimgrey', size=(loop_radius*2) + target_width, # size = diameter
     visibleWedge=[0, target_upper_bound['easy']], radialCycles=1, angularCycles=0, interpolate=False,   # radialCycles=1 to avoid color flip
-    autoLog=False, units='cm', angularRes=500)
+    autoLog=False, units='cm', angularRes=1000)
 target_zone_cover = visual.Circle(win, radius = loop_radius - target_width/2, edges=100,
                 lineColor=None, fillColor=[0, 0, 0]) # Covers center of wedge used to draw taret zone
 
