@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.3.3'
+paradigm_version = '2.3.4'
 
 from psychopy import visual, event, core, gui, logging, data
 from target_time_cyclone_log import*
@@ -33,7 +33,7 @@ key = 'space'                       # Response key (eventually will be assigned 
 #  TOLERANCE AND INTERVAL PARAMETERS  
 #======================================
 interval_dur = 1                    # duration (in sec) of target time interval
-feedback_delay = 2                  # duration (in s) of delay between end of interval and feedback onset
+feedback_delay = 0.8                  # duration (in s) of delay between end of interval and feedback onset
 feedback_dur = 2                    # duration (in s) of feedback presentation
 ITIs = [0.2, 0.4, 0.7, 1.0]         # length of inter-trial intervals (in s)
 post_instr_delay = 1                # duration of delay (in s) after instructions/break to make sure they're ready
