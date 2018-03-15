@@ -58,6 +58,7 @@ def instruction_loop(instrs, intro=False):
 #===================================================
 def set_trial_timing(trial_clock, block_n, trial_n, training=False):#!!! why is condition here if it's not used? 
     # for training mode, input block_n=None
+    win.flip()                                   # !!! to lock timing before first frame.
     trial_clock.reset()
     trial_start = trial_clock.getTime()
     target_time = trial_start + interval_dur
@@ -76,7 +77,7 @@ def moving_ball(block_n, trial_n, training=False):
     
     # Draw Stimuli
     for circ_xi in range(n_circ-1):# - sum(hidden_pos[covered])):
-        target_zone_draw(False)
+        target_zone_draw()
         if circ_xi == 0:
             circ_colors[n_circ-1] = (1,1,1)
         if paradigm_type=='ecog' and circ_start[circ_xi] < trigger_dur:
@@ -87,22 +88,22 @@ def moving_ball(block_n, trial_n, training=False):
             circ_colors[circ_xi] = (1,1,1)      # Turn light on
         circles.colors = circ_colors
         circles.draw()
+#        if circ_xi==1 and paradigm_type=='eeg':
+#            win.callOnFlip(port.setData, 1)  # sets just this pin to be high
         win.flip()
-        if circ_xi==1 and paradigm_type=='eeg':
-            port.setData(1)  # sets just this pin to be high
+
         
         circ_colors[n_circ-1] = (-1,-1,-1)
         circ_colors[circ_xi] = flip_list[circ_xi]  # Turn light back off
         circles.colors = circ_colors
-        
         while trial_clock.getTime() < trial_start + circ_start[circ_xi]:
             for press in event.getKeys(keyList=[key,'escape','q'], timeStamped=trial_clock):
                 if press[0] in ['escape','q']:
                     win.close()
                     core.quit()
                 response = [press]
-                #!!! Responses captured here were not getting registered.  Initialized response at top of function to capture response in this loop. 
-    
+                    #!!! Responses captured here were not getting registered.  Initialized response at top of function to capture response in this loop. 
+        
     # Log any responses
     if not response:
         response = event.getKeys(keyList=key, timeStamped=trial_clock)  #!!! responses here still tied to flips?
@@ -117,7 +118,7 @@ def moving_ball(block_n, trial_n, training=False):
 
 #===================================================
 def feedback_delay_func(responses, block_n, trial_n, training=False):
-    target_zone_draw(False)
+    target_zone_draw()
     circles.draw()
     # !!! Do we need these delay starts? If we're not testing timing, no...
 #    if not training:
@@ -126,9 +127,10 @@ def feedback_delay_func(responses, block_n, trial_n, training=False):
 #    else:
 #        win.logOnFlip('TRAINING T{0} feedback_delay starts: total time = {1:.3f}, trial time = {2:.3f}'.format(
 #                                                trial_n,exp_clock.getTime(),trial_clock.getTime()),logging.INFO)
+    
+#    if paradigm_type=='eeg': 
+#        win.callOnFlip(port.setData, 0)
     win.flip()
-    if paradigm_type=='eeg': 
-        port.setData(0)
     
     # Catch responses during delay before feedback onset
     while trial_clock.getTime() < feedback_start:
@@ -138,7 +140,7 @@ def feedback_delay_func(responses, block_n, trial_n, training=False):
             if not training:
                 win.logOnFlip('B{0}_T{1} Response: {2}, FRAME TIME = {3}'.format(block_n,trial_n,response,win.lastFrameT),logging.DATA)
             else:
-                win.logOnFlip('TRAINING T{0} Response: {1}, FRAME TIME = {2}'.format(trial_n,response,win.lastFrameT),logging.DATA)
+                win.logOnFlip('TRAINING T{0} Response: {1}, FRAME TIME = {2}, TRIAL START = {3}'.format(trial_n,response,win.lastFrameT,trial_start),logging.DATA)
             response = []
             
     # !!! Timing test, can be removed later
@@ -154,7 +156,7 @@ def feedback_delay_func(responses, block_n, trial_n, training=False):
 #===================================================
 def calc_feedback(block_n, condition, trial_n, training=False):
     global training_score
-    target_zone_draw(False)
+    target_zone_draw()
     surp = False
     if len(responses)>0:
         if len(responses)>1:
@@ -182,32 +184,15 @@ def calc_feedback(block_n, condition, trial_n, training=False):
             win_flag = 1
         resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
         resp_marker.setEnd(pol2cart(error_angle+270, loop_radius+resp_marker_width/2))
-        target_zone_draw(surp)                      # Using our defined target_zone_draw, not .draw to have correct visual.  
-        resp_marker.draw()
         
         
-        if not surp:
-            tolerances[condition]+= tolerance_step[condition][win_flag]      # Update tolerances based on feedback. Needs to be here.   
-            if tolerances[condition] > tolerance_lim[0]:                      #!!! Won't work if moved to staircase. Would need new implementation.
-                tolerances[condition] = tolerance_lim[0]
-            elif tolerances[condition] < tolerance_lim[1]:
-                tolerances[condition] = tolerance_lim[1]
-            if training and trial_n>=n_fullvis:
-                training_score[condition] += point_fn[win_flag]
-#                print training_score
-                
-            elif not training:
-                points[block_n]+= point_fn[win_flag]
-            if training:
-                win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
-                win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: FRAME TIME = {3}'.format('T', trial_n, outcome_sound, win.lastFrameT),logging.DATA)
-            else:
-                win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
-                win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: FRAME TIME = {3}'.format(block_n, trial_n, outcome_sound, win.lastFrameT),logging.DATA)
+        
+        
     else:   # No response detected
         target_zone.setColor('red')
-        target_zone_draw(surp)
+        target_zone_draw()
         outcome_str = 'None'
+        resp_marker.setLineColor(None)
         # Not adjusting tolerance for this type of trial...
         if not training:
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,-1,condition,tolerances[condition]),logging.DATA)
@@ -219,11 +204,34 @@ def calc_feedback(block_n, condition, trial_n, training=False):
        trigger_rect.draw()
     
     # Present feedback
-    turn_sound[outcome_str].play()
+    win.callOnFlip(turn_sound[outcome_str].play)
+#    if paradigm_type=='eeg': 
+#        win.callOnFlip(port.setData, 2)
+    for frameN in range(feedback_dur * 60):        # softcode 60 to framerate later. 
+        target_zone_draw()                      # Using our defined target_zone_draw, not .draw to have correct visual.  
+        resp_marker.draw()
+        win.flip()
     win.flip()
-    if paradigm_type=='eeg': 
-        port.setData(2)
-    
+
+    if not surp and outcome_str != 'None':
+        tolerances[condition]+= tolerance_step[condition][win_flag]      # Update tolerances based on feedback. Needs to be here.   
+        if tolerances[condition] > tolerance_lim[0]:                      #!!! Won't work if moved to staircase. Would need new implementation.
+            tolerances[condition] = tolerance_lim[0]
+        elif tolerances[condition] < tolerance_lim[1]:
+            tolerances[condition] = tolerance_lim[1]
+        if training and trial_n>=n_fullvis:
+            training_score[condition] += point_fn[win_flag]
+#                print training_score
+            
+        elif not training:
+            points[block_n]+= point_fn[win_flag]
+        if training:
+            win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
+            win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: FRAME TIME = {3}'.format('T', trial_n, outcome_sound, win.lastFrameT),logging.DATA)
+        else:
+            win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,RT,condition,tolerances[condition]),logging.DATA)
+            win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: FRAME TIME = {3}'.format(block_n, trial_n, outcome_sound, win.lastFrameT),logging.DATA)
+            
     resp_marker.setLineColor('black')
     target_zone.setColor('dimgrey')
     while trial_clock.getTime() < feedback_end:
@@ -300,17 +308,11 @@ def score_instr():
         core.quit()
 
 #===================================================
-def target_zone_draw(surp):
-    if surp:
-        sockets.draw()
-        circles.draw()
-        target_zone.draw()
-        target_zone_cover.draw()
-    else:
-        target_zone.draw()
-        target_zone_cover.draw()
-        sockets.draw()
-        circles.draw()
+def target_zone_draw():
+    target_zone.draw()
+    target_zone_cover.draw()
+    sockets.draw()
+    circles.draw()
 
 #===================================================
 def select_surp_sound():
@@ -324,8 +326,8 @@ def select_surp_sound():
 #============================================================
 # INSTRUCTIONS
 #============================================================
-if paradigm_type=='eeg':
-   port = parallel.ParallelPort(address=53504)
+#if paradigm_type=='eeg':
+#   port = parallel.ParallelPort(address=53504)
 
 welcome_txt.draw()
 adv_screen_txt.draw()
@@ -340,8 +342,8 @@ win.flip()
 #============================================================
 # TRAINING
 #============================================================
-if paradigm_type=='eeg':
-    port.setData(0) # sets all pins low
+#if paradigm_type=='eeg':
+#    port.setData(0) # sets all pins low
 for trial_n in range(n_fullvis+2*n_training):
     #========================================================
     # Initialize Trial
@@ -375,14 +377,15 @@ for trial_n in range(n_fullvis+2*n_training):
     #========================================================
     # Set Trial Timing
     #   NOTE: need to run this outside the function the first time to initialize
+    win.flip                                # !!! to lock timing before first frame.
     trial_clock.reset()                                                       # In loop as temp variables, may exg to variable file
-    trial_start = trial_clock.getTime()
+    trial_start = trial_clock.getTime()    
     target_time = trial_start + interval_dur
     feedback_start = trial_start + interval_dur + feedback_delay
     feedback_end = feedback_start + feedback_dur
     ITI = np.max(ITIs)
     win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,win.lastFrameT),logging.INFO)
-   
+
     #========================================================
     # Moving Ball
     moving_ball(None, trial_n, training=True)
@@ -398,10 +401,10 @@ for trial_n in range(n_fullvis+2*n_training):
     #========================================================
     # ITI
     win.logOnFlip('B{0}_T{1} ITI={2}; FRAME TIME = {3}'.format('T',trial_n,ITI,win.lastFrameT),logging.INFO)
-    win.flip()
-    if paradigm_type=='eeg':
-        port.setData(0)
     
+#    if paradigm_type=='eeg':
+#        win.callOnFlip(port.setData, 0)
+    win.flip()
     # Staircase Tolerance
     staircase(condition)
     while trial_clock.getTime() < feedback_end + ITI:
@@ -461,9 +464,10 @@ for block_n, block_type in enumerate(block_order):
         #========================================================
         # ITI
         win.logOnFlip('B{0}_T{1} ITI={2}; FRAME TIME = {3}'.format(block_n,trial_n,ITI,win.lastFrameT),logging.INFO)
+        
+#        if paradigm_type=='eeg':
+#            win.callOnFlip(port.setData, 0)
         win.flip()
-        if paradigm_type=='eeg':
-            port.setData(0)
         staircase(condition)
         while trial_clock.getTime() < feedback_end + ITI:
             for press in event.getKeys(keyList=[key,'escape','q']):

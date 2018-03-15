@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.3.4'
+paradigm_version = '2.3.5'
 
 from psychopy import visual, event, core, gui, logging, data
 from target_time_cyclone_log import*
@@ -32,8 +32,8 @@ key = 'space'                       # Response key (eventually will be assigned 
 #======================================
 #  TOLERANCE AND INTERVAL PARAMETERS  
 #======================================
-interval_dur = 1                    # duration (in sec) of target time interval
-feedback_delay = 0.8                  # duration (in s) of delay between end of interval and feedback onset
+interval_dur = 1                    # duration (in s) of target time interval
+feedback_delay = 0.8                # duration (in s) of delay between end of interval and feedback onset
 feedback_dur = 2                    # duration (in s) of feedback presentation
 ITIs = [0.2, 0.4, 0.7, 1.0]         # length of inter-trial intervals (in s)
 post_instr_delay = 1                # duration of delay (in s) after instructions/break to make sure they're ready
@@ -51,7 +51,7 @@ instr_img_pos = (5, -2)
 #======================
 # STIMULUS PARAMETERS  
 #======================
-full_screen = True                 # Make the window full screen? (True/False)
+full_screen = True                  # Make the window full screen? (True/False)
 #screen_to_show = 1                 # Select which screen to display the window on
 screen_units = 'cm'                 # Set visual object sizes in cm (constant across all screens)
 
@@ -63,11 +63,11 @@ target_width = 1.5                  # thickness of target zone IN CM
 xhr_thickness = .5                  # Thickness of the crosshair on top of the bullseye
 
 covered_portion = 0.6               # % of interval time obscured when covered=True
-resp_marker_width = 2.5   # Width of the response marker (marks where they pressed the button)
+resp_marker_width = 2.5             # Width of the response marker (marks where they pressed the button)
 resp_marker_thickness = 4           # Thickness of the response marker
 conditions = ['easy', 'hard']       # labels of the trial conditions
 trigger_rect_height = 150           # height of the photodiode trigger rectangle IN PIXELS (based on 1920x1080 screen)
-trigger_dur = 0.2
+trigger_dur = 0.2                    # in s. 
 point_fn = [100, -100]              # reward function determining points awarded for [correct, incorrect, surprise]
 
 #========================

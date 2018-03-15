@@ -1,13 +1,13 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.3.4'
+paradigm_version = '2.3.5'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['pygame']
 from psychopy import visual, event, core, gui, logging, data, sound
 #from psychopy import parallel
 import numpy as np
-import math, time, random, csv, glob
+import math, time, random, csv, glob, warnings
 from itertools import groupby
 from target_time_cyclone_log import * 
 from target_time_cyclone_parameters import*
@@ -20,9 +20,14 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #============================================================
 win = visual.Window(size=(1280,1024), fullscr=full_screen, color=(0,0,0),
                     monitor='testMonitor',# screen=screen_to_show,
-                    allowGUI=False, units=screen_units)#, waitBlanking=False); # !!! check on this waitBlank parameter!
+                    allowGUI=False, units=screen_units, waitBlanking=True); # !!! check on this waitBlank parameter!
 #NOTE: ECoG-A laptop size = 36cm wide, 20sm tall
 
+frame_rate = win.getActualFrameRate()
+if frame_rate < 60:
+    warnings.warn('Frame rate less than 60hz')
+if frame_rate > 60:
+    warnings.warn('Frame rate greater than 60hz')
 exp_clock = core.Clock()
 trial_clock = core.Clock()
 if paradigm_type == 'ecog':
