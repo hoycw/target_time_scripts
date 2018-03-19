@@ -20,7 +20,7 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #============================================================
 win = visual.Window(size=(1280,1024), fullscr=full_screen, color=(0,0,0),
                     monitor='testMonitor',# screen=screen_to_show,
-                    allowGUI=False, units=screen_units, waitBlanking=True); # !!! check on this waitBlank parameter!
+                    allowGUI=False, units=screen_units, waitBlanking=True);
 #NOTE: ECoG-A laptop size = 36cm wide, 20sm tall
 
 frame_rate = win.getActualFrameRate()
@@ -159,7 +159,7 @@ sockets = visual.ElementArrayStim(win, nElements=n_circ,sizes=socket_size,xys = 
 target_upper_bound = {'easy': angle_ratio * (tolerances['easy']*2),  # Get angle of +/- tolerance from interval_dur
                       'hard': angle_ratio * (tolerances['hard']*2)}
 target_origin = {'easy': 180 - (tolerances['easy'] * angle_ratio),   # zero starts at 12 oclock for radial stim.  
-                 'hard': 180 - (tolerances['hard'] * angle_ratio)}   #!!! Ian comment: Strange indexing, -0 ending sets too far to right
+                 'hard': 180 - (tolerances['hard'] * angle_ratio)}   # Ian comment: Strange indexing, -0 ending sets too far to right
 
 target_zone = visual.RadialStim(win, tex='sqrXsqr', color='dimgrey', size=(loop_radius*2) + target_width, # size = diameter
     visibleWedge=[0, target_upper_bound['easy']], radialCycles=1, angularCycles=0, interpolate=False,   # radialCycles=1 to avoid color flip

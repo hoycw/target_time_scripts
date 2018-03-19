@@ -41,7 +41,6 @@ def instruction_loop(instrs, intro=False):
             if adv[0] in ['escape','q']:
                 win.close()
                 core.quit()
-
     else:
         instr_txt.text = instrs
         instr_txt.pos = (0,2)
@@ -56,9 +55,9 @@ def instruction_loop(instrs, intro=False):
 
 
 #===================================================
-def set_trial_timing(trial_clock, block_n, trial_n, training=False):#!!! why is condition here if it's not used? 
+def set_trial_timing(trial_clock, block_n, trial_n, training=False):
     # for training mode, input block_n=None
-    win.flip()                                   # !!! to lock timing before first frame.
+    win.flip()                                   # to lock timing before first frame.
     trial_clock.reset()
     trial_start = trial_clock.getTime()
     target_time = trial_start + interval_dur
@@ -185,9 +184,6 @@ def calc_feedback(block_n, condition, trial_n, training=False):
         resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
         resp_marker.setEnd(pol2cart(error_angle+270, loop_radius+resp_marker_width/2))
         
-        
-        
-        
     else:   # No response detected
         target_zone.setColor('red')
         target_zone_draw()
@@ -225,7 +221,6 @@ def calc_feedback(block_n, condition, trial_n, training=False):
         if training and trial_n>=n_fullvis:
             training_score[condition] += point_fn[win_flag]
 #                print training_score
-            
         elif not training:
             points[block_n]+= point_fn[win_flag]
         if training:

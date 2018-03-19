@@ -2,6 +2,7 @@
 #  Log of alterations to experiment
 #===================================
 
+# cyclone v2.3.6: now switched to time by frames, ECoG trigger and EEG port triggers work
 # cyclone v2.3.4: added 'None' (no response) outcome sound to fix crash with no response
 # cyclone v2.3.3: fixed some timing issues, a typo or two, a littel house cleaning here and there
 # cyclone v2.3.2: added EEG parallel port triggers, fixed EEG+debug loop, changed bar to black on surprise trials, fixed outcome sound logging
