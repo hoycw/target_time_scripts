@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.3.6'
+paradigm_version = '2.3.7'
 
 from psychopy import visual, event, core, gui, logging, data
 from target_time_cyclone_log import*
@@ -16,6 +16,7 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 def experiment_parameters(type):                        #function that selects correct parameter from corresponding dicts 
     return n_fullvis[type], n_training[type], n_blocks[type], n_trials[type], break_min_dur[type]
 
+# probably need debug y/n and eeg/ecog input from the log file, which will then determine the values below
 #   eeg/ecog is needed even for debug mode, because of parallel port for EEG and trigger rectangle for ECoG
 n_fullvis     = {'eeg':5,  'ecog':5}                   # number of EASY examples to start (large tolerance, full window)
 n_training    = {'eeg':15, 'ecog':15}                  # number of training trials PER CONDITION

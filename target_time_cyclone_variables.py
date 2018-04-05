@@ -1,9 +1,9 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.3.6'
+paradigm_version = '2.3.7'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
-prefs.general['audioLib'] = ['pygame']
+prefs.general['audioLib'] = ['sounddevice']
 from psychopy import visual, event, core, gui, logging, data, sound
 #from psychopy import parallel
 import numpy as np
@@ -23,13 +23,15 @@ win = visual.Window(size=(1280,1024), fullscr=full_screen, color=(0,0,0),
                     allowGUI=False, units=screen_units, waitBlanking=True);
 #NOTE: ECoG-A laptop size = 36cm wide, 20sm tall
 
+frame_dur = win.getMsPerFrame(msg='Please wait, testing frame rate...')
 frame_rate = win.getActualFrameRate()
 if frame_rate < 60:
-    warnings.warn('Frame rate less than 60hz')
+    warnings.warn('Frame rate less than 60hz: '+str(frame_rate))
 if frame_rate > 60:
-    warnings.warn('Frame rate greater than 60hz')
+    warnings.warn('Frame rate greater than 60hz: '+str(frame_rate))
 exp_clock = core.Clock()
 trial_clock = core.Clock()
+block_frame_clock = core.Clock()
 if paradigm_type == 'ecog':
     block_order = np.array([0, 0, 1, 1])
 else:
@@ -105,10 +107,10 @@ surprise_sounds = {'breaks': glob.glob("surprise_sounds/breaks/*.wav"),
                    'thuds': glob.glob("surprise_sounds/thuds/*.wav")}
 
 
-turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, secs=0.8),  # Swich sound sample once sounds present
-             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=8000, secs=0.8),
-             "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, secs=0.8),
-             'None': sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=8000, secs=0.8)}
+turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, secs=0.8, stereo=True),  # Switch sound sample once sounds present
+             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=8000, secs=0.8, stereo=True),
+             "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, secs=0.8, stereo=True),
+             'None': sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=8000, secs=0.8, stereo=True)}
 
 turn_sound["WIN!"].setVolume(0.8)
 turn_sound["LOSE!"].setVolume(0.8)
@@ -159,7 +161,7 @@ sockets = visual.ElementArrayStim(win, nElements=n_circ,sizes=socket_size,xys = 
 target_upper_bound = {'easy': angle_ratio * (tolerances['easy']*2),  # Get angle of +/- tolerance from interval_dur
                       'hard': angle_ratio * (tolerances['hard']*2)}
 target_origin = {'easy': 180 - (tolerances['easy'] * angle_ratio),   # zero starts at 12 oclock for radial stim.  
-                 'hard': 180 - (tolerances['hard'] * angle_ratio)}   # Ian comment: Strange indexing, -0 ending sets too far to right
+                 'hard': 180 - (tolerances['hard'] * angle_ratio)}   #!!! Ian comment: Strange indexing, -0 ending sets too far to right
 
 target_zone = visual.RadialStim(win, tex='sqrXsqr', color='dimgrey', size=(loop_radius*2) + target_width, # size = diameter
     visibleWedge=[0, target_upper_bound['easy']], radialCycles=1, angularCycles=0, interpolate=False,   # radialCycles=1 to avoid color flip
