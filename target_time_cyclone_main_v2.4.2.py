@@ -175,7 +175,7 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
 #    win.callOnFlip(turn_sound[outcome_str].play)
     if paradigm_type=='eeg': 
         win.callOnFlip(port.setData, 2)
-    for frameN in range(feedback_dur * frame_rate):
+    for frameN in range(feedback_dur * 60): #!!! change to frame_rate variable
         if paradigm_type=='ecog': 
             trigger_rect.draw()
         if frameN == 0:
