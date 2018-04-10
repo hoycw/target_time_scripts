@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.3.7'
+paradigm_version = '2.4.1'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -30,8 +30,6 @@ if frame_rate < 60:
 if frame_rate > 60:
     warnings.warn('Frame rate greater than 60hz: '+str(frame_rate))
 exp_clock = core.Clock()
-trial_clock = core.Clock()
-block_frame_clock = core.Clock()
 if paradigm_type == 'ecog':
     block_order = np.array([0, 0, 1, 1])
 else:
@@ -121,6 +119,7 @@ turn_sound["None"].setVolume(0.8)
 #===================================================
 # CIRCLE & TARGET ZONE PARAMETERS
 #===================================================
+trial_dur = interval_dur + feedback_delay + feedback_dur
 angle_ratio = 360/float(interval_dur)
 
 #---------------------------------------------------
