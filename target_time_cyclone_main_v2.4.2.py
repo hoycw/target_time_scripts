@@ -28,7 +28,7 @@ from target_time_cyclone_variables import*
 #============================
 def instruction_loop(instrs, intro=False):
     image_index = 0
-# displays instructions for current trial type
+    # displays instructions for current trial type
     # If intro=True, instrs won't be used (can just be '') 
     if instrs!= main_str:
         for instr_str in instrs:
@@ -45,12 +45,6 @@ def instruction_loop(instrs, intro=False):
             adv_screen_txt.draw()
             win.flip()
             instr_key_check()
-#            adv = event.waitKeys(keyList=[key, 'escape', 'q'])
-#            if adv[0] in ['escape','q']:
-#                rtbox.close()
-#                win.close()
-#                core.quit()
-
     else:
         instr_txt.text = instrs
         instr_txt.pos = (0,2)
@@ -58,17 +52,11 @@ def instruction_loop(instrs, intro=False):
         adv_screen_txt.draw()
         win.flip()
         instr_key_check()
-#        adv = event.waitKeys(keyList=[key, 'escape', 'q'])
-#        if adv[0] in ['escape','q']:
-#            rtbox.close()
-#            win.close()
-#            core.quit()
         core.wait(post_instr_delay)     # let them prep before hitting them with interval_dur
 
 #===================================================
 def instr_key_check(check_time=0.2):
     waiting = True
-#    wait_ix=0
     while waiting:
         press = event.getKeys(keyList=['escape','q'])
         if press:
@@ -78,22 +66,6 @@ def instr_key_check(check_time=0.2):
             waiting = False
         core.wait(check_time)
     rtbox.clear()
-
-
-#===================================================
-#def set_trial_timing(trial_clock, block_n, trial_n, training=False):#!!! why is condition here if it's not used? 
-#    # for training mode, input block_n=None
-#    win.flip()                                   # !!! to lock timing before first frame.
-#    trial_clock.reset()
-#    trial_start = trial_clock.getTime()
-#    target_time = trial_start + interval_dur
-#    feedback_start = target_time + feedback_delay
-#    feedback_end = feedback_start + feedback_dur
-#    ITI = random.choice(ITIs)       #!!! probably want specific random sequences to be determined ahead of time
-#    if training:   # !!! do we want to get rid of this and make training and block logging uniform style?
-#        win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,win.lastFrameT),logging.INFO)
-#    else:
-#        win.logOnFlip('B{0}_T{1} start: FRAME TIME = {2}'.format(block_n,trial_n,win.lastFrameT),logging.INFO)
 
 
 #===================================================
@@ -120,7 +92,7 @@ def moving_ball(block_n, trial_n, training=False):
         circ_colors[n_circ-1] = (-1,-1,-1)
         circ_colors[circ_xi] = flip_list[circ_xi]  # Turn light back off
         circles.colors = circ_colors
-        while exp_clock.getTime() < trial_start + circ_start[circ_xi]:
+        while exp_clock.getTime() < trial_start + circ_start[circ_xi]:  # wait until this light should turn off
             core.wait(0.001)
     
     # Turn off stimuli for feedback_delay
@@ -130,14 +102,6 @@ def moving_ball(block_n, trial_n, training=False):
         win.callOnFlip(port.setData, 0)
     win.flip()
     
-#            for press in event.getKeys(keyList=[key,'escape','q'], timeStamped=trial_clock):
-#                if press[0] in ['escape','q']:
-#                    rtbox.close()
-#                    win.close()
-#                    core.quit()
-#                response = [press]
-                    #!!! Responses captured here were not getting registered.  Initialized response at top of function to capture response in this loop. 
-        
 #    # Log any responses
 #    if not response:
 #        response = event.getKeys(keyList=key, timeStamped=trial_clock)  #!!! responses here still tied to flips?
@@ -152,50 +116,20 @@ def moving_ball(block_n, trial_n, training=False):
 
 
 #===================================================
-#def feedback_delay_func(block_n, trial_n, training=False):#!!! do I need to pass in trial_start, or is that global enough?
-#    target_zone_draw()
-#    circles.draw()
-#    # !!! Do we need these delay starts? If we're not testing timing, no...
-#    if not training:
-#        win.logOnFlip('B{0}_T{1} feedback_delay starts: total time = {2:.3f}, trial time = {3:.3f}'.format(
-#                                    block_n,trial_n,exp_clock.getTime(),trial_clock.getTime()),logging.INFO)
-#    else:
-#        win.logOnFlip('TRAINING T{0} feedback_delay starts: total time = {1:.3f}, trial time = {2:.3f}'.format(
-#                                                trial_n,exp_clock.getTime(),trial_clock.getTime()),logging.INFO)
-#    
-#    if paradigm_type=='eeg': 
-#        win.callOnFlip(port.setData, 0)
-#    win.flip()
-#    
-#    # Catch responses during delay before feedback onset
-#    while exp_clock.getTime() < trial_start + interval_dur + feedback_delay:#feedback_start:
-#        core.wait(0.001)
-#        response = event.getKeys(keyList=key, timeStamped=trial_clock)
-#        if len(response)>0:
-#            responses.append(response)
-#            if not training:
-#                win.logOnFlip('B{0}_T{1} Response: {2}, FRAME TIME = {3}'.format(block_n,trial_n,response,win.lastFrameT),logging.DATA)
-#            else:
-#                win.logOnFlip('TRAINING T{0} Response: {1}, FRAME TIME = {2}, TRIAL START = {3}'.format(trial_n,response,win.lastFrameT,trial_start),logging.DATA)
-#            response = []
-            
-    # !!! Timing test, can be removed later
-#    offset_error = trial_clock.getTime()-interval_dur-feedback_delay-trial_start #this should tell us how accurate the timing of the feedback_delay and total trial was
-#    if not training:
-#        win.logOnFlip('B{0}_T{1} feedback delay end: {2:.5f}; offset error = {3:.5f}'.format(block_n,trial_n,trial_clock.getTime(),
-#                                                            offset_error),logging.INFO)
-#    else:                                                    
-#        win.logOnFlip('TRAINING T{0} feedback delay end: {1:.5f}; offset error = {2:.5f}'.format(trial_n,trial_clock.getTime(),
-#                                                            offset_error),logging.INFO)
-
-
-#===================================================
-def calc_feedback(block_n, condition, trial_n, trial_start, training=False):
+def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
     global training_score
     surp = False
     
     # Check for and process responses
-    (rts, btns) = rtbox.secs()
+    if use_rtbox:
+        (rts, btns) = rtbox.secs()
+    else:
+        responses = event.getKeys(keyList=[key],timeStamped=exp_clock)
+        try:
+            btns, rts = zip(*responses)     # unpack [(key1,time1),(key2,time2)] into (key1,key2) and (time1,time2)
+        except ValueError:
+            btns = []
+            rts = []
     
     if len(rts)>0:
         if len(rts)>1:          # Warning if more than one button was pressed
@@ -241,7 +175,7 @@ def calc_feedback(block_n, condition, trial_n, trial_start, training=False):
 #    win.callOnFlip(turn_sound[outcome_str].play)
     if paradigm_type=='eeg': 
         win.callOnFlip(port.setData, 2)
-    for frameN in range(feedback_dur * 60):        # softcode 60 to framerate later. 
+    for frameN in range(feedback_dur * frame_rate):
         if paradigm_type=='ecog': 
             trigger_rect.draw()
         if frameN == 0:
@@ -261,7 +195,6 @@ def calc_feedback(block_n, condition, trial_n, trial_start, training=False):
             tolerances[condition] = tolerance_lim[1]
         if training and trial_n>=n_fullvis:
             training_score[condition] += point_fn[win_flag]
-#                print training_score
             
         elif not training:
             points[block_n]+= point_fn[win_flag]
@@ -275,12 +208,9 @@ def calc_feedback(block_n, condition, trial_n, trial_start, training=False):
     resp_marker.setLineColor('black')
     target_zone.setColor('dimgrey')
     while exp_clock.getTime() < trial_start + trial_dur:
-        for press in event.getKeys(keyList=[key,'escape','q']):
-            if press in ['escape','q']:
+        for press in event.getKeys(keyList=['escape','q']):
+            if press:
                 clean_quit()
-#                rtbox.close()
-#                win.close()
-#                core.quit()
 
 
 #===================================================
@@ -306,11 +236,7 @@ def block_break(block_n, training=False):
         adv_screen_txt.draw()
         win.flip()
         instr_key_check()
-#        adv = event.waitKeys(keyList=[key, 'escape','q'])
-#        if adv[0] in ['escape','q']:
-#            rtbox.close()
-#            win.close()
-#            core.quit()
+
 
 #===============================================
 def point_calc(block_n):
@@ -347,11 +273,7 @@ def score_instr():
     adv_screen_txt.draw()
     win.flip()
     instr_key_check()
-#    adv = event.waitKeys(keyList=[key, 'escape', 'q'])
-#    if adv[0] in ['escape','q']:
-#        rtbox.close()
-#        win.close()
-#        core.quit()
+
 
 #===================================================
 def target_zone_draw():
@@ -370,7 +292,7 @@ def select_surp_sound():
 
 #===================================================
 def clean_quit():
-#    os.system("sudo /home/knight_lab/Startup_Scripts/python_priority_rush_off.sh")
+#    os.system("sudo /home/knight_lab/Startup_Scripts/python_priority_rush_off.sh")     # If using core.rush in Linux
     rtbox.close()
     win.close()
     core.quit()
@@ -382,11 +304,14 @@ def clean_quit():
 if paradigm_type=='eeg':
    port = parallel.ParallelPort(address=53504)
 
-# RT Button Box
-rtbox = RTBox.RTBox(exp_clock.getTime)          # Initialize
+# Initialize RT Button Box
+if use_rtbox:
+    rtbox = RTBox.RTBox(host_clock=exp_clock.getTime)
+else:
+    rtbox = RTBox.RTBox(boxID='')#,host_clock=exp_clock.getTime)
 # rt_clock_ratio = rtbox.clockRatio()           # get ratio between system and rtbox clocks, maybe not necessary
 # win.logOnFlip('rtbox_clock_ratio = '+str(rt_clock_ratio), logging.DATA)
-rtbox.buttonNames(['rtkey','rtkey','rtkey','rtkey'])    # make all 4 buttons act the same
+rtbox.buttonNames([key, key, key, key])    # make all 4 buttons have same name as the key variable
 rtbox.disable('all')
 rtbox.enable('press')
 rtbox.clear()
@@ -395,11 +320,6 @@ welcome_txt.draw()
 adv_screen_txt.draw()
 win.flip()
 instr_key_check()
-#adv = event.waitKeys(keyList=[key, 'escape', 'q'])
-#if adv[0] in ['escape', 'q']:
-#    rtbox.close()
-#    win.close()
-#    core.quit()
 instruction_loop(instr_strs, intro=True)
 win.flip()
 
@@ -425,7 +345,7 @@ for trial_n in range(n_fullvis+2*n_training):
     win.logOnFlip('TRAINING T{0}: window={1}; condition={2}'.format(trial_n,covered,condition),logging.INFO)
     event.clearEvents()
     rtbox.clear()
-    surp_cnt = 0 
+    surp_cnt = 0
     outcome_str = ''
     target_zone.visibleWedge = [0, target_upper_bound[condition]]
     target_zone.ori = target_origin[condition]
@@ -441,14 +361,6 @@ for trial_n in range(n_fullvis+2*n_training):
     
     #========================================================
     # Set Trial Timing
-    #   NOTE: need to run this outside the function the first time to initialize
-#    win.flip                                # !!! to lock timing before first frame.
-#    trial_clock.reset()                                                       # In loop as temp variables, may exg to variable file
-#    trial_start = trial_clock.getTime()    
-#    target_time = trial_start + interval_dur
-#    feedback_start = trial_start + interval_dur + feedback_delay
-#    feedback_end = feedback_start + feedback_dur
-    ITI = np.max(ITIs)
     win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,win.lastFrameT),logging.INFO)
 
     #========================================================
@@ -459,31 +371,28 @@ for trial_n in range(n_fullvis+2*n_training):
     # Feedback Delay- wait until 1.5 frames before desired feedback onset
     while exp_clock.getTime() < trial_start + trial_dur - feedback_dur - 1/frame_rate:
         core.wait(0.001)
-#    feedback_delay_func(None, trial_n, training=True)
     
     #========================================================
     # Feedback
-    print 'about to call calc_feedback; time into trial =  {0}'.format(exp_clock.getTime()-trial_start)
-    calc_feedback(None, condition, trial_n, trial_start, training=True)
+    print 'about to call calc_feedback; time into trial =  {0}'.format(exp_clock.getTime()-trial_start) #!!! remove after testing
+    feedback_fn(None, condition, trial_n, trial_start, training=True)
     
     #========================================================
     # ITI
-    ITI = random.choice(ITIs)       #!!! probably want specific random sequences to be determined ahead of time
+    ITI = np.max(ITIs)       #!!! probably want specific random sequences to be determined ahead of time
     win.logOnFlip('B{0}_T{1} ITI={2}; FRAME TIME = {3}'.format('T',trial_n,ITI,win.lastFrameT),logging.INFO)
     
     if paradigm_type=='eeg':
         win.callOnFlip(port.setData, 0)
     win.flip()
+    
     # Staircase Tolerance
     staircase(condition)
-    while exp_clock.getTime() < trial_start + trial_dur + ITI:#!!!feedback_end + ITI:
-        for press in event.getKeys(keyList=[key,'escape','q']):
-            if press in ['escape','q']:
+    while exp_clock.getTime() < trial_start + trial_dur + ITI:
+        for press in event.getKeys(keyList=['escape','q']):
+            if press:
                 clean_quit()
-#                rtbox.close()
-#                win.close()
-#                core.quit()
-    if (trial_n==n_fullvis+n_training-1) or (trial_n==n_fullvis+2*n_training-1):                    #Score instructions with score after easy training
+    if (trial_n==n_fullvis+n_training-1) or (trial_n==n_fullvis+2*n_training-1):    #Score instructions with score after easy training
         score_instr()
 
 
@@ -516,7 +425,6 @@ for block_n, block_type in enumerate(block_order):
         
         #========================================================
         # Set Trial Timing
-#        set_trial_timing(trial_clock, block_n, condition, trial_n)
         
         #========================================================
         # Moving Ball
@@ -526,12 +434,11 @@ for block_n, block_type in enumerate(block_order):
         # Feedback Delay
         while exp_clock.getTime() < trial_start + trial_dur - feedback_dur - 1/frame_rate:
             core.wait(0.001)
-#        feedback_delay_func(block_n, trial_n, training=False)
         
         #========================================================
         # Feedback
         print 'about to call calc_feedback; time into trial =  {0}'.format(exp_clock.getTime()-trial_start)
-        calc_feedback(block_n, condition, trial_n, trial_start, False)
+        feedback_fn(block_n, condition, trial_n, trial_start, False)
         
         #========================================================
         # ITI
@@ -543,12 +450,9 @@ for block_n, block_type in enumerate(block_order):
         win.flip()
         staircase(condition)
         while exp_clock.getTime() < trial_start + trial_dur + ITI:#!!!feedback_end + ITI:
-            for press in event.getKeys(keyList=[key,'escape','q']):
-                if press in ['escape','q']:
+            for press in event.getKeys(keyList=['escape','q']):
+                if press:
                     clean_quit()
-#                    rtbox.close()
-#                    win.close()
-#                    core.quit()
     
     #========================================================
     # Break Between Blocks
@@ -558,10 +462,6 @@ for block_n, block_type in enumerate(block_order):
 
 endgame_txt.draw()
 win.flip()
-core.wait(10)
+core.wait(end_screen_dur)
 
 clean_quit()
-#rtbox.close()
-#win.close()
-#core.quit()
-

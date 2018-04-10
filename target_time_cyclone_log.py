@@ -1,6 +1,6 @@
 # target_time log suite
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.1'
+paradigm_version = '2.4.2'
 
 from psychopy import visual, event, core, gui, logging, data
 import numpy as np
@@ -27,6 +27,7 @@ file_dlg = gui.Dlg(title="Run Information")
 file_dlg.addText('Paradigm Version: '+paradigm_version, color='Blue')
 file_dlg.addField(label='SBJ Code:')
 file_dlg.addField(label='Parameter Version:',choices=['ecog','eeg'])
+file_dlg.addField(label='Use RT Box:',initial=True)
 file_dlg.addField(label='Debug Mode:',initial=False)
 #file_dlg.addField('Response Key:') # Ideally space bar? something more accurate?
 
@@ -35,8 +36,8 @@ if file_dlg.OK:
     dlg_resp   = file_dlg.data
     log_prefix = dlg_resp[0]
     paradigm_type  = dlg_resp[1]
-    debug_mode = dlg_resp[2]    #!!! need a logic check that this is y/Y/n/N value
-    #key = dlg_resp[1] !!! fix this!!!
+    use_rtbox = dlg_resp[2]
+    debug_mode = dlg_resp[3]
     log_filename = '../logs/{0}_response_log_{1}.txt'.format(log_prefix,exp_datetime)
 else: 
     print 'User Cancelled'
@@ -64,6 +65,7 @@ win.saveFrameIntervals(fileName=log_filename, clear=False)           #write fram
 win.logOnFlip('paradigm_name = '+str(paradigm_name), logging.DATA)
 win.logOnFlip('paradigm_version = '+str(paradigm_version), logging.DATA)
 win.logOnFlip('paradigm_type = '+str(paradigm_type), logging.DATA)
+win.logOnFlip('use_rtbox = '+str(use_rtbox), logging.DATA)
 win.logOnFlip('debug_mode = '+str(debug_mode), logging.DATA)
 win.logOnFlip('n_blocks = '+str(n_blocks), logging.DATA)
 win.logOnFlip('n_trials = '+str(n_trials), logging.DATA)
