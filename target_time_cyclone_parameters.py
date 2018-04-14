@@ -7,6 +7,7 @@ from target_time_cyclone_log import*
 #from psychopy import parallel
 import numpy as np
 import math, time, random
+from target_time_cyclone_log import use_rtbox
 
 exp_datetime = time.strftime("%Y%m%d%H%M%S")
 
@@ -26,7 +27,7 @@ break_min_dur = {'eeg':20, 'ecog':20}                  # minimum length (in s) f
 n_fullvis, n_training, n_blocks, n_trials, break_min_dur = experiment_parameters(paradigm_type)
 #!!! check if n_trials/N-blocks==integer
 
-key = 'space'                       # Response key
+key = 'any button' if use_rtbox else 'space'                      # Response key
 
 
 #======================================

@@ -144,7 +144,7 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
             target_zone.setColor('blue')
             resp_marker.setLineColor(None)
             outcome_str = 'SURPRISE!'
-            select_surp_sound()
+            outcome_sound = select_surp_sound()
             surp = True
         elif np.abs(error)<tolerances[condition]:             # WIN
             target_zone.setColor('green')
@@ -162,19 +162,21 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
         target_zone.setColor('red')
         outcome_str = 'None'
         resp_marker.setLineColor(None)
+        no_response_time = exp_clock.getTime()-trial_start
         # Not adjusting tolerance for this type of trial...
         if not training:
             win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,-1,condition,tolerances[condition]),logging.DATA)
-            win.logOnFlip('B{0}_T{1} feedback start: FRAME TIME = {2}'.format(block_n,trial_n,win.lastFrameT),logging.INFO)
+            win.logOnFlip('B{0}_T{1} feedback start: TIME = {2}'.format(block_n,trial_n, no_response_time),logging.INFO)
         else:
             win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,-1,condition,tolerances[condition]),logging.DATA)
-            win.logOnFlip('B{0}_T{1} feedback start: FRAME TIME = {2}'.format('T',trial_n,win.lastFrameT),logging.INFO)
+            win.logOnFlip('B{0}_T{1} feedback start: TIME = {2}'.format('T',trial_n,no_response_time),logging.INFO)
     
     # Present feedback
     win.flip()      # create fixed timing between this flip and sound/draw onsets
 #    win.callOnFlip(turn_sound[outcome_str].play)
     if paradigm_type=='eeg': 
         win.callOnFlip(port.setData, 2)
+
     for frameN in range(feedback_dur * 60): #!!! change to frame_rate variable
         if paradigm_type=='ecog': 
             trigger_rect.draw()
@@ -184,8 +186,11 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
         resp_marker.draw()
         win.flip()
         if frameN==0:
-            print 'just flipped feedback: {0}'.format(exp_clock.getTime()-trial_start)
+            feedback_onset = exp_clock.getTime()-trial_start
+            print 'just flipped feedback: {0}'.format(feedback_onset)
+        
     win.flip()
+    
     
     if not surp and outcome_str != 'None':
         tolerances[condition]+= tolerance_step[condition][win_flag]      # Update tolerances based on feedback. Needs to be here.   
@@ -198,12 +203,12 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
             
         elif not training:
             points[block_n]+= point_fn[win_flag]
-        if training:
-            win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
-            win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: FRAME TIME = {3}'.format('T', trial_n, outcome_sound, win.lastFrameT),logging.DATA)
-        else:
-            win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
-            win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: FRAME TIME = {3}'.format(block_n, trial_n, outcome_sound, win.lastFrameT),logging.DATA)
+    if training:
+        win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
+        win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format('T', trial_n, outcome_sound, feedback_onset),logging.DATA)
+    else:
+        win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
+        win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format(block_n, trial_n, outcome_sound, feedback_onset),logging.DATA)
             
     resp_marker.setLineColor('black')
     target_zone.setColor('dimgrey')
@@ -287,8 +292,8 @@ def select_surp_sound():
     sound_type = np.random.choice(block_sounds.keys())                      # Selects the subfolder to draw sounds from (ie. 'breaks').
     sound_file = block_sounds[sound_type][surp_sound_index]                 # Selects the specific wav file from the subfolder.
     turn_sound['SURPRISE!'] = sound.Sound(value= sound_file, sampleRate=44100, secs=0.8)
-    win.logOnFlip('B{0}_T{1} SOUND = {2}   feedback start: FRAME TIME = {3}'.format(block_n, trial_n, sound_file, win.lastFrameT),logging.DATA)
     block_sounds.pop(sound_type)
+    return sound_file
 
 #===================================================
 def clean_quit():
@@ -306,7 +311,8 @@ if paradigm_type=='eeg':
 
 # Initialize RT Button Box
 if use_rtbox:
-    rtbox = RTBox.RTBox(host_clock=exp_clock.getTime)
+    rtbox = RTBox.RTBox()
+    rtbox.hostClock(exp_clock.getTime)
 else:
     rtbox = RTBox.RTBox(boxID='')#,host_clock=exp_clock.getTime)
 # rt_clock_ratio = rtbox.clockRatio()           # get ratio between system and rtbox clocks, maybe not necessary
@@ -360,12 +366,13 @@ for trial_n in range(n_fullvis+2*n_training):
         instruction_loop(train_str[condition])
     
     #========================================================
-    # Set Trial Timing
-    win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,win.lastFrameT),logging.INFO)
-
-    #========================================================
     # Moving Ball
     trial_start = moving_ball(None, trial_n, training=True)
+    
+    #========================================================
+    # Get Trial Timing
+    win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,trial_start),logging.INFO)
+
     
     #========================================================
     # Feedback Delay- wait until 1.5 frames before desired feedback onset
@@ -380,7 +387,7 @@ for trial_n in range(n_fullvis+2*n_training):
     #========================================================
     # ITI
     ITI = np.max(ITIs)       #!!! probably want specific random sequences to be determined ahead of time
-    win.logOnFlip('B{0}_T{1} ITI={2}; FRAME TIME = {3}'.format('T',trial_n,ITI,win.lastFrameT),logging.INFO)
+    win.logOnFlip('B{0}_T{1} ITI={2}; TIME = {3}'.format('T',trial_n,ITI,exp_clock.getTime()-trial_start),logging.INFO)
     
     if paradigm_type=='eeg':
         win.callOnFlip(port.setData, 0)
@@ -411,7 +418,7 @@ for block_n, block_type in enumerate(block_order):
     target_zone.ori = target_origin[condition]
     block_start_txt.text = block_start_str.format(block_n+1, n_blocks*len(conditions), condition)
     block_start_txt.draw()
-    win.logOnFlip('B{0} ({1}) Start Text: FRAMETIME = {2}'.format(block_n,condition,win.lastFrameT),logging.INFO)
+    win.logOnFlip('B{0} ({1}) Start Text: TIME = {2}'.format(block_n,condition,exp_clock.getTime()),logging.INFO)
     win.flip()
     core.wait(block_start_dur)
     win.flip()
@@ -443,7 +450,7 @@ for block_n, block_type in enumerate(block_order):
         #========================================================
         # ITI
         ITI = random.choice(ITIs)       #!!! probably want specific random sequences to be determined ahead of time
-        win.logOnFlip('B{0}_T{1} ITI={2}; FRAME TIME = {3}'.format(block_n,trial_n,ITI,win.lastFrameT),logging.INFO)
+        win.logOnFlip('B{0}_T{1} ITI={2}; TIME = {3}'.format(block_n,trial_n,ITI, exp_clock.getTime()-trial_start),logging.INFO)
         
         if paradigm_type=='eeg':
             win.callOnFlip(port.setData, 0)

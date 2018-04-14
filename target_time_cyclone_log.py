@@ -98,6 +98,5 @@ win.logOnFlip('win.size = '+str(win.size), logging.DATA)
 win.logOnFlip('point_fn = '+str(point_fn), logging.DATA)
 
 exp_clock.reset()
-win.logOnFlip('CLOCK RESET FRAME TIME = {0}'.format(win.lastFrameT),logging.DATA)
 win.flip()
 

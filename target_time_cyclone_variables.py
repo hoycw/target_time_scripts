@@ -13,6 +13,7 @@ from target_time_cyclone_log import *
 from target_time_cyclone_parameters import*
 
 
+
 exp_datetime = time.strftime("%Y%m%d%H%M%S")
 
 #============================================================
@@ -102,7 +103,7 @@ surprise_sounds = {'breaks': glob.glob("surprise_sounds/breaks/*.wav"),
                    'smash': glob.glob("surprise_sounds/smash/*.wav"),
                    'snares': glob.glob("surprise_sounds/snares/*.wav"),
                    'stabs': glob.glob("surprise_sounds/stabs/*.wav"),
-                   'thuds': glob.glob("surprise_sounds/thuds/*.wav")}
+                   'squeaks': glob.glob("surprise_sounds/squeaks/*.wav")}
 
 
 turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, secs=0.8, stereo=True),  # Switch sound sample once sounds present
