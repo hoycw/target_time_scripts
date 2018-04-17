@@ -91,9 +91,9 @@ training_score = { "easy" : 0, "hard": 0 }
 #======================================
 #           SOUND STIMULI 
 #======================================
-win_sound = 'cash_register_x.wav'
+win_sound = "new_win_sound.wav"
 #              
-loss_sound = "lose_tone.wav"
+loss_sound = "new_loss_sound.wav"
 
 surprise_sounds = {'breaks': glob.glob("surprise_sounds/breaks/*.wav"),
                    'cymbols': glob.glob("surprise_sounds/cymbols/*.wav"),
