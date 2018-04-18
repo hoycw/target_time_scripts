@@ -130,7 +130,6 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
         except ValueError:
             btns = []
             rts = []
-    
     if len(rts)>0:
         if len(rts)>1:          # Warning if more than one button was pressed
             win.logOnFlip('WARNING!!! More than one response detected (taking first) on B{0}_T{1}: responses = {2}'.format(
@@ -203,13 +202,13 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
             
         elif not training:
             points[block_n]+= point_fn[win_flag]
-    if training:
-        win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
-        win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format('T', trial_n, outcome_sound, feedback_onset),logging.DATA)
-    else:
-        win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
-        win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format(block_n, trial_n, outcome_sound, feedback_onset),logging.DATA)
-            
+        if training:
+            win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
+            win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format('T', trial_n, outcome_sound, feedback_onset),logging.DATA)
+        else:
+            win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
+            win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format(block_n, trial_n, outcome_sound, feedback_onset),logging.DATA)
+                
     resp_marker.setLineColor('black')
     target_zone.setColor('dimgrey')
     while exp_clock.getTime() < trial_start + trial_dur:
@@ -396,8 +395,11 @@ for trial_n in range(n_fullvis+2*n_training):
     # Staircase Tolerance
     staircase(condition)
     while exp_clock.getTime() < trial_start + trial_dur + ITI:
-        for press in event.getKeys(keyList=['escape','q']):
-            if press:
+        for press in event.getKeys(keyList=['escape','q', 'p']):
+            if press in ['p']:
+                event.waitKeys(keyList=['p'])
+                core.wait(block_start_dur)
+            else:
                 clean_quit()
     if (trial_n==n_fullvis+n_training-1) or (trial_n==n_fullvis+2*n_training-1):    #Score instructions with score after easy training
         score_instr()
@@ -457,8 +459,11 @@ for block_n, block_type in enumerate(block_order):
         win.flip()
         staircase(condition)
         while exp_clock.getTime() < trial_start + trial_dur + ITI:#!!!feedback_end + ITI:
-            for press in event.getKeys(keyList=['escape','q']):
-                if press:
+            for press in event.getKeys(keyList=['escape','q', 'p']):
+                if press in ['p']:
+                    event.waitKeys(keyList=['p'])
+                    core.wait(block_start_dur)
+                else: 
                     clean_quit()
     
     #========================================================
@@ -469,6 +474,6 @@ for block_n, block_type in enumerate(block_order):
 
 endgame_txt.draw()
 win.flip()
-core.wait(end_screen_dur)
+core.f(end_screen_dur)
 
 clean_quit()
