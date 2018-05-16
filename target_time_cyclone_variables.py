@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.2'
+paradigm_version = '2.4.2.1'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -81,6 +81,7 @@ instr_pic_dict = {0:'grey.jpg',
                   3:'target_arrow.jpg',
                   4:'win.jpg', 
                   5:'loss.jpg',
+                  6:'surprise.jpg',
                   'easy':'easy.jpg',
                   'hard':'hard.jpg'}
 instr_pic = visual.ImageStim(win, image='cyclone_pics/{0}'.format(instr_pic_dict[0]), flipHoriz=False, pos=(0, -2), units='cm')
@@ -106,10 +107,10 @@ surprise_sounds = {'breaks': glob.glob("surprise_sounds/breaks/*.wav"),
                    'squeaks': glob.glob("surprise_sounds/squeaks/*.wav")}
 
 
-turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, secs=0.8, stereo=True),  # Switch sound sample once sounds present
-             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=8000, secs=0.8, stereo=True),
-             "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, secs=0.8, stereo=True),
-             'None': sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=8000, secs=0.8, stereo=True)}
+turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, blockSize=2048, secs=0.8, stereo=True),  # Switch sound sample once sounds present
+             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=2048,secs=0.8, stereo=True),
+             "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, blockSize=2048,secs=0.8, stereo=True),
+             'None': sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=2048, secs=0.8, stereo=True)}
 
 turn_sound["WIN!"].setVolume(0.8)
 turn_sound["LOSE!"].setVolume(0.8)
@@ -185,6 +186,8 @@ instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move 
                'The gray bar at the bottom is the target zone.',
                'If you respond in the target zone, it turns green and you win points!',
                'If you miss the target zone, it turns red and you lose points.',
+               'Every once in a while, the target zone will turn blue.  ' +\
+               "Ignore this, it won't affect your score.",
                "Let's get started with a few examples..."]
 train_str = {'easy': ["Good job! From now on, only the first part of the circle will light up.",
                     "That means you need to time your response without seeing the light go all the way around.",
@@ -230,6 +233,9 @@ point_instr_txt = visual.TextStim(win,text=point_instr_str, height=1.5,units='cm
 
 total_point_txt = visual.TextStim(win,text=total_point_str,height=1.5,units='cm', alignVert='center',
                                 name='total_points', color='black',pos=(0,6),wrapWidth=20)
+
+pause_txt = visual.TextStim(win,text='Paused', height=4,units='cm',alignHoriz='center',alignVert='center',
+                                name='pause', color='black', bold=True, pos=(0,2),wrapWidth=30)
 
 endgame_txt = visual.TextStim(win,text="Fantastic!!! You're all done. Thank you so much for participating in this experiment!",
                             height=2,units='cm',alignHoriz='center',alignVert='center',
