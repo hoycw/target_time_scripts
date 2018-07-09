@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.2.1'
+paradigm_version = '2.4.2.2'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -106,11 +106,11 @@ surprise_sounds = {'breaks': glob.glob("surprise_sounds/breaks/*.wav"),
                    'stabs': glob.glob("surprise_sounds/stabs/*.wav"),
                    'squeaks': glob.glob("surprise_sounds/squeaks/*.wav")}
 
-
-turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, blockSize=2048, secs=0.8, stereo=True),  # Switch sound sample once sounds present
-             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=2048,secs=0.8, stereo=True),
-             "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, blockSize=2048,secs=0.8, stereo=True),
-             'None': sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=2048, secs=0.8, stereo=True)}
+block_sz = 128
+turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=True),  # Switch sound sample once sounds present
+             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=True),
+             "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=True),
+             'None': sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=True)}
 
 turn_sound["WIN!"].setVolume(0.8)
 turn_sound["LOSE!"].setVolume(0.8)
