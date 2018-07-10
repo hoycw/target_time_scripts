@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.2.2'
+paradigm_version = '2.4.3'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -106,11 +106,11 @@ surprise_sounds = {'breaks': glob.glob("surprise_sounds/breaks/*.wav"),
                    'stabs': glob.glob("surprise_sounds/stabs/*.wav"),
                    'squeaks': glob.glob("surprise_sounds/squeaks/*.wav")}
 
-block_sz = 128
-turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=True),  # Switch sound sample once sounds present
-             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=True),
-             "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=True),
-             'None': sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=True)}
+block_sz = 512
+turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1),  # Switch sound sample once sounds present
+             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1),
+             "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1),
+             'None': sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1)}
 
 turn_sound["WIN!"].setVolume(0.8)
 turn_sound["LOSE!"].setVolume(0.8)
@@ -179,6 +179,7 @@ trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_h
 #===================================================
 # INSTRUCTIONS
 #===================================================
+rtbox_strs = "You will be using the Response Time Box.\nYou can respond by pressing any of the four buttons on the box."
 instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move around this circle.',
                'Your goal is to respond at the exact moment when it completes the circle.',
                "The light always starts at the bottom and moves at the same speed, "+\
@@ -186,9 +187,11 @@ instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move 
                'The gray bar at the bottom is the target zone.',
                'If you respond in the target zone, it turns green and you win points!',
                'If you miss the target zone, it turns red and you lose points.',
-               'Every once in a while, the target zone will turn blue.  ' +\
-               "Ignore this, it won't affect your score.",
+               'Sometimes, the target zone will turn blue.  ' +\
+               "Ignore this (it won't affect your score).",
                "Let's get started with a few examples..."]
+if use_rtbox:
+    instr_strs.insert(-1,rtbox_strs)
 train_str = {'easy': ["Good job! From now on, only the first part of the circle will light up.",
                     "That means you need to time your response without seeing the light go all the way around.",
                     "Let's try some more examples..."],
@@ -214,7 +217,7 @@ welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=4,units
                                 name='welcome', color='black', bold=True, pos=(0,2),wrapWidth=30)
 
 instr_txt = visual.TextStim(win,text=instr_strs[0],height=1.5,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(0,7),wrapWidth=30)
+                                name='instr', color='black',pos=(0,7),wrapWidth=40)
 
 adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(key),
                                 height=1.5,units='cm',name='adv_screen', color='black', pos=(0,-10),wrapWidth=40)

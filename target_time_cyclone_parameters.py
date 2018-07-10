@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.2.2'
+paradigm_version = '2.4.3'
 
 from psychopy import visual, event, core, gui, logging, data
 from target_time_cyclone_log import*
@@ -27,7 +27,7 @@ break_min_dur = {'eeg':20, 'ecog':20}                  # minimum length (in s) f
 n_fullvis, n_training, n_blocks, n_trials, break_min_dur = experiment_parameters(paradigm_type)
 #!!! check if n_trials/N-blocks==integer
 
-key = 'any button' if use_rtbox else 'space'                      # Response key
+key = 'space'#'t' if use_rtbox else 'space'                      # Response key
 
 
 #======================================

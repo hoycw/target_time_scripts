@@ -1,4 +1,3 @@
-
 from psychopy import logging, prefs
 prefs.general['audioLib'] = ['sounddevice']
 #logging.console.setLevel(logging.DEBUG)  # get messages about the sound lib as it loads
@@ -152,19 +151,18 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
         outcome_sound = loss_sound
 #        no_response_time = exp_clock.getTime()-trial_start
 #        # Not adjusting tolerance for this type of trial...
-
     
     # Present feedback
     win.flip()      # create fixed timing between this flip and sound/draw onsets
-#    win.callOnFlip(turn_sound[outcome_str].play)
+    win.callOnFlip(turn_sound[outcome_str].play)
     if paradigm_type=='eeg': 
         win.callOnFlip(port.setData, 2)
 
     for frameN in range(feedback_dur * 60): #!!! change to frame_rate variable
         if paradigm_type=='ecog': 
             trigger_rect.draw()
-        if frameN == 0:
-            turn_sound[outcome_str].play()
+#        if frameN == 0:
+#            turn_sound[outcome_str].play()
         target_zone_draw()                      # Using our defined target_zone_draw, not .draw to have correct visual.  
         resp_marker.draw()
         win.flip()
@@ -188,11 +186,12 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
             points[block_n]+= point_fn[win_flag]
     if training:
         win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
+        win.logOnFlip('B{0}_T{1} responses/times = {2} / {3}'.format('T', trial_n, btns, rts),logging.DATA)
         win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format('T', trial_n, outcome_sound, feedback_onset),logging.DATA)
     else:
         win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
+        win.logOnFlip('B{0}_T{1} responses/times = {2} / {3}'.format(block_n, trial_n, btns, rts),logging.DATA)
         win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format(block_n, trial_n, outcome_sound, feedback_onset),logging.DATA)
-            
     resp_marker.setLineColor('black')
     target_zone.setColor('dimgrey')
     while exp_clock.getTime() < trial_start + trial_dur:
@@ -274,7 +273,7 @@ def target_zone_draw():
 def select_surp_sound():
     sound_type = np.random.choice(block_sounds.keys())                      # Selects the subfolder to draw sounds from (ie. 'breaks').
     sound_file = block_sounds[sound_type][surp_sound_index]                 # Selects the specific wav file from the subfolder.
-    turn_sound['SURPRISE!'] = sound.Sound(value= sound_file, sampleRate=44100, blockSize=2048, secs=0.8, stereo=True)
+    turn_sound['SURPRISE!'] = sound.Sound(value= sound_file, sampleRate=44100, blockSize=512, secs=0.8, stereo=-1)
     block_sounds.pop(sound_type)
     return sound_file
 
@@ -300,7 +299,7 @@ else:
     rtbox = RTBox.RTBox(boxID='')#,host_clock=exp_clock.getTime)
 # rt_clock_ratio = rtbox.clockRatio()           # get ratio between system and rtbox clocks, maybe not necessary
 # win.logOnFlip('rtbox_clock_ratio = '+str(rt_clock_ratio), logging.DATA)
-rtbox.buttonNames([key, key, 'p', 'q'])    # make all 4 buttons have same name as the key variable
+rtbox.buttonNames([key, key, key, key])    # make all 4 buttons have same name as the key variable
 rtbox.disable('all')
 rtbox.enable('press')
 rtbox.clear()
@@ -382,8 +381,10 @@ for trial_n in range(n_fullvis+2*n_training):
         for press in event.getKeys(keyList=['escape','q', 'p']):
             if press in ['p']:
                 pause_txt.draw()
+                win.logOnFlip('PAUSE STARTED: B{0}_T{1}, TIME = {3}'.format(block_n, trial_n, exp_clock.getTime()))
                 win.flip()
                 event.waitKeys(keyList=['p'])
+                win.logOnFlip('PAUSE ENDED: B{0}_T{1}, TIME = {3}'.format(block_n, trial_n, exp_clock.getTime()))
                 core.wait(block_start_dur)
             else:
                 clean_quit()
