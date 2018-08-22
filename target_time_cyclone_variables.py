@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.3'
+paradigm_version = '3'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -92,6 +92,11 @@ training_score = { "easy" : 0, "hard": 0 }
 #======================================
 #           SOUND STIMULI 
 #======================================
+# movie
+movie = visual.MovieStim(win=win, filename='movies/0008.mp4', size = 6, units = 'cm')
+print movie.duration
+print movie.size
+
 win_sound = "new_win_sound.wav"
 #              
 loss_sound = "new_loss_sound.wav"
