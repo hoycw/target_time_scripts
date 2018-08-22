@@ -2,6 +2,7 @@
 #  Log of alterations to experiment
 #===================================
 
+# cyclone v3.4.4: fixing the decreasing volume issue
 # cyclone v2.4.3: final tweaks! finally got the audio-visual alignment where I want it (~17ms post-visual auditory onset), instructions and RTBox are updated, etc.
 # cyclone v2.4.2: not exactly sure what all changed, but likely a lot of parameters to get audio visual alignment via sounddevice backend
 # cyclone v2.3:   Remoeved all picture feedback. Implemented surpirse tiral sounds with 9 categories of sounds each holding 8 samples. For each block,
