@@ -2,7 +2,8 @@
 #  Log of alterations to experiment
 #===================================
 
-# cyclone v3.4.4: fixing the decreasing volume issue
+# cyclone v2.4.5: define/initialize outcome sound inside of feedback_fn to avoid volume decreases; compensate for this computational time with feedback_compute_dur and change to logic of when I start the feedback_fn to get consistent trail onset to feednack onset timing; eliminated n_rand_blocks as well as surp_cnt and surp_sound_index since both should just be block_n; change monitor to use "Built_in" and all text and visual sizes to fit correct monitor specs; change break min dur to 15s; added skip to block feature; added flicker sequence at beginning
+# cyclone v2.4.4: fixing the decreasing volume issue
 # cyclone v2.4.3: final tweaks! finally got the audio-visual alignment where I want it (~17ms post-visual auditory onset), instructions and RTBox are updated, etc.
 # cyclone v2.4.2: not exactly sure what all changed, but likely a lot of parameters to get audio visual alignment via sounddevice backend
 # cyclone v2.3:   Remoeved all picture feedback. Implemented surpirse tiral sounds with 9 categories of sounds each holding 8 samples. For each block,

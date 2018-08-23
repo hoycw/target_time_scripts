@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.4'
+paradigm_version = '2.4.5'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -19,10 +19,11 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #============================================================
 # EXPERIMENTAL VARIABLES
 #============================================================
-win = visual.Window(size=(1280,1024), fullscr=full_screen, color=(0,0,0),
-                    monitor='testMonitor',# screen=screen_to_show,
+win = visual.Window(size=(1920,1080), fullscr=full_screen, color=(0,0,0),
+                    monitor='Built_in',# screen=screen_to_show,
                     allowGUI=False, units=screen_units, waitBlanking=True);
-#NOTE: ECoG-A laptop size = 36cm wide, 20sm tall
+#NOTE: ThinkPad P51 (ECoG-1/Klay/etc.) = 34.5cm wide, 19.5cm tall
+#   ECoG-A laptop size = 36cm wide, 20sm tall
 
 frame_dur = win.getMsPerFrame(msg='Please wait, testing frame rate...')
 frame_rate = win.getActualFrameRate()
@@ -49,7 +50,7 @@ while any([cnt>=3 for cnt in block_repeat_cnt]):
 #-------------------------------------------------------------------
 # Determine surprise trial numbers
 # Draw surprise trial numbers from CSVs
-surprise_sequence = set(random.sample(range(n_rand_blocks), n_rand_blocks))
+surprise_sequence = set(random.sample(range(len(block_order)), len(block_order)))
 surp_csv =  "surp_csvs/{0}_{1}_randomized_list.csv".format(paradigm_type, str(n_trials))
 if debug_mode:
     surp_csv = "surp_csvs/debug_randomized_list.csv"
@@ -63,7 +64,7 @@ surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
 #============================================================
 # FEEDBACK STIMULI
 #============================================================
-points = np.zeros(n_blocks*len(conditions))       # point total for each block
+points = np.zeros(len(block_order))       # point total for each block
 resp_marker = visual.Line(win, start=(-resp_marker_width/2, 0),
                                 end=(resp_marker_width/2, 0),
                                 lineColor='black', lineWidth=resp_marker_thickness)
@@ -106,6 +107,7 @@ surprise_sounds = {'breaks': glob.glob("surprise_sounds/breaks/*.wav"),
                    'squeaks': glob.glob("surprise_sounds/squeaks/*.wav")}
 
 block_sz = 512
+# Should not need turn_sound anymore, but leaving here just so the stream gets initialized...
 turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1),  # Switch sound sample once sounds present
              "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1),
              "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1),
@@ -180,14 +182,14 @@ trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_h
 #===================================================
 rtbox_strs = "You will be using the Response Time Box.\nYou can respond by pressing any of the four buttons on the box."
 instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move around this circle.',
-               'Your goal is to respond at the exact moment when it completes the circle.',
+               'Your goal is to respond at the exact\nmoment when it completes the circle.',
                "The light always starts at the bottom and moves at the same speed, "+\
                'so the perfect response is always at the same time: the Target Time!',
                'The gray bar at the bottom is the target zone.',
                'If you respond in the target zone, it turns green and you win points!',
                'If you miss the target zone, it turns red and you lose points.',
-               'Sometimes, the target zone will turn blue.  ' +\
-               "Ignore this (it won't affect your score).",
+               'Sometimes, the target zone will turn blue.\n' +\
+               "Ignore this. It won't affect your score.",
                "Let's get started with a few examples..."]
 if use_rtbox:
     instr_strs.insert(-1,rtbox_strs)
@@ -204,44 +206,44 @@ main_str = "Ready to try the real deal? We'll reset your score to 0 and start co
             'or press {0} to start playing Target Time!'.format(key)
 
 block_start_str = 'Level {0}/{1}: {2}'
-break_str = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
+break_str       = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
 block_point_str = 'Level {0} Score: {1}'
 total_point_str = 'Total Score: {0}'
-score_demo_str = "You scored {0} points this round."
-
-point_instr_str = "After each block, you'll see your score from this round. Points also add up across rounds."
+score_demo_str  = 'You scored {0} points this round.'
+point_instr_str = "After each block, you'll see your score from this round.\nPoints also add up across rounds."
+end_game_str    = "Fantastic!!! You're all done. Thank you so much for participating in this experiment!"
 times_demo_called = 1
 
-welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=4,units='cm',alignHoriz='center',alignVert='center',
+welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=2,units='cm',alignHoriz='center',alignVert='center',
                                 name='welcome', color='black', bold=True, pos=(0,2),wrapWidth=30)
 
-instr_txt = visual.TextStim(win,text=instr_strs[0],height=1.5,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(0,7),wrapWidth=40)
+instr_txt = visual.TextStim(win,text=instr_strs[0],height=1,units='cm', alignVert='center',
+                                name='instr', color='black',pos=(0,6),wrapWidth=25)
 
 adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(key),
-                                height=1.5,units='cm',name='adv_screen', color='black', pos=(0,-10),wrapWidth=40)
+                                height=0.75,units='cm',name='adv_screen', color='black', pos=(0,-7),wrapWidth=20)#short no need wrap
 
-block_start_txt = visual.TextStim(win,text=block_start_str,height=3,units='cm',alignHoriz='center',alignVert='center',
-                                name='block_start', color='black', bold=True, pos=(0,2),wrapWidth=30)
+block_start_txt = visual.TextStim(win,text=block_start_str,height=2,units='cm',alignHoriz='center',alignVert='center',
+                                name='block_start', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap
 
-block_point_txt = visual.TextStim(win,text=block_point_str,height=1.5,units='cm', alignVert='center',
-                                name='block_points', color='black',pos=(0,8),wrapWidth=20)
+block_point_txt = visual.TextStim(win,text=block_point_str,height=1,units='cm', alignVert='center',
+                                name='block_points', color='black',pos=(0,6),wrapWidth=20)#short no need wrap
 
-score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=1.5,units='cm', alignVert='center',
-                                name='score_demo', color='green',pos=(0,8),wrapWidth=30)
+score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=1,units='cm', alignVert='center',
+                                name='score_demo', color='green',pos=(0,6),wrapWidth=30)#short no need wrap
 
-point_instr_txt = visual.TextStim(win,text=point_instr_str, height=1.5,units='cm', alignVert='center',
-                                name='point_instr', color='black',pos=(0,0),wrapWidth=30)
+point_instr_txt = visual.TextStim(win,text=point_instr_str, height=1,units='cm', alignVert='center',
+                                name='point_instr', color='black',pos=(0,0),wrapWidth=30)#built in line break
 
-total_point_txt = visual.TextStim(win,text=total_point_str,height=1.5,units='cm', alignVert='center',
-                                name='total_points', color='black',pos=(0,6),wrapWidth=20)
+total_point_txt = visual.TextStim(win,text=total_point_str,height=1,units='cm', alignVert='center',
+                                name='total_points', color='black', bold=True, pos=(0,4.5),wrapWidth=20)#short no need wrap
 
-pause_txt = visual.TextStim(win,text='Paused', height=4,units='cm',alignHoriz='center',alignVert='center',
-                                name='pause', color='black', bold=True, pos=(0,2),wrapWidth=30)
+pause_txt = visual.TextStim(win,text='Paused', height=2,units='cm',alignHoriz='center',alignVert='center',
+                                name='pause', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap
 
-endgame_txt = visual.TextStim(win,text="Fantastic!!! You're all done. Thank you so much for participating in this experiment!",
-                            height=2,units='cm',alignHoriz='center',alignVert='center',
-                            name='endgame', color='black', bold=False, pos=(0,-4),wrapWidth=30)
+endgame_txt = visual.TextStim(win,text=end_game_str,
+                            height=1.25,units='cm',alignHoriz='center',alignVert='center',
+                            name='endgame', color='black', bold=False, pos=(0,-2),wrapWidth=30)
 
 instr_img = visual.ImageStim(win, image='cyclone_pics/grey.jpg', flipHoriz=False, 
                                 pos=instr_img_pos, size=instr_img_size, units='cm')

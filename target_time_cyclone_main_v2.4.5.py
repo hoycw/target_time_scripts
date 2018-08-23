@@ -1,14 +1,11 @@
 from psychopy import logging, prefs
 prefs.general['audioLib'] = ['sounddevice']
 #logging.console.setLevel(logging.DEBUG)  # get messages about the sound lib as it loads
-#from psychopy import sound
-#print sound.Sound, sound.audioDriver
 
 from psychopy import visual, event, core, gui, data, parallel, sound
 from psychopy.tools.coordinatetools import pol2cart
 import sys, os; sys.path.append(os.getcwd())    # necessary to get RTBox.py
 
-    
 import numpy as np
 import math, time, random, copy
 import RTBox
@@ -23,6 +20,8 @@ core.wait(0.5)      # give the system time to settle
 import target_time_cyclone_log
 from target_time_cyclone_parameters import*
 from target_time_cyclone_variables import*
+print 'Using %s(with %s) for audioLib(with audioDriver)' % (sound.audioLib, sound.audioDriver)
+bad_fb_onset_cnt = 0
 
 #============================
 # DEFINE PARADIGM FUNCTIONS
@@ -63,8 +62,6 @@ def instr_key_check(check_time=0.2):
     core.wait(check_time)
     rtbox.clear()
 
-
-
 #===================================================
 def moving_ball(block_n, trial_n, training=False):
     # Draw Stimuli
@@ -100,13 +97,13 @@ def moving_ball(block_n, trial_n, training=False):
     win.flip()
     return trial_start
 
-
 #===================================================
 def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
     global training_score
+    global bad_fb_onset_cnt
     surp = False
     
-    # Check for and process responses
+    # Check for responses
     if use_rtbox:
         (rts, btns) = rtbox.secs()
     else:
@@ -116,6 +113,7 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
         except ValueError:
             btns = []
             rts = []
+    # Process responses
     if len(rts)>0:
         if len(rts)>1:          # Warning if more than one button was pressed
             win.logOnFlip('WARNING!!! More than one response detected (taking first) on B{0}_T{1}: responses = {2}'.format(
@@ -125,21 +123,21 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
         btn = btns[0]
         error = rt - interval_dur
         error_angle = error*angle_ratio
-        if not training and trial_n in surprise_trials[surp_cnt]:          # Surprise on if not in training and if in list of surprise trials  
+        if not training and trial_n in surprise_trials[block_n]:          # Surprise on if not in training and if in list of surprise trials  
             target_zone.setColor('blue')
             resp_marker.setLineColor(None)
             outcome_str = 'SURPRISE!'
-            outcome_sound = select_surp_sound()
+            sound_file = select_surp_sound()
             surp = True
         elif np.abs(error)<tolerances[condition]:             # WIN
             target_zone.setColor('green')
             outcome_str = 'WIN!'
-            outcome_sound = win_sound
+            sound_file = 'paradigm_sounds/{0}'.format(win_sound)
             win_flag = 0
         else:                                   # LOSS
             target_zone.setColor('red')
             outcome_str = 'LOSE!'
-            outcome_sound = loss_sound
+            sound_file = 'paradigm_sounds/{0}'.format(loss_sound)
             win_flag = 1
         resp_marker.setStart(pol2cart(error_angle+270, loop_radius-resp_marker_width/2))
         resp_marker.setEnd(pol2cart(error_angle+270, loop_radius+resp_marker_width/2))
@@ -148,30 +146,42 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
         outcome_str = 'None'
         rt=-1
         resp_marker.setLineColor(None)
-        outcome_sound = loss_sound
+        sound_file = 'paradigm_sounds/{0}'.format(loss_sound)
 #        no_response_time = exp_clock.getTime()-trial_start
 #        # Not adjusting tolerance for this type of trial...
+    outcome_sound = sound.Sound(value=sound_file, sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1)
+    outcome_sound.setVolume(0.8)
     
     # Present feedback
-    win.flip()      # create fixed timing between this flip and sound/draw onsets
-    win.callOnFlip(turn_sound[outcome_str].play)
+    target_zone_draw()
+    circles.draw()
+    win.flip()
+#    preflip = exp_clock.getTime()-trial_start
+    win.callOnFlip(outcome_sound.play)
     if paradigm_type=='eeg': 
         win.callOnFlip(port.setData, 2)
-
-    for frameN in range(feedback_dur * 60): #!!! change to frame_rate variable
+    
+    for frameN in range(feedback_dur * 60): #assuming frame_rate is close enough it would round to 60 (this must be an int)
         if paradigm_type=='ecog': 
             trigger_rect.draw()
 #        if frameN == 0:
 #            turn_sound[outcome_str].play()
         target_zone_draw()                      # Using our defined target_zone_draw, not .draw to have correct visual.  
         resp_marker.draw()
+        # Wait until 1.5 frames before desired presentation time, then create fixed timing between this flip and sound/draw onsets
+        if frameN==0:
+#            prewait = exp_clock.getTime()-trial_start
+#            desired = interval_dur + feedback_delay - 0.5/frame_rate
+            while exp_clock.getTime() < trial_start + interval_dur + feedback_delay - 0.5/frame_rate:
+                core.wait(0.0002)
         win.flip()
         if frameN==0:
             feedback_onset = exp_clock.getTime()-trial_start
-            #print 'just flipped feedback: {0}'.format(feedback_onset)
-        
+#            if feedback_onset > 1.793 or feedback_onset < 1.792:
+#                bad_fb_onset_cnt += 1
+#                print '{0} --> B{1}T{2} times:\n\tpreflip    {3}\n\tprewait    {4}\n\tdesired    {5}\n\tfeedback = {6}'.format(
+#                    bad_fb_onset_cnt,block_n,trial_n,preflip,prewait,desired,feedback_onset)
     win.flip()
-    turn_sound[outcome_str].setVolume(0.8)      # Try to reset volume to prevent slow fade after repetitions
     
     if not surp and outcome_str != 'None':
         tolerances[condition]+= tolerance_step[condition][win_flag]      # Update tolerances based on feedback. Needs to be here.   
@@ -187,18 +197,17 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
     if training:
         win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
         win.logOnFlip('B{0}_T{1} responses/times = {2} / {3}'.format('T', trial_n, btns, rts),logging.DATA)
-        win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format('T', trial_n, outcome_sound, feedback_onset),logging.DATA)
+        win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format('T', trial_n, sound_file, feedback_onset),logging.DATA)
     else:
         win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
         win.logOnFlip('B{0}_T{1} responses/times = {2} / {3}'.format(block_n, trial_n, btns, rts),logging.DATA)
-        win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format(block_n, trial_n, outcome_sound, feedback_onset),logging.DATA)
+        win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format(block_n, trial_n, sound_file, feedback_onset),logging.DATA)
     resp_marker.setLineColor('black')
     target_zone.setColor('dimgrey')
     while exp_clock.getTime() < trial_start + trial_dur:
         for press in event.getKeys(keyList=['escape','q']):
             if press:
                 clean_quit()
-
 
 #===================================================
 def staircase(condition): 
@@ -207,13 +216,12 @@ def staircase(condition):
     target_zone.visibleWedge = [0, target_upper_bound[condition]]
     target_zone.ori = target_origin[condition]
 
-
 #===================================================
 def block_break(block_n, training=False): 
     point_calc(block_n)
     # If not the last block, print feedback
-    if block_n<n_blocks*len(conditions)-1:
-        instr_txt.text = break_str.format(n_blocks*len(conditions)-block_n-1,break_min_dur)
+    if block_n<len(block_order)-1:
+        instr_txt.text = break_str.format(len(block_order)-block_n-1,break_min_dur)
         instr_txt.draw()
         win.flip()
         core.wait(break_min_dur)
@@ -223,7 +231,6 @@ def block_break(block_n, training=False):
         adv_screen_txt.draw()
         win.flip()
         instr_key_check()
-
 
 #===============================================
 def point_calc(block_n):
@@ -261,7 +268,6 @@ def score_instr():
     win.flip()
     instr_key_check()
 
-
 #===================================================
 def target_zone_draw():
     target_zone.draw()
@@ -272,10 +278,8 @@ def target_zone_draw():
 #===================================================
 def select_surp_sound():
     sound_type = np.random.choice(block_sounds.keys())                      # Selects the subfolder to draw sounds from (ie. 'breaks').
-    sound_file = block_sounds[sound_type][surp_sound_index]                 # Selects the specific wav file from the subfolder.
-    turn_sound['SURPRISE!'] = sound.Sound(value=sound_file, sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1)
-    turn_sound["SURPRISE!"].setVolume(0.8)
-    block_sounds.pop(sound_type)
+    sound_file = block_sounds[sound_type][block_n]                 # Selects the specific wav file from the subfolder.
+    block_sounds.pop(sound_type)                                            # Don't use this sound type again in this block
     return sound_file
 
 #===================================================
@@ -291,6 +295,17 @@ def clean_quit():
 #============================================================
 if paradigm_type=='eeg':
    port = parallel.ParallelPort(address=53504)
+
+# ECoG Photodiode flicker sequence to signal start of data block
+if paradigm_type=='ecog':
+    for flick in range(n_flicker):
+        trigger_rect.draw()
+        win.flip()
+        core.wait(flicker_dur)
+        win.flip()
+        core.wait(flicker_dur)
+        if flick%flicker_brk == flicker_brk-1:
+            core.wait(flicker_dur)
 
 # Initialize RT Button Box
 if use_rtbox:
@@ -317,7 +332,6 @@ win.flip()
 #============================================================
 if paradigm_type=='eeg':
     port.setData(0) # sets all pins low
-print 'Using %s(with %s) for sounds' % (sound.audioLib, sound.audioDriver)
 
 for trial_n in range(n_fullvis+2*n_training):
     #========================================================
@@ -334,7 +348,7 @@ for trial_n in range(n_fullvis+2*n_training):
     win.logOnFlip('TRAINING T{0}: window={1}; condition={2}'.format(trial_n,covered,condition),logging.INFO)
     event.clearEvents()
     rtbox.clear()
-    surp_cnt = 0
+#    surp_cnt = 0
     outcome_str = ''
     target_zone.visibleWedge = [0, target_upper_bound[condition]]
     target_zone.ori = target_origin[condition]
@@ -347,6 +361,7 @@ for trial_n in range(n_fullvis+2*n_training):
     # Instructions
     if (trial_n==n_fullvis) or (trial_n==n_fullvis+n_training):                    # First Easy/Hard Training
         instruction_loop(train_str[condition])
+    core.wait(post_instr_delay)                                         # Delay so they aren't caught off guard
     
     #========================================================
     # Moving Ball
@@ -358,8 +373,8 @@ for trial_n in range(n_fullvis+2*n_training):
 
     
     #========================================================
-    # Feedback Delay- wait until 1.5 frames before desired feedback onset
-    while exp_clock.getTime() < trial_start + trial_dur - feedback_dur - 1/frame_rate:
+    # Feedback Delay- wait to capture as many responses as possible before starting feedback computations
+    while exp_clock.getTime() < trial_start + interval_dur + feedback_delay - feedback_compute_dur:
         core.wait(0.001)
     
     #========================================================
@@ -400,13 +415,13 @@ instruction_loop(main_str)                    # Main instruction call
 # Constant Reward Function (start awarding points)
 outcome_win.text = '+{0}'.format(point_fn[0])
 outcome_loss.text = '{0}'.format(point_fn[1])
-for block_n, block_type in enumerate(block_order):
+for block_n, block_type in enumerate(block_order[starting_block-1:],starting_block-1):
     block_sounds = surprise_sounds.copy()
-    surp_sound_index = 0
+#    surp_sound_index = 0
     condition = conditions[block_type]
     target_zone.visibleWedge = [0, target_upper_bound[condition]]
     target_zone.ori = target_origin[condition]
-    block_start_txt.text = block_start_str.format(block_n+1, n_blocks*len(conditions), condition)
+    block_start_txt.text = block_start_str.format(block_n+1, len(block_order), condition)
     block_start_txt.draw()
     win.logOnFlip('B{0} ({1}) Start Text: TIME = {2}'.format(block_n,condition,exp_clock.getTime()),logging.INFO)
     win.flip()
@@ -421,20 +436,17 @@ for block_n, block_type in enumerate(block_order):
         rtbox.clear()
         
         #========================================================
-        # Set Trial Timing
-        
-        #========================================================
         # Moving Ball
         trial_start = moving_ball(block_n, trial_n, training=False)
         
         #========================================================
-        # Feedback Delay
-        while exp_clock.getTime() < trial_start + trial_dur - feedback_dur - 1/frame_rate:
+        # Feedback Delay- wait to capture as many responses as possible before starting feedback computations
+        while exp_clock.getTime() < trial_start + interval_dur + feedback_delay - feedback_compute_dur:
             core.wait(0.001)
         
         #========================================================
         # Feedback
-        print 'about to call calc_feedback; time into trial =  {0}'.format(exp_clock.getTime()-trial_start)
+        #print 'about to call calc_feedback; time into trial =  {0}'.format(exp_clock.getTime()-trial_start)
         feedback_fn(block_n, condition, trial_n, trial_start, False)
         
         #========================================================
@@ -446,7 +458,7 @@ for block_n, block_type in enumerate(block_order):
             win.callOnFlip(port.setData, 0)
         win.flip()
         staircase(condition)
-        while exp_clock.getTime() < trial_start + trial_dur + ITI:#!!!feedback_end + ITI:
+        while exp_clock.getTime() < trial_start + trial_dur + ITI:
             for press in event.getKeys(keyList=['escape','q', 'p']):
                 if press in ['p']:
                     pause_txt.draw()
@@ -458,8 +470,8 @@ for block_n, block_type in enumerate(block_order):
     
     #========================================================
     # Break Between Blocks
-    surp_cnt += 1
-    surp_sound_index += 1 
+#    surp_cnt += 1
+#    surp_sound_index += 1 
     block_break(block_n)
 
 endgame_txt.draw()

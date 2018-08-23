@@ -1,6 +1,6 @@
 # target_time log suite
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.4'
+paradigm_version = '2.4.5'
 
 from psychopy import visual, event, core, gui, logging, data
 import numpy as np
@@ -29,6 +29,7 @@ file_dlg.addField(label='SBJ Code:')
 file_dlg.addField(label='Parameter Version:',choices=['ecog','eeg'])
 file_dlg.addField(label='Use RT Box:',initial=True)
 file_dlg.addField(label='Debug Mode:',initial=False)
+file_dlg.addField(label='Starting Block:',initial=1)
 #file_dlg.addField('Response Key:') # Ideally space bar? something more accurate?
 
 file_dlg.show()
@@ -38,6 +39,7 @@ if file_dlg.OK:
     paradigm_type  = dlg_resp[1]
     use_rtbox = dlg_resp[2]
     debug_mode = dlg_resp[3]
+    starting_block = dlg_resp[4]
     log_filename = '../logs/{0}_response_log_{1}.txt'.format(log_prefix,exp_datetime)
 else: 
     print 'User Cancelled'
@@ -67,13 +69,13 @@ win.logOnFlip('paradigm_version = '+str(paradigm_version), logging.DATA)
 win.logOnFlip('paradigm_type = '+str(paradigm_type), logging.DATA)
 win.logOnFlip('use_rtbox = '+str(use_rtbox), logging.DATA)
 win.logOnFlip('debug_mode = '+str(debug_mode), logging.DATA)
+win.logOnFlip('starting_block = '+str(starting_block), logging.DATA)
 win.logOnFlip('n_blocks = '+str(n_blocks), logging.DATA)
 win.logOnFlip('n_trials = '+str(n_trials), logging.DATA)
 win.logOnFlip('n_fullvis = '+str(n_fullvis), logging.DATA)
-win.logOnFlip('n_training = '+str(n_training), logging.DATA)            # surp_rate, n_surp, and n_rand_blocks to log
+win.logOnFlip('n_training = '+str(n_training), logging.DATA)
 win.logOnFlip('surp_rate = '+str(surp_rate), logging.DATA)
 win.logOnFlip('n_surp = '+str(n_surp), logging.DATA)
-win.logOnFlip('n_rand_blocks = '+str(n_rand_blocks), logging.DATA)
 win.logOnFlip('surprise_sequence = '+str(surprise_sequence), logging.DATA)
 win.logOnFlip('interval_dur = '+str(interval_dur), logging.DATA)
 win.logOnFlip('feedback_delay = '+str(feedback_delay), logging.DATA)
