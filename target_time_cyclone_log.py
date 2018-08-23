@@ -11,7 +11,7 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #=====================================
 #=====================================
 # CHECK VERSION NUMBER CONSISTENCY
-files = [f for f in os.listdir('.') if f[-3:]=='.py' and f.startswith(paradigm_name+'_main')]
+files = [f for f in os.listdir('.') if f[-3:]=='.py' and f.startswith('MAIN_'+paradigm_name)]
 # Check for clean directory with only 1 main script
 assert len(files)==1
 # Check that filename matches paradigm_version coded above
