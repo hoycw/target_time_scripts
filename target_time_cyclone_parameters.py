@@ -46,7 +46,7 @@ tolerances = {'easy':0.125,           # Tolerance (in s) on either side of the t
              'hard':0.05}            # e.g., interval-tolerance < correct_RT < interval+ tolerance
 tolerance_step = {'easy': [-0.003,0.012],
                     'hard': [-0.012,0.003]} # adjustment (in s) for [correct,incorrect] responses
-tolerance_lim = [0.2, 0.015]
+tolerance_lim = [0.3, 0.015]
 
 n_flicker   = 10                     # number of times to flicker the photodiode on at initial task start
 flicker_dur = 0.1                   # duration of each flicker in start sequence
