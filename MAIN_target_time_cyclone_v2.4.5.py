@@ -155,7 +155,7 @@ def feedback_fn(block_n, condition, trial_n, trial_start, training=False):
     # Present feedback
     target_zone_draw()
     circles.draw()
-    win.flip()
+    #win.flip()
 #    preflip = exp_clock.getTime()-trial_start
     win.callOnFlip(outcome_sound.play)
     if paradigm_type=='eeg': 
