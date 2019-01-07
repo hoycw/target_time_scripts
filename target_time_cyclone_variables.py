@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.5'
+paradigm_version = '2.4.7'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -33,7 +33,7 @@ if frame_rate > 60:
     warnings.warn('Frame rate greater than 60hz: '+str(frame_rate))
 exp_clock = core.Clock()
 if paradigm_type == 'ecog':
-    block_order = np.array([0, 0, 1, 1])
+    block_order = np.array([0, 1, 0, 1])
 else:
     block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])   #!!! consider counterbalancing future participants
 def repeat_cnt(sequence):

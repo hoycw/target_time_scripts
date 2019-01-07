@@ -2,6 +2,8 @@
 #  Log of alterations to experiment
 #===================================
 
+# cyclone v2.4.7: increase max tolerance to 0.4s to help low functioning patients (shouldn't affect good performers); only 2 ITIs (0.7, 1s) to avoid distortion in internal timing after very short ITIs; ecog block order change to be E, H, E, H
+# cyclone v2.4.6: EEG development branch to deal with shitty audio/visual alignment in 135D, needs to be merged back into master branch at some point...
 # cyclone v2.4.5: define/initialize outcome sound inside of feedback_fn to avoid volume decreases; compensate for this computational time with feedback_compute_dur and change to logic of when I start the feedback_fn to get consistent trail onset to feednack onset timing; eliminated n_rand_blocks as well as surp_cnt and surp_sound_index since both should just be block_n; change monitor to use "Built_in" and all text and visual sizes to fit correct monitor specs; change break min dur to 15s; added skip to block feature; added flicker sequence at beginning
 # cyclone v2.4.4: fixing the decreasing volume issue
 # cyclone v2.4.3: final tweaks! finally got the audio-visual alignment where I want it (~17ms post-visual auditory onset), instructions and RTBox are updated, etc.

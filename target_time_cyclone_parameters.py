@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.5'
+paradigm_version = '2.4.7'
 
 from psychopy import visual, event, core, gui, logging, data
 from target_time_cyclone_log import*
@@ -37,7 +37,7 @@ interval_dur = 1                    # duration (in s) of target time interval
 feedback_delay = 0.8                # duration (in s) of delay between end of interval and feedback onset
 feedback_compute_dur = 0.2          # time (in s) given to compute feedback before being ready to present (will not collect responses in this time!)
 feedback_dur = 1                    # duration (in s) of feedback presentation
-ITIs = [0.2, 0.4, 0.7, 1.0]         # length of inter-trial intervals (in s)
+ITIs = [0.7, 1.0]         # length of inter-trial intervals (in s)
 post_instr_delay = 1                # duration of delay (in s) after instructions/break to make sure they're ready
 block_start_dur = 2                 # duration (in s) to display block start text (e.g., "Level _: type")
 end_screen_dur = 10                 # duration (in s) of the ending "thank you all done" screen
@@ -46,7 +46,7 @@ tolerances = {'easy':0.125,           # Tolerance (in s) on either side of the t
              'hard':0.05}            # e.g., interval-tolerance < correct_RT < interval+ tolerance
 tolerance_step = {'easy': [-0.003,0.012],
                     'hard': [-0.012,0.003]} # adjustment (in s) for [correct,incorrect] responses
-tolerance_lim = [0.2, 0.015]
+tolerance_lim = [0.4, 0.015]
 
 n_flicker   = 10                     # number of times to flicker the photodiode on at initial task start
 flicker_dur = 0.1                   # duration of each flicker in start sequence
