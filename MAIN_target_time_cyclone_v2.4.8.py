@@ -411,10 +411,10 @@ for trial_n in range(n_fullvis+2*n_training):
         for press in event.getKeys(keyList=['escape','q', 'p']):
             if press in ['p']:
                 pause_txt.draw()
-                win.logOnFlip('PAUSE STARTED: B{0}_T{1}, TIME = {3}'.format(block_n, trial_n, exp_clock.getTime()))
+                win.logOnFlip('PAUSE STARTED: B{0}_T{1}, TIME = {2}'.format('T', trial_n, exp_clock.getTime()),logging.INFO)
                 win.flip()
                 event.waitKeys(keyList=['p'])
-                win.logOnFlip('PAUSE ENDED: B{0}_T{1}, TIME = {3}'.format(block_n, trial_n, exp_clock.getTime()))
+                win.logOnFlip('PAUSE ENDED: B{0}_T{1}, TIME = {2}'.format('T', trial_n, exp_clock.getTime()),logging.INFO)
                 core.wait(block_start_dur)
             else:
                 clean_quit()
@@ -476,8 +476,10 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
             for press in event.getKeys(keyList=['escape','q', 'p']):
                 if press in ['p']:
                     pause_txt.draw()
+                    win.logOnFlip('PAUSE STARTED: B{0}_T{1}, TIME = {2}'.format(block_n, trial_n, exp_clock.getTime()),logging.INFO)
                     win.flip()
                     event.waitKeys(keyList=['p'])
+                    win.logOnFlip('PAUSE ENDED: B{0}_T{1}, TIME = {2}'.format(block_n, trial_n, exp_clock.getTime()),logging.INFO)
                     core.wait(block_start_dur)
                 else: 
                     clean_quit()

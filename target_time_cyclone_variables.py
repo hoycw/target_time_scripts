@@ -229,7 +229,7 @@ if paradigm_type == 'ecog':
 else:
     instr_txt_pos = (0,8)
 instr_txt = visual.TextStim(win,text=instr_strs[0],height=1,units='cm', alignVert='center',
-                                name='instr', color='black',pos=instr_txt_pos,wrapWidth=25)
+                                name='instr', color='black',pos=instr_txt_pos,wrapWidth=30)
 
 if paradigm_type == 'ecog':
     adv_txt_pos = (0,-7)
