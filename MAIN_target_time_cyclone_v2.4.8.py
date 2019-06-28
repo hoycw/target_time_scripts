@@ -359,7 +359,7 @@ for trial_n in range(n_fullvis+2*n_training):
     else:                                   # Hard Training
         condition = 'hard'
         
-    win.logOnFlip('TRAINING T{0}: window={1}; condition={2}'.format(trial_n,covered,condition),logging.INFO)
+    win.logOnFlip('TRAINING T{0}: window={1}; condition={2}'.format(trial_n,covered,condition),logging.DATA)
     event.clearEvents()
     rtbox.clear()
 #    surp_cnt = 0
@@ -383,7 +383,7 @@ for trial_n in range(n_fullvis+2*n_training):
     
     #========================================================
     # Get Trial Timing
-    win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,trial_start),logging.INFO)
+    win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,trial_start),logging.DATA)
 
     
     #========================================================
@@ -399,7 +399,7 @@ for trial_n in range(n_fullvis+2*n_training):
     #========================================================
     # ITI
     ITI = np.max(ITIs)       #!!! probably want specific random sequences to be determined ahead of time
-    win.logOnFlip('B{0}_T{1} ITI={2}; TIME = {3}'.format('T',trial_n,ITI,exp_clock.getTime()-trial_start),logging.INFO)
+    win.logOnFlip('B{0}_T{1} ITI={2}; TIME = {3}'.format('T',trial_n,ITI,exp_clock.getTime()-trial_start),logging.DATA)
     
     if paradigm_type=='eeg':
         win.callOnFlip(port.setData, 0)
@@ -411,10 +411,10 @@ for trial_n in range(n_fullvis+2*n_training):
         for press in event.getKeys(keyList=['escape','q', 'p']):
             if press in ['p']:
                 pause_txt.draw()
-                win.logOnFlip('PAUSE STARTED: B{0}_T{1}, TIME = {2}'.format('T', trial_n, exp_clock.getTime()),logging.INFO)
+                win.logOnFlip('PAUSE STARTED: B{0}_T{1}, TIME = {2}'.format('T', trial_n, exp_clock.getTime()),logging.DATA)
                 win.flip()
                 event.waitKeys(keyList=['p'])
-                win.logOnFlip('PAUSE ENDED: B{0}_T{1}, TIME = {2}'.format('T', trial_n, exp_clock.getTime()),logging.INFO)
+                win.logOnFlip('PAUSE ENDED: B{0}_T{1}, TIME = {2}'.format('T', trial_n, exp_clock.getTime()),logging.DATA)
                 core.wait(block_start_dur)
             else:
                 clean_quit()
@@ -437,7 +437,7 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
     target_zone.ori = target_origin[condition]
     block_start_txt.text = block_start_str.format(block_n+1, len(block_order), condition)
     block_start_txt.draw()
-    win.logOnFlip('B{0} ({1}) Start Text: TIME = {2}'.format(block_n,condition,exp_clock.getTime()),logging.INFO)
+    win.logOnFlip('B{0} ({1}) Start Text: TIME = {2}'.format(block_n,condition,exp_clock.getTime()),logging.DATA)
     win.flip()
     core.wait(block_start_dur)
     win.flip()
@@ -466,7 +466,7 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
         #========================================================
         # ITI
         ITI = random.choice(ITIs)       #!!! probably want specific random sequences to be determined ahead of time
-        win.logOnFlip('B{0}_T{1} ITI={2}; TIME = {3}'.format(block_n,trial_n,ITI, exp_clock.getTime()-trial_start),logging.INFO)
+        win.logOnFlip('B{0}_T{1} ITI={2}; TIME = {3}'.format(block_n,trial_n,ITI, exp_clock.getTime()-trial_start),logging.DATA)
         
         if paradigm_type=='eeg':
             win.callOnFlip(port.setData, 0)
@@ -476,10 +476,10 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
             for press in event.getKeys(keyList=['escape','q', 'p']):
                 if press in ['p']:
                     pause_txt.draw()
-                    win.logOnFlip('PAUSE STARTED: B{0}_T{1}, TIME = {2}'.format(block_n, trial_n, exp_clock.getTime()),logging.INFO)
+                    win.logOnFlip('PAUSE STARTED: B{0}_T{1}, TIME = {2}'.format(block_n, trial_n, exp_clock.getTime()),logging.DATA)
                     win.flip()
                     event.waitKeys(keyList=['p'])
-                    win.logOnFlip('PAUSE ENDED: B{0}_T{1}, TIME = {2}'.format(block_n, trial_n, exp_clock.getTime()),logging.INFO)
+                    win.logOnFlip('PAUSE ENDED: B{0}_T{1}, TIME = {2}'.format(block_n, trial_n, exp_clock.getTime()),logging.DATA)
                     core.wait(block_start_dur)
                 else: 
                     clean_quit()
