@@ -195,8 +195,8 @@ instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move 
                'The gray bar at the bottom is the target zone.',
                'If you respond in the target zone, it turns green and you win points!',
                'If you miss the target zone, it turns red and you lose points.',
-               'Sometimes, the target zone will turn blue.\n' +\
-               "Ignore this. These trials don't count, so can't win or lose point_instr_str.",
+               'Sometimes, the target zone will turn blue. Ignore this.\n' +\
+               "These trials don't count, so you won't win or lose points.",
                "Let's get started with a few examples..."]
 if use_rtbox:
     instr_strs.insert(-1,rtbox_strs)
@@ -234,7 +234,7 @@ instr_txt = visual.TextStim(win,text=instr_strs[0],height=1,units='cm', alignVer
 if paradigm_type == 'ecog':
     adv_txt_pos = (0,-7)
 else:
-    adv_txt_pos = (0,-11)
+    adv_txt_pos = (0,-12)
 adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(key),
                                 height=0.75,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
 
