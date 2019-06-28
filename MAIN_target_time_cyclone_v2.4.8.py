@@ -261,11 +261,10 @@ def score_instr():
     global training_score
     score_demo_txt.text = score_demo_str.format(training_score[condition])
     total_point_txt.text = total_point_str.format(np.sum(training_score.values()))
-    if training_score[condition] > 0:
+    if training_score[condition] >= 0:
         score_demo_txt.color = 'green'
         total_point_txt.color = 'green'
-    
-    if training_score[condition] <= 0:
+    else:
         score_demo_txt.color = 'red'
         total_point_txt.color = 'red'
     
