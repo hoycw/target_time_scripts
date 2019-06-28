@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.7'
+paradigm_version = '2.4.8'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -19,8 +19,12 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #============================================================
 # EXPERIMENTAL VARIABLES
 #============================================================
+if paradigm_type == 'ecog':
+    monitor_name = 'Built_in'
+else:
+    monitor_name = '135D_monitor'
 win = visual.Window(size=(1920,1080), fullscr=full_screen, color=(0,0,0),
-                    monitor='Built_in',# screen=screen_to_show,
+                    monitor=monitor_name,# screen=screen_to_show,
                     allowGUI=False, units=screen_units, waitBlanking=True);
 #NOTE: ThinkPad P51 (ECoG-1/Klay/etc.) = 34.5cm wide, 19.5cm tall
 #   ECoG-A laptop size = 36cm wide, 20sm tall
@@ -108,10 +112,10 @@ surprise_sounds = {'breaks': glob.glob("surprise_sounds/breaks/*.wav"),
 
 block_sz = 512
 # Should not need turn_sound anymore, but leaving here just so the stream gets initialized...
-turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1),  # Switch sound sample once sounds present
-             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1),
-             "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1),
-             'None': sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=-1)}
+turn_sound = {"WIN!": sound.Sound(value='paradigm_sounds/{0}'.format(win_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=1),  # Switch sound sample once sounds present
+             "LOSE!":sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=1),
+             "SURPRISE!": sound.Sound(value= surprise_sounds['breaks'][0], sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=1),
+             'None': sound.Sound(value='paradigm_sounds/{0}'.format(loss_sound), sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=1)}
 
 turn_sound["WIN!"].setVolume(0.8)
 turn_sound["LOSE!"].setVolume(0.8)
@@ -180,7 +184,10 @@ trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_h
 #===================================================
 # INSTRUCTIONS
 #===================================================
-rtbox_strs = "You will be using the Response Time Box.\nYou can respond by pressing any of the four buttons on the box."
+if paradigm_type=='ecog':
+    rtbox_strs = "You will be using the Response Time Box.\nPlease respond by using your THUMB to press any of the buttons on the box."
+else:
+    rtbox_strs = "You will be using the Response Time Box.\nPlease respond by using your RIGHT THUMB to press any of the buttons on the box."
 instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move around this circle.',
                'Your goal is to respond at the exact\nmoment when it completes the circle.',
                "The light always starts at the bottom and moves at the same speed, "+\
@@ -189,7 +196,7 @@ instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move 
                'If you respond in the target zone, it turns green and you win points!',
                'If you miss the target zone, it turns red and you lose points.',
                'Sometimes, the target zone will turn blue.\n' +\
-               "Ignore this. It won't affect your score.",
+               "Ignore this. These trials don't count, so can't win or lose point_instr_str.",
                "Let's get started with a few examples..."]
 if use_rtbox:
     instr_strs.insert(-1,rtbox_strs)
@@ -217,11 +224,19 @@ times_demo_called = 1
 welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=2,units='cm',alignHoriz='center',alignVert='center',
                                 name='welcome', color='black', bold=True, pos=(0,2),wrapWidth=30)
 
+if paradigm_type == 'ecog':
+    instr_txt_pos = (0,6)
+else:
+    instr_txt_pos = (0,8)
 instr_txt = visual.TextStim(win,text=instr_strs[0],height=1,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(0,6),wrapWidth=25)
+                                name='instr', color='black',pos=instr_txt_pos,wrapWidth=25)
 
+if paradigm_type == 'ecog':
+    adv_txt_pos = (0,-7)
+else:
+    adv_txt_pos = (0,-11)
 adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(key),
-                                height=0.75,units='cm',name='adv_screen', color='black', pos=(0,-7),wrapWidth=20)#short no need wrap
+                                height=0.75,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
 
 block_start_txt = visual.TextStim(win,text=block_start_str,height=2,units='cm',alignHoriz='center',alignVert='center',
                                 name='block_start', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap

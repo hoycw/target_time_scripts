@@ -1,6 +1,6 @@
 # target_time log suite
 paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.7'
+paradigm_version = '2.4.8'
 
 from psychopy import visual, event, core, gui, logging, data
 import numpy as np
