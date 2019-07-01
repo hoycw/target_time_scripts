@@ -16,7 +16,7 @@ from oddball_parameters import*
 # Randomly assign visual, auditory, and response mappings
 if paradigm_type == 'ecog':
     # Randomly permute index for stimuli/responses
-    v_idx = np.random.permutation(np.arange(len(conditions)))
+    v_idx = np.random.permutation(np.arange(len(conditions)))   # [target, standard, distractor]
     a_idx = np.random.permutation([0, 1])
     r_idx = np.random.permutation([0, 1])  # [Target, Reject]
 else:
@@ -142,11 +142,11 @@ outcome_pics = ['win.jpg', 'loss.jpg', 'surprise.jpg']
 keys = ['left', 'right']
 adv_key = 'right'
 kb_resp_str = ['LEFT', 'RIGHT']
-rtbox_resp_str = ['gray buttons 1 or 2', 'black buttons 3 or 4']
+rtbox_resp_str = ['white buttons 1 or 2', 'black buttons 3 or 4']
 
 if use_rtbox:
-    resp_strs = ['Response Time Box','any of the GRAY buttons (1 or 2)', 'any of the BLACK buttons (3 or 4)']
-    resp_pic = 'rtbox.jpg'
+    resp_strs = ['Response Time Box','any of the WHITE buttons (1 or 2)', 'any of the BLACK buttons (3 or 4)']
+    resp_pic = 'RTBox_LR_instruction_img.jpg'
 else:
     resp_strs = ['keyboard','the LEFT ARROW', 'the RIGHT ARROW']
     resp_pic = ''
@@ -165,9 +165,9 @@ feedback_str = 'B{0}_T{1}: Outcome = {2}; RT = {3}; condition = {4}'
 instr_strs = ['Welcome! In this game, we will show you a series of pictures and sounds.\n'+\
               'Your job is to earn points by collecting the rare target stimulus,\n'+\
               'but rejecting the standard and distracter stimuli.',
-              'This is a target. To collect them and win 100 points, press {0}.'.format(resp_strs[r_idx[0]+1]),
-              'This is a standard. To reject standards and win 100 points, press {0}.'.format(resp_strs[r_idx[1]+1]),
-              'This is a distracter. To reject distracters and win 100 points, press {0}.'.format(resp_strs[r_idx[1]+1]),
+              'This is a target. To collect them and win points, press {0}.'.format(resp_strs[r_idx[0]+1]),
+              'This is a standard. To reject standards and win points, press {0}.'.format(resp_strs[r_idx[1]+1]),
+              'Beware of these distracters! To reject distracters and win points, press {0}.'.format(resp_strs[r_idx[1]+1]),
               resp_instr_str,
               'To summarize, press the correct response for each stimulus:',
               "Let's try a few examples..."]
