@@ -1,5 +1,5 @@
 paradigm_name = 'oddball'
-paradigm_version = '1.0'
+paradigm_version = '1.1'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -14,6 +14,7 @@ from oddball_parameters import*
 #           EXPERIMENTAL DESIGN VARIABLES
 #============================================================
 # Randomly assign visual, auditory, and response mappings
+np.random.seed()
 if paradigm_type == 'ecog':
     # Randomly permute index for stimuli/responses
     v_idx = np.random.permutation(np.arange(len(conditions)))   # [target, standard, distractor]
@@ -140,21 +141,22 @@ trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_h
 #---------------------------------------------------
 outcome_pics = ['win.jpg', 'loss.jpg', 'surprise.jpg']
 keys = ['left', 'right']
+actions = ['COLLECT', 'REJECT']
 adv_key = 'right'
-kb_resp_str = ['LEFT', 'RIGHT']
-rtbox_resp_str = ['white buttons 1 or 2', 'black buttons 3 or 4']
 
 if use_rtbox:
-    resp_strs = ['Response Time Box','any of the WHITE buttons (1 or 2)', 'any of the BLACK buttons (3 or 4)']
+    resp_str_prefix = 'any of the'
+    resp_strs = ['Response Time Box','WHITE buttons (1,2)', 'BLACK buttons (3,4)']
     resp_pic = 'RTBox_LR_instruction_img.jpg'
 else:
-    resp_strs = ['keyboard','the LEFT ARROW', 'the RIGHT ARROW']
+    resp_str_prefix = 'the'
+    resp_strs = ['keyboard','LEFT ARROW', 'RIGHT ARROW']
     resp_pic = ''
 
-resp_instr_str = 'You will respond using the {0}.\n'+\
-                 'Please only use the index and middle finger of whichever hand the experimenter tells you.\n'+\
-                 'To collect targets, press {1}.\n'+\
-                 'To reject standards and distracers, press {2}.'.format(resp_strs[0],resp_strs[r_idx[0]+1],resp_strs[r_idx[1]+1])
+resp_instr_str = 'You will be responding using the {0}.\n'.format(resp_strs[0]) +\
+                 'Please only use the index and middle finger of whichever hand the experimenter tells you.\n' +\
+                 'To COLLECT targets, press {0} {1}.\n'.format(resp_str_prefix,resp_strs[r_idx[0]+1]) +\
+                 'To REJECT standards and distracers, press {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[1]+1])
 
 feedback_str = 'B{0}_T{1}: Outcome = {2}; RT = {3}; condition = {4}'
 
@@ -162,21 +164,21 @@ feedback_str = 'B{0}_T{1}: Outcome = {2}; RT = {3}; condition = {4}'
 # Instruction Strings
 #---------------------------------------------------
 # Main instructions
-instr_strs = ['Welcome! In this game, we will show you a series of pictures and sounds.\n'+\
-              'Your job is to earn points by collecting the rare target stimulus,\n'+\
+instr_strs = ['Welcome! In this game, we will show you a series of pictures and sounds.'+\
+              'Your job is to earn points by collecting the rare target stimulus,'+\
               'but rejecting the standard and distracter stimuli.',
-              'This is a target. To collect them and win points, press {0}.'.format(resp_strs[r_idx[0]+1]),
-              'This is a standard. To reject standards and win points, press {0}.'.format(resp_strs[r_idx[1]+1]),
-              'Beware of these distracters! To reject distracters and win points, press {0}.'.format(resp_strs[r_idx[1]+1]),
               resp_instr_str,
+              'This is a target. To COLLECT them and win points, press {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[0]+1]),
+              'This is a standard. To REJECT standards and win points, press {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[1]+1]),
+              'Beware of these distracters! REJECT them like standards by pressing {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[1]+1]),
               'To summarize, press the correct response for each stimulus:',
               "Let's try a few examples..."]
 # Strings for instruction summary reminder
-instr_pic_names = ['',outcome_pics[v_idx[0]],outcome_pics[v_idx[1]],outcome_pics[v_idx[2]],resp_pic,'combo','']
-instr_cond_strs = ['Target','Standard','Distracter']
+instr_pic_names = ['',resp_pic,outcome_pics[v_idx[0]],outcome_pics[v_idx[1]],outcome_pics[v_idx[2]],'combo','']
+instr_cond_strs = ['Target (COLLECT)','Standard (REJECT)','Distracter (REJECT)']
 instr_resp_strs = [resp_strs[r_idx[0]+1], resp_strs[r_idx[1]+1], resp_strs[r_idx[1]+1]]
 # Starting the task
-main_str = ["Ready to try the real deal? We'll reset your score to 0 and start counting for real now.\n"+\
+main_str = ["Ready to try the real deal?\nWe'll reset your score to 0 and start counting for real now.\n"+\
             "You'll do {0} blocks, each lasting {1} trials.\n\n".format(n_blocks,n_trials)+\
             'Press Q/escape to try more practice rounds, '+\
             'or press {0} to start playing!'.format(adv_key)]
@@ -199,52 +201,62 @@ if paradigm_type == 'ecog':
     instr_txt_pos = (0,6)
 else:
     instr_txt_pos = (0,8)    
-instr_txt = visual.TextStim(win,text=instr_strs[0],height=1,units='cm', alignVert='center',
+instr_txt = visual.TextStim(win,text=instr_strs[0],height=0.8,units='cm', alignVert='center',
                                 name='instr', color='black',pos=instr_txt_pos,wrapWidth=30)
-instr_resp_txts = [visual.TextStim(win,text=instr_resp_strs[0],height=1,units='cm', alignVert='center',
+instr_condlab_txts = [visual.TextStim(win,text=instr_cond_strs[0],height=0.6,units='cm', alignVert='center',
+                                name='instr', color='black',pos=(-8,2),wrapWidth=10),
+                  visual.TextStim(win,text=instr_cond_strs[1],height=0.6,units='cm', alignVert='center',
+                                name='instr', color='black',pos=(0,2),wrapWidth=10),
+                  visual.TextStim(win,text=instr_cond_strs[2],height=0.6,units='cm', alignVert='center',
+                                name='instr', color='black',pos=(8,2),wrapWidth=10)]
+instr_resp_txts = [visual.TextStim(win,text=instr_resp_strs[0],height=0.6,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(-8,-5),wrapWidth=10),
-                  visual.TextStim(win,text=instr_resp_strs[1],height=1,units='cm', alignVert='center',
+                  visual.TextStim(win,text=instr_resp_strs[1],height=0.6,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(0,-5),wrapWidth=10),
-                  visual.TextStim(win,text=instr_resp_strs[2],height=1,units='cm', alignVert='center',
+                  visual.TextStim(win,text=instr_resp_strs[2],height=0.6,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(8,-5),wrapWidth=10)]
+instr_action_txts = [visual.TextStim(win,text=actions[r_idx[0]],height=0.6,units='cm', alignVert='center',
+                                name='instr', color='black',pos=(-2,3),wrapWidth=10),
+                  visual.TextStim(win,text=actions[r_idx[1]],height=0.6,units='cm', alignVert='center',
+                                name='instr', color='black',pos=(2,3),wrapWidth=10)]
 
 if paradigm_type == 'ecog':
-    adv_txt_pos = (0,-7)
+    adv_txt_pos = (0,-8)
 else:
     adv_txt_pos = (0,-12)
-adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(adv_key),
-                                height=0.75,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
+adv_screen_txt = visual.TextStim(win,text='Press {0} ({1}) to advance or Q/escape to quit...'.format(adv_key, resp_strs[2]),
+                                height=0.5,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
 
 block_start_txt = visual.TextStim(win,text=block_start_str,height=2,units='cm',alignHoriz='center',alignVert='center',
                                 name='block_start', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap
 
-block_point_txt = visual.TextStim(win,text=block_point_str,height=1,units='cm', alignVert='center',
-                                name='block_points', color='black',pos=(0,6),wrapWidth=20)#short no need wrap
+block_point_txt = visual.TextStim(win,text=block_point_str,height=0.8,units='cm', alignVert='center',
+                                name='block_points', color='black',pos=(0,3),wrapWidth=20)#short no need wrap
 
-score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=1,units='cm', alignVert='center',
+score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=0.8,units='cm', alignVert='center',
                                 name='score_demo', color='green',pos=(0,6),wrapWidth=30)#short no need wrap
 
-point_instr_txt = visual.TextStim(win,text=point_instr_str, height=1,units='cm', alignVert='center',
+point_instr_txt = visual.TextStim(win,text=point_instr_str, height=0.8,units='cm', alignVert='center',
                                 name='point_instr', color='black',pos=(0,0),wrapWidth=30)#built in line break
 
-total_point_txt = visual.TextStim(win,text=total_point_str,height=1,units='cm', alignVert='center',
-                                name='total_points', color='black', bold=True, pos=(0,4.5),wrapWidth=20)#short no need wrap
+total_point_txt = visual.TextStim(win,text=total_point_str,height=0.8,units='cm', alignVert='center',
+                                name='total_points', color='black', bold=True, pos=(0,0),wrapWidth=20)#short no need wrap
 
 pause_txt = visual.TextStim(win,text='Paused', height=2,units='cm',alignHoriz='center',alignVert='center',
                                 name='pause', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap
 
 endgame_txt = visual.TextStim(win,text=end_game_str,
                             height=1.25,units='cm',alignHoriz='center',alignVert='center',
-                            name='endgame', color='black', bold=False, pos=(0,-2),wrapWidth=30)
+                            name='endgame', color='black', bold=False, pos=(0,-4),wrapWidth=30)
 
 #---------------------------------------------------
 # Instruction Images
 #---------------------------------------------------
 # Instructions
-instr_img_pos = (5, -2)
-instr_img_size = (13,10)
+instr_img_pos = (0, -2.5)
+instr_img_size = (10,10)
 instr_summ_pos = [(-8,-2), (0,-2), (8,-2)]
-instr_summ_size = (4,3)
+instr_summ_size = (6,6)
 
 instr_img = visual.ImageStim(win, image='cyclone_pics/'+outcome_pics[0], flipHoriz=False, 
                                 pos=instr_img_pos, size=instr_img_size, units='cm')

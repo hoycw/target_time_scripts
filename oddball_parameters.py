@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'oddball'
-paradigm_version = '1.0'
+paradigm_version = '1.1'
 
 from psychopy import visual, event, core, gui, logging, data
 from oddball_log import*
@@ -48,7 +48,7 @@ flicker_brk = 5                     # break the sequence after this many flicker
 #======================
 # STIMULUS PARAMETERS  
 #======================
-full_screen = False                  # Make the window full screen? (True/False)
+full_screen = True                  # Make the window full screen? (True/False)
 #screen_to_show = 1                 # Select which screen to display the window on
 screen_units = 'cm'                 # Set visual object sizes in cm (constant across all screens)
 

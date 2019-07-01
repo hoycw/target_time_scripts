@@ -38,9 +38,13 @@ def instruction_loop(instrs, instrp, intro=False):
                 for ix in range(len(conditions)):
                     instr_summ_imgs[ix].draw()
                     instr_resp_txts[ix].draw()
+                    instr_condlab_txts[ix].draw()
             else:
                 instr_img.image = 'cyclone_pics/{0}'.format(instrp[instr_ix])
                 instr_img.draw()
+                if instrp[instr_ix]=='RTBox_LR_instruction_img.jpg':
+                    instr_action_txts[0].draw()
+                    instr_action_txts[1].draw()
         adv_screen_txt.draw()
         win.flip()
         instr_key_check()
@@ -111,7 +115,7 @@ def present_stim(trial_type, next_trial_start):
     return trial_start
 
 #===================================================
-def check_resp(block_n, trial_n, training=False):
+def check_resp(block_n, trial_n, block_score, training=False):
     if training:
         condition = conditions[train_cond_n[trial_n]]
     else:
@@ -150,6 +154,8 @@ def check_resp(block_n, trial_n, training=False):
     
     win.logOnFlip('B{0}_T{1} responses/times = {2} / {3}'.format(block_n, trial_n, btns, rts),logging.DATA)
     win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,rt,condition),logging.DATA)
+    
+    return block_score
 
 
 #===================================================
@@ -157,12 +163,12 @@ def block_break(block_n, block_score, total_score, training=False):
     if training:
         block_point_txt.text = score_demo_str.format(block_score)
         # Print point training string, not total score
-        total_point_txt.text = point_instr_str
-        total_point_txt.color = 'black'
+        instr_txt.text = point_instr_str
     else:
         block_point_txt.text = block_point_str.format(block_n+1,block_score)
         total_score += block_score
         total_point_txt.text = total_point_str.format(total_score)
+        total_point_txt.draw()
         if total_score >= 0:
             total_point_txt.color = 'green'
         else:
@@ -172,10 +178,10 @@ def block_break(block_n, block_score, total_score, training=False):
     else:
         block_point_txt.color = 'red'
     block_point_txt.draw()
-    total_point_txt.draw()
     
     # If not the last block, print feedback
     if training:
+        instr_txt.draw()
         adv_screen_txt.draw()
         win.flip()
         instr_key_check()
@@ -296,7 +302,7 @@ for trial_n in range(n_training):
     
     #========================================================
     # Get responses
-    check_resp('T', trial_n, training=True)
+    block_score = check_resp('T', trial_n, block_score, training=True)
 
 # Present Score feedback
 total_score = block_break('T', block_score, total_score, training=True)
@@ -336,7 +342,7 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
         
         #========================================================
         # Get responses
-        check_resp(block_n, trial_n)
+        block_score = check_resp(block_n, trial_n, block_score)
     
     #========================================================
     # Break Between Blocks
