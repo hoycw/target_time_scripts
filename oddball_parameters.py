@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'oddball'
-paradigm_version = '1.1'
+paradigm_version = '1.2'
 
 from psychopy import visual, event, core, gui, logging, data
 from oddball_log import*
@@ -35,7 +35,7 @@ point_amt = 100                                         # Amount to increase/dec
 #======================================
 stim_dur = 1                        # duration stimulus is on screen
 sound_dur = 0.2                     # duration of sounds
-ITIs = [0.4, 0.5, 0.6]              # duration between stimuli
+ITIs = [0.5, 0.7]              # duration between stimuli
 resp_proc_dur = 0.1                 # duration of window to check for responses at end of trial
 post_instr_delay = 1                # duration of delay (in s) after instructions/break to make sure they're ready
 block_start_dur = 2                 # duration (in s) to display block start text (e.g., "Level _: type")

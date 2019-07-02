@@ -21,7 +21,6 @@ import oddball_log
 from oddball_parameters import*
 from oddball_variables import*
 print 'Using %s(with %s) for audioLib(with audioDriver)' % (sound.audioLib, sound.audioDriver)
-bad_fb_onset_cnt = 0
 
 #============================
 # DEFINE PARADIGM FUNCTIONS
@@ -124,7 +123,7 @@ def check_resp(block_n, trial_n, block_score, training=False):
     if use_rtbox:
         (rts, btns) = rtbox.secs()
     else:
-        responses = event.getKeys(keyList=[keys],timeStamped=exp_clock)
+        responses = event.getKeys(keyList=keys,timeStamped=exp_clock)
         try:
             btns, rts = zip(*responses)     # unpack [(key1,time1),(key2,time2)] into (key1,key2) and (time1,time2)
         except ValueError:

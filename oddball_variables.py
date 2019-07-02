@@ -1,5 +1,5 @@
 paradigm_name = 'oddball'
-paradigm_version = '1.1'
+paradigm_version = '1.2'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -125,6 +125,7 @@ target_origin = 180 - (0.1 * 360)   # zero starts at 12 oclock for radial stim
 target_zone = visual.RadialStim(win, tex='sqrXsqr', color='dimgrey', size=(loop_radius*2) + target_width, # size = diameter
     visibleWedge=[0, target_upper_bound], radialCycles=1, angularCycles=0, interpolate=False,   # radialCycles=1 to avoid color flip
     autoLog=False, units='cm', angularRes=1000)
+target_zone.ori = target_origin
 target_zone_cover = visual.Circle(win, radius = loop_radius - target_width/2, edges=100,
                 lineColor=None, fillColor=[0, 0, 0]) # Covers center of wedge used to draw taret zone
 
