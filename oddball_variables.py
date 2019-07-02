@@ -149,7 +149,7 @@ trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_h
 #===================================================
 # Response instructions
 #---------------------------------------------------
-outcome_pics = ['win.jpg', 'loss.jpg', 'surprise.jpg']
+outcome_pics = ['cropped green.jpg', 'cropped red.jpg', 'cropped blue.jpg']
 keys = ['left', 'right']
 actions = ['COLLECT', 'REJECT']
 adv_key = 'right'
