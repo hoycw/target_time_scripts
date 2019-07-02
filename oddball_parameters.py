@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'oddball'
-paradigm_version = '1.2'
+paradigm_version = '1.3'
 
 from psychopy import visual, event, core, gui, logging, data
 from oddball_log import*
@@ -14,7 +14,7 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #============================================================
 # EXPERIMENT STRUCTURE PARAMETERS
 #============================================================
-conditions = ['tar', 'std', 'odd']       # labels of the trial conditions
+conditions = ['std', 'tar', 'odd']       # labels of the trial conditions
 
 def experiment_parameters(type):                        #function that selects correct parameter from corresponding dicts 
     return n_training[type], n_blocks[type], n_trials[type], break_min_dur[type]
@@ -41,9 +41,9 @@ post_instr_delay = 1                # duration of delay (in s) after instruction
 block_start_dur = 2                 # duration (in s) to display block start text (e.g., "Level _: type")
 end_screen_dur = 10                 # duration (in s) of the ending "thank you all done" screen
 
-n_flicker   = 10                     # number of times to flicker the photodiode on at initial task start
-flicker_dur = 0.15                   # duration of each flicker in start sequence
-flicker_brk = 5                     # break the sequence after this many flickers (breaks up continuous flickering)
+n_flicker   = 6                     # number of times to flicker the photodiode on at initial task start
+flicker_dur = 0.15                  # duration of each flicker in start sequence
+flicker_brk = 3                     # break the sequence after this many flickers (breaks up continuous flickering)
 
 #======================
 # STIMULUS PARAMETERS  
@@ -53,7 +53,7 @@ full_screen = True                  # Make the window full screen? (True/False)
 screen_units = 'cm'                 # Set visual object sizes in cm (constant across all screens)
 
 # Sounds
-sound_freqs = [440, 880]            # frequency of standard and target tones (randomized)
+#sound_freqs = [440, 880]            # frequency of standard and target tones (randomized)
 
 # Visual
 n_circ = 30                         # number of "lights" in the loop

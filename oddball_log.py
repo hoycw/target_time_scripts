@@ -1,6 +1,6 @@
 # target_time log suite
 paradigm_name = 'oddball'
-paradigm_version = '1.2'
+paradigm_version = '1.3'
 
 from psychopy import visual, event, core, gui, logging, data
 import numpy as np

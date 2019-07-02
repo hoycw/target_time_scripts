@@ -1,5 +1,5 @@
 paradigm_name = 'oddball'
-paradigm_version = '1.2'
+paradigm_version = '1.3'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -17,7 +17,7 @@ from oddball_parameters import*
 np.random.seed()
 if paradigm_type == 'ecog':
     # Randomly permute index for stimuli/responses
-    v_idx = np.random.permutation(np.arange(len(conditions)))   # [target, standard, distractor]
+    v_idx = np.random.permutation(np.arange(len(conditions)))   # [standard, target, distractor]
     a_idx = np.random.permutation([0, 1])
     r_idx = np.random.permutation([0, 1])  # [Target, Reject]
 else:
@@ -40,9 +40,12 @@ with open(odd_csv, 'r') as read:
     block_cond_n = [row for row_number, row in enumerate(reader)
                     if row_number in block_order]
 # Convert to int, which can be used as index
+odd_cnt = 0
 for b_ix in range(n_blocks):
     for t_ix in range(n_trials):
         block_cond_n[b_ix][t_ix] = int(float(block_cond_n[b_ix][t_ix]))
+        if block_cond_n[b_ix][t_ix]==2:
+            odd_cnt += 1
 
 # Randomize oddball stimuli (50 total available)
 odd_idx = np.random.permutation(np.arange(50)).tolist()
@@ -58,6 +61,12 @@ train_cond_n = train_cond_n[0]  # only need single training block
 # Convert to int, which can be used as index
 for t_ix in range(len(train_cond_n)):
     train_cond_n[t_ix] = int(float(train_cond_n[t_ix]))
+    if train_cond_n[t_ix]==2:
+        odd_cnt += 1
+
+# Check if sufficient oddball sounds
+print 'odd_cnt = ', odd_cnt
+assert odd_cnt <= 50
 
 #-------------------------------------------------------------------
 # Create experiment clock
@@ -85,13 +94,13 @@ if frame_rate > 60:
 #======================================
 #           SOUND STIMULI
 #======================================
-std_freq = sound_freqs[a_idx[0]]                      # frequency of target tone
-tar_freq = sound_freqs[a_idx[1]]                      # frequency of target tone
+std_name = 'oddball_sounds/440Hz_44100Hz_16bit_200ms.wav'
+tar_name = 'oddball_sounds/1kHz_44100Hz_16bit_200ms.wav'
 odd_names = glob.glob("oddball_sounds/P3A*.WAV")
 
-block_sz = 512
+block_sz = 256
 # Create a sound just so the stream gets initialized...
-tmp_sound = sound.Sound(value=tar_freq, sampleRate=44100, blockSize=block_sz, secs=sound_dur, stereo=1, volume=0.8)
+tmp_sound = sound.Sound(value=tar_name, sampleRate=44100, blockSize=block_sz, secs=sound_dur, stereo=1, volume=1.0)
 
 #===================================================
 #           VISUAL STIMULI
@@ -169,15 +178,20 @@ instr_strs = ['Welcome! In this game, we will show you a series of pictures and 
               'Your job is to earn points by collecting the rare target stimulus,'+\
               'but rejecting the standard and distracter stimuli.',
               resp_instr_str,
-              'This is a target. To COLLECT them and win points, press {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[0]+1]),
-              'This is a standard. To REJECT standards and win points, press {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[1]+1]),
-              'Beware of these distracters! REJECT them like standards by pressing {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[1]+1]),
+              'Most of the time, this standard stimulus will appear.\n'+\
+              'It will always be the first stimulus in every block.\n'+\
+              'REJECT these to win points by pressing {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[1]+1]),
+              'Pay attention for this rare target!\n'+\
+              'COLLECT the targets and win points by pressing {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[0]+1]),
+              'Beware of distracters like this!\nThey are rare, and will sound different every time.\n'+\
+              'Just like standard stimuli, REJECT these by pressing {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[1]+1]),
               'To summarize, press the correct response for each stimulus:',
               "Let's try a few examples..."]
 # Strings for instruction summary reminder
+instr_sound_names = ['','',std_name,tar_name,'','','']
 instr_pic_names = ['',resp_pic,outcome_pics[v_idx[0]],outcome_pics[v_idx[1]],outcome_pics[v_idx[2]],'combo','']
-instr_cond_strs = ['Target (COLLECT)','Standard (REJECT)','Distracter (REJECT)']
-instr_resp_strs = [resp_strs[r_idx[0]+1], resp_strs[r_idx[1]+1], resp_strs[r_idx[1]+1]]
+instr_cond_strs = ['Standard (REJECT)','Target (COLLECT)','Distracter (REJECT)']
+instr_resp_strs = [resp_strs[r_idx[1]+1], resp_strs[r_idx[0]+1], resp_strs[r_idx[1]+1]]
 # Starting the task
 main_str = ["Ready to try the real deal?\nWe'll reset your score to 0 and start counting for real now.\n"+\
             "You'll do {0} blocks, each lasting {1} trials.\n\n".format(n_blocks,n_trials)+\
@@ -207,13 +221,13 @@ instr_txt = visual.TextStim(win,text=instr_strs[0],height=0.8,units='cm', alignV
 instr_condlab_txts = [visual.TextStim(win,text=instr_cond_strs[0],height=0.6,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(-8,2),wrapWidth=10),
                   visual.TextStim(win,text=instr_cond_strs[1],height=0.6,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(0,2),wrapWidth=10),
+                                name='instr', color='black', bold=True, pos=(0,2), wrapWidth=10),
                   visual.TextStim(win,text=instr_cond_strs[2],height=0.6,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(8,2),wrapWidth=10)]
 instr_resp_txts = [visual.TextStim(win,text=instr_resp_strs[0],height=0.6,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(-8,-5),wrapWidth=10),
                   visual.TextStim(win,text=instr_resp_strs[1],height=0.6,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(0,-5),wrapWidth=10),
+                                name='instr', color='black', bold=True, pos=(0,-5), wrapWidth=10),
                   visual.TextStim(win,text=instr_resp_strs[2],height=0.6,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(8,-5),wrapWidth=10)]
 instr_action_txts = [visual.TextStim(win,text=actions[r_idx[0]],height=0.6,units='cm', alignVert='center',

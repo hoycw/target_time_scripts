@@ -44,6 +44,10 @@ def instruction_loop(instrs, instrp, intro=False):
                 if instrp[instr_ix]=='RTBox_LR_instruction_img.jpg':
                     instr_action_txts[0].draw()
                     instr_action_txts[1].draw()
+        if intro and len(instr_sound_names[instr_ix])>0:
+            instr_sound = sound.Sound(value=instr_sound_names[instr_ix], sampleRate=44100,
+                            blockSize=block_sz, secs=sound_dur, stereo=1, volume=1.0)
+            win.callOnFlip(instr_sound.play)
         adv_screen_txt.draw()
         win.flip()
         instr_key_check()
@@ -72,12 +76,13 @@ def present_stim(trial_type, next_trial_start):
     
     # Set Sound
     if conditions[trial_type]=='tar':
-        sound_value = tar_freq
+        sound_name = tar_name
     elif conditions[trial_type]=='std':
-        sound_value = std_freq
+        sound_name = std_name
     else:                       # Oddball
-        sound_value = odd_names[odd_idx.pop()]
-    play_sound = sound.Sound(value=sound_value, sampleRate=44100, blockSize=block_sz, secs=0.8, stereo=1, volume=0.8)
+        sound_name = odd_names[odd_idx.pop()]
+    play_sound = sound.Sound(value=sound_name, sampleRate=44100, blockSize=block_sz,
+                            secs=sound_dur, stereo=1, volume=1.0)
     
     # Send trigger, set up sound
     if paradigm_type=='eeg':
@@ -159,6 +164,7 @@ def check_resp(block_n, trial_n, block_score, training=False):
 
 #===================================================
 def block_break(block_n, block_score, total_score, training=False):
+    win.logOnFlip('B{0} block_score = {1}; total_score = {2}'.format(block_n,block_score,total_score),logging.DATA)
     if training:
         block_point_txt.text = score_demo_str.format(block_score)
         # Print point training string, not total score
