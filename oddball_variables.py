@@ -239,7 +239,7 @@ if paradigm_type == 'ecog':
     adv_txt_pos = (0,-8)
 else:
     adv_txt_pos = (0,-12)
-adv_screen_txt = visual.TextStim(win,text='Press {0} ({1}) to advance or Q/escape to quit...'.format(adv_key, resp_strs[2]),
+adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(resp_strs[2]),
                                 height=0.5,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
 
 block_start_txt = visual.TextStim(win,text=block_start_str,height=2,units='cm',alignHoriz='center',alignVert='center',
