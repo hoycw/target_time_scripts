@@ -98,9 +98,9 @@ std_name = 'oddball_sounds/440Hz_44100Hz_16bit_200ms.wav'
 tar_name = 'oddball_sounds/1kHz_44100Hz_16bit_200ms.wav'
 odd_names = glob.glob("oddball_sounds/P3A*.WAV")
 
-block_sz = 256
+block_szs = [512, 256]
 # Create a sound just so the stream gets initialized...
-tmp_sound = sound.Sound(value=tar_name, sampleRate=44100, blockSize=block_sz, secs=sound_dur, stereo=1, volume=1.0)
+tmp_sound = sound.Sound(value=tar_name, sampleRate=44100, blockSize=block_szs[0], secs=sound_dur, stereo=1, volume=1.0)
 
 #===================================================
 #           VISUAL STIMULI

@@ -46,7 +46,7 @@ def instruction_loop(instrs, instrp, intro=False):
                     instr_action_txts[1].draw()
         if intro and len(instr_sound_names[instr_ix])>0:
             instr_sound = sound.Sound(value=instr_sound_names[instr_ix], sampleRate=44100,
-                            blockSize=block_sz, secs=sound_dur, stereo=1, volume=1.0)
+                            blockSize=block_szs[0], secs=sound_dur, stereo=1, volume=1.0)
             win.callOnFlip(instr_sound.play)
         adv_screen_txt.draw()
         win.flip()
@@ -77,10 +77,13 @@ def present_stim(trial_type, next_trial_start):
     # Set Sound
     if conditions[trial_type]=='tar':
         sound_name = tar_name
+        block_sz = block_szs[0]
     elif conditions[trial_type]=='std':
         sound_name = std_name
+        block_sz = block_szs[0]
     else:                       # Oddball
         sound_name = odd_names[odd_idx.pop()]
+        block_sz = block_szs[1]
     play_sound = sound.Sound(value=sound_name, sampleRate=44100, blockSize=block_sz,
                             secs=sound_dur, stereo=1, volume=1.0)
     
