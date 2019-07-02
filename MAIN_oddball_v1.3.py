@@ -154,7 +154,7 @@ def check_resp(block_n, trial_n, block_score, training=False):
             block_score += point_amt
         else:                                   # LOSS
             outcome_str = 'incorrect'
-            block_score -= point_amt
+            # block_score -= point_amt  # decided not to penalize misses
     else:   # No response detected
         outcome_str = 'none'
         rt=-1
