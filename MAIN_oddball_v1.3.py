@@ -107,7 +107,7 @@ def present_stim(trial_type, next_trial_start):
             while exp_clock.getTime() < next_trial_start - 0.5/frame_rate:
                 # Hard coded delay for EEG:
                 if not sound_played and exp_clock.getTime() > next_trial_start - 0.16:
-                    outcome_sound.play()
+                    play_sound.play()
                     sound_played = True
                 core.wait(0.00002)
         win.flip()

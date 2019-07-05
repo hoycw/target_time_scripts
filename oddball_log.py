@@ -50,11 +50,12 @@ else:
 if paradigm_type == 'eeg':
     ord_gui = gui.Dlg(title='Subject Number')
     ord_gui.addText('EEG Oddball Stimulus/Response Mappings')
-    ord_gui.addFiled(label='SBJ Number:')
+    ord_gui.addField(label='SBJ Number:')
     ord_gui.show()
     if ord_gui.OK:
         ord_gui_data = ord_gui.data
-        eeg_seq_num = ord_gui_data[0]
+        eeg_seq_num = int(float(ord_gui_data[0]))
+        assert eeg_seq_num > 0
     else:
         print 'User Cancelled'
         core.quit()
