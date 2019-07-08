@@ -43,7 +43,7 @@ def instruction_loop(instrs, instrp, intro=False):
                 instr_img.draw()
         if intro and len(instr_sound_names[instr_ix])>0:
             instr_sound = sound.Sound(value=instr_sound_names[instr_ix], sampleRate=sound_srate,
-                            blockSize=block_szs[0], secs=stim_dur, stereo=1, volume=1.0)
+                            blockSize=block_szs[0], secs=stim_dur, stereo=1, volume=volumes[0])
             win.callOnFlip(instr_sound.play)
         adv_screen_txt.draw()
         win.flip()
@@ -54,13 +54,13 @@ def instruction_loop(instrs, instrp, intro=False):
 def instr_key_check(check_time=0.2):
     if use_rtbox:
         (adv_time, adv) = rtbox.secs()
-        while adv == [] or adv[0] not in [adv_key, 'escape', 'q']:
+        while adv == [] or adv[0] not in [key, 'escape', 'q']:
             (adv_time, adv) = rtbox.secs()
             if adv == []:
-                adv = event.getKeys(keyList=[adv_key, 'escape', 'q'])
+                adv = event.getKeys(keyList=[key, 'escape', 'q'])
             core.wait(check_time)
     else:
-        adv = event.waitKeys(keyList=[adv_key, 'escape', 'q'])
+        adv = event.waitKeys(keyList=[key, 'escape', 'q'])
     if adv[0] in ['escape','q']:
         clean_quit()
     core.wait(check_time)
@@ -75,14 +75,17 @@ def present_stim(trial_type, next_trial_start):
     if conditions[trial_type]=='tar':
         sound_name = tar_name
         block_sz = block_szs[0]
+        volume = volumes[0]
     elif conditions[trial_type]=='std':
         sound_name = std_name
         block_sz = block_szs[0]
+        volume = volumes[0]
     else:                       # Oddball
         sound_name = odd_names[odd_idx.pop()]
         block_sz = block_szs[1]
+        volume = volumes[1]
     play_sound = sound.Sound(value=sound_name, sampleRate=sound_srate, blockSize=block_sz,
-                            secs=stim_dur, stereo=1, volume=1.0)
+                            secs=stim_dur, stereo=1, volume=volume)
     
     # Send trigger, set up sound
     if paradigm_type=='eeg':
@@ -93,7 +96,7 @@ def present_stim(trial_type, next_trial_start):
         sound_played = True
     
     # Present stimuli
-    for frameN in range(stim_dur * 60): #assuming frame_rate is close enough it would round to 60 (this must be an int)
+    for frameN in range(int(round(stim_dur * 60))): #assuming frame_rate is close enough it would round to 60 (this must be an int)
         # Draw visual stimuli
         target_zone_draw()
         if paradigm_type=='ecog':
@@ -128,7 +131,7 @@ def check_resp(block_n, trial_n, block_score, training=False):
     if use_rtbox:
         (rts, btns) = rtbox.secs()
     else:
-        responses = event.getKeys(keyList=keys,timeStamped=exp_clock)
+        responses = event.getKeys(keyList=key,timeStamped=exp_clock)
         try:
             btns, rts = zip(*responses)     # unpack [(key1,time1),(key2,time2)] into (key1,key2) and (time1,time2)
         except ValueError:
@@ -142,11 +145,7 @@ def check_resp(block_n, trial_n, block_score, training=False):
                             block_n, trial_n, rts),logging.WARNING)
         rt = rts[0]-trial_start             # take only first response
         btn = btns[0]
-        if condition=='tar':
-            correct_resp = keys[r_idx[0]]
-        else:
-            correct_resp = keys[r_idx[1]]
-        if btn==correct_resp:             # WIN
+        if btn==key and condition=='tar':             # WIN
             outcome_str = 'correct'
             block_score += point_amt
         else:                                   # LOSS
@@ -250,7 +249,7 @@ else:
     rtbox = RTBox.RTBox(boxID='')#,host_clock=exp_clock.getTime)
 # rt_clock_ratio = rtbox.clockRatio()           # get ratio between system and rtbox clocks, maybe not necessary
 # win.logOnFlip('rtbox_clock_ratio = '+str(rt_clock_ratio), logging.DATA)
-rtbox.buttonNames([keys[0], keys[0], keys[1], keys[1]])
+rtbox.buttonNames([key, key, key, key])
 rtbox.disable('all')
 rtbox.enable('press')
 rtbox.clear()

@@ -98,10 +98,11 @@ std_name = 'oddball_sounds/440Hz_22050Hz_176kbs_pcmu8_200ms.wav'
 tar_name = 'oddball_sounds/1kHz_22050Hz_176kbs_pcmu8_200ms.wav'
 odd_names = glob.glob("oddball_sounds/P3A*.WAV")
 
-block_szs = [512, 256]  # [tones (come on too fast), oddballs (come on slower)]
+volumes = [0.8, 1.0]	# [tones, oddballs]
+block_szs = [256, 256]  # [tones (come on too fast), oddballs (come on slower)]
 sound_srate = 22050
 # Create a sound just so the stream gets initialized...
-tmp_sound = sound.Sound(value=tar_name, sampleRate=sound_srate, blockSize=block_szs[0], secs=stim_dur, stereo=1, volume=1.0)
+tmp_sound = sound.Sound(value=tar_name, sampleRate=sound_srate, blockSize=block_szs[0], secs=stim_dur, stereo=1, volume=volumes[0])
 
 #===================================================
 #           VISUAL STIMULI
@@ -174,30 +175,30 @@ feedback_str = 'B{0}_T{1}: Outcome = {2}; RT = {3}; condition = {4}'
 #---------------------------------------------------
 # Main instructions
 instr_strs = ['Welcome! In this game, we will show you a series of pictures and sounds.'+\
-              'Your job is to earn points by pressing {0}\nwhen the rare target stimulus appears.'.format(key),
-              resp_instr_str,
+              'Your job is to earn points by responding when the rare target stimulus appears.',
               'Most of the time, this standard stimulus will appear.\n'+\
               'It will always be the first stimulus in every block.\n'+\
               "You don't need to respond on these trials.",
-              'Pay attention for this rare target!\n'+\
-              'You win points by pressing {0} on the {1} to collect these targets.'.format(key, resp_method_str),
-              "Watch out!\nDo NOT press anything for distracters like this!\nThey are also rare, but will sound different every time.\n",
-              'To summarize, press {0} when a target appears:'.format(key),
+              'Pay attention for this rare target! When it appears,\n'+\
+              'press {0} on the {1} to win {2} points.'.format(key, resp_method_str, point_amt),
+              "Watch out! Do NOT press anything for distracters like this!\nThey are also rare, but will sound different every time.\n",
+              resp_instr_str,
+              "To summarize, press {0} when a target appears,\nbut otherwise don't respond".format(key),
               "Let's try a few examples..."]
 # Strings for instruction summary reminder
-instr_sound_names = ['','',std_name,tar_name,'','','']
-instr_pic_names = ['','',outcome_pics[v_idx[0]],outcome_pics[v_idx[1]],outcome_pics[v_idx[2]],'combo','']
+instr_sound_names = ['',std_name,tar_name,'','','','']
+instr_pic_names = ['',outcome_pics[v_idx[0]],outcome_pics[v_idx[1]],outcome_pics[v_idx[2]],'','combo','']
 instr_cond_strs = ['Standard','Target','Distracter']
 instr_resp_str  = 'Press {0}'.format(key)
 # Starting the task
 main_str = ["Ready to try the real deal?\nWe'll reset your score to 0 and start counting for real now.\n"+\
-            "You'll do {0} blocks, each lasting {1} minutes.\n\n".format(n_blocks,block_len_min)+\
+            "You'll do {0} blocks, each lasting {1:.1f} minutes.\n\n".format(n_blocks,block_len_min)+\
             'Press Q/escape to try more practice rounds, '+\
-            'or press {0} to start playing!'.format(adv_key)]
+            'or press {0} to start playing!'.format(key)]
 
 # Between blocks
 score_demo_str  = 'You scored {0} points this round.'
-point_instr_str = "After each block, you'll see your score from this round.\nPoints also add up across rounds."
+point_instr_str = "After each block, you'll see your score from that round.\nPoints also add up across rounds."
 
 block_start_str = 'Level {0}/{1}'
 break_str       = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
@@ -233,13 +234,13 @@ instr_condlab_txts = [visual.TextStim(win,text=instr_cond_strs[0],height=small_s
                   visual.TextStim(win,text=instr_cond_strs[2],height=small_str_sz,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(8,2),wrapWidth=10)]
 instr_resp_txt =  visual.TextStim(win,text=instr_resp_str,height=small_str_sz,units='cm', alignVert='center',
-                                name='instr', color='black', bold=True, pos=(0,-5), wrapWidth=10),
+                                name='instr', color='black', bold=True, pos=(0,-5), wrapWidth=10)
 
 if paradigm_type == 'ecog':
     adv_txt_pos = (0,-8)
 else:
     adv_txt_pos = (0,-12)
-adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(resp_strs[2]),
+adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(key),
                                 height=adv_str_sz,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
 
 block_start_txt = visual.TextStim(win,text=block_start_str,height=large_str_sz,units='cm',alignHoriz='center',alignVert='center',
