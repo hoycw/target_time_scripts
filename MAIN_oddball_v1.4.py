@@ -36,17 +36,14 @@ def instruction_loop(instrs, instrp, intro=False):
             if instrp[instr_ix]=='combo':
                 for ix in range(len(conditions)):
                     instr_summ_imgs[ix].draw()
-                    instr_resp_txts[ix].draw()
                     instr_condlab_txts[ix].draw()
+                instr_resp_txt.draw()
             else:
                 instr_img.image = 'cyclone_pics/{0}'.format(instrp[instr_ix])
                 instr_img.draw()
-                if instrp[instr_ix]=='RTBox_LR_instruction_img.jpg':
-                    instr_action_txts[0].draw()
-                    instr_action_txts[1].draw()
         if intro and len(instr_sound_names[instr_ix])>0:
-            instr_sound = sound.Sound(value=instr_sound_names[instr_ix], sampleRate=44100,
-                            blockSize=block_szs[0], secs=sound_dur, stereo=1, volume=1.0)
+            instr_sound = sound.Sound(value=instr_sound_names[instr_ix], sampleRate=sound_srate,
+                            blockSize=block_szs[0], secs=stim_dur, stereo=1, volume=1.0)
             win.callOnFlip(instr_sound.play)
         adv_screen_txt.draw()
         win.flip()
@@ -84,8 +81,8 @@ def present_stim(trial_type, next_trial_start):
     else:                       # Oddball
         sound_name = odd_names[odd_idx.pop()]
         block_sz = block_szs[1]
-    play_sound = sound.Sound(value=sound_name, sampleRate=44100, blockSize=block_sz,
-                            secs=sound_dur, stereo=1, volume=1.0)
+    play_sound = sound.Sound(value=sound_name, sampleRate=sound_srate, blockSize=block_sz,
+                            secs=stim_dur, stereo=1, volume=1.0)
     
     # Send trigger, set up sound
     if paradigm_type=='eeg':

@@ -1,5 +1,5 @@
 paradigm_name = 'oddball'
-paradigm_version = '1.3'
+paradigm_version = '1.4'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -13,21 +13,22 @@ from oddball_parameters import*
 #============================================================
 #           EXPERIMENTAL DESIGN VARIABLES
 #============================================================
+# Create experiment clock
+exp_clock = core.Clock()
+block_len_min = (stim_dur + max(ITIs)) * n_trials / 60
+
+#-------------------------------------------------------------------
 # Randomly assign visual, auditory, and response mappings
 np.random.seed()
 if paradigm_type == 'ecog':
     # Randomly permute index for stimuli/responses
     v_idx = np.random.permutation(np.arange(len(conditions)))   # [standard, target, distractor]
-    a_idx = np.random.permutation([0, 1])
-    r_idx = np.random.permutation([0, 1])  # [Target, Reject]
 else:
     # Assign permutation based on SBJ #
     vis_opts = list(permutations(np.arange(len(conditions))))
-    resp_opts = list(permutations([0, 1])) # same for auditory
     v_idx = vis_opts[eeg_seq_num % len(vis_opts)]
-    a_idx = resp_opts[eeg_seq_num % 2]
-    r_idx = resp_opts[eeg_seq_num % 2]  # [Target, Reject]
 
+#-------------------------------------------------------------------
 # Randomize block order
 block_order = np.random.permutation(np.arange(8))   # randomize amongst all 8 possible blocks
 block_order = block_order[:n_blocks]
@@ -47,9 +48,11 @@ for b_ix in range(n_blocks):
         if block_cond_n[b_ix][t_ix]==2:
             odd_cnt += 1
 
+#-------------------------------------------------------------------
 # Randomize oddball stimuli (50 total available)
 odd_idx = np.random.permutation(np.arange(50)).tolist()
 
+#-------------------------------------------------------------------
 # Select training order
 train_csv = "oddball_trial_order_csvs/debug_10_trial_randomized_orders.csv"
 train_ix = np.random.choice(np.arange(8))
@@ -69,9 +72,6 @@ print 'odd_cnt = ', odd_cnt
 assert odd_cnt <= 50
 
 #-------------------------------------------------------------------
-# Create experiment clock
-exp_clock = core.Clock()
-
 # Create monitor window
 if paradigm_type == 'ecog':
     monitor_name = 'Built_in'
@@ -94,13 +94,14 @@ if frame_rate > 60:
 #======================================
 #           SOUND STIMULI
 #======================================
-std_name = 'oddball_sounds/440Hz_44100Hz_16bit_200ms.wav'
-tar_name = 'oddball_sounds/1kHz_44100Hz_16bit_200ms.wav'
+std_name = 'oddball_sounds/440Hz_22050Hz_176kbs_pcmu8_200ms.wav'
+tar_name = 'oddball_sounds/1kHz_22050Hz_176kbs_pcmu8_200ms.wav'
 odd_names = glob.glob("oddball_sounds/P3A*.WAV")
 
-block_szs = [512, 256]
+block_szs = [512, 256]  # [tones (come on too fast), oddballs (come on slower)]
+sound_srate = 22050
 # Create a sound just so the stream gets initialized...
-tmp_sound = sound.Sound(value=tar_name, sampleRate=44100, blockSize=block_szs[0], secs=sound_dur, stereo=1, volume=1.0)
+tmp_sound = sound.Sound(value=tar_name, sampleRate=sound_srate, blockSize=block_szs[0], secs=stim_dur, stereo=1, volume=1.0)
 
 #===================================================
 #           VISUAL STIMULI
@@ -150,23 +151,21 @@ trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_h
 # Response instructions
 #---------------------------------------------------
 outcome_pics = ['cropped green.jpg', 'cropped red.jpg', 'cropped blue.jpg']
-keys = ['left', 'right']
-actions = ['COLLECT', 'REJECT']
-adv_key = 'right'
 
 if use_rtbox:
-    resp_str_prefix = 'any of the'
-    resp_strs = ['Response Time Box','WHITE buttons (1,2)', 'BLACK buttons (3,4)']
-    resp_pic = 'RTBox_LR_instruction_img.jpg'
+    key = 'any button'
+    resp_method_str = 'Response Time Box'
+    effector_str = 'the THUMB of whichever hand the experimenter tells you'
+    rtbox_added_str = 'You can press any of the four buttons.'
 else:
+    key = 'space'
+    resp_method_str = 'keyboard'
+    effector_str = 'your RIGHT THUMB'
+    rtbox_added_str = ''
     resp_str_prefix = 'the'
-    resp_strs = ['keyboard','LEFT ARROW', 'RIGHT ARROW']
-    resp_pic = ''
 
-resp_instr_str = 'You will be responding using the {0}.\n'.format(resp_strs[0]) +\
-                 'Please only use the index and middle finger of whichever hand the experimenter tells you.\n' +\
-                 'To COLLECT targets, press {0} {1}.\n'.format(resp_str_prefix,resp_strs[r_idx[0]+1]) +\
-                 'To REJECT standards and distracers, press {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[1]+1])
+resp_instr_str = 'You will be responding using the {0}.\n'.format(resp_method_str) +\
+                 'Please only use {0}.\n{1}'.format(effector_str, rtbox_added_str)
 
 feedback_str = 'B{0}_T{1}: Outcome = {2}; RT = {3}; condition = {4}'
 
@@ -175,26 +174,24 @@ feedback_str = 'B{0}_T{1}: Outcome = {2}; RT = {3}; condition = {4}'
 #---------------------------------------------------
 # Main instructions
 instr_strs = ['Welcome! In this game, we will show you a series of pictures and sounds.'+\
-              'Your job is to earn points by collecting the rare target stimulus,'+\
-              'but rejecting the standard and distracter stimuli.',
+              'Your job is to earn points by pressing {0}\nwhen the rare target stimulus appears.'.format(key),
               resp_instr_str,
               'Most of the time, this standard stimulus will appear.\n'+\
               'It will always be the first stimulus in every block.\n'+\
-              'REJECT these to win points by pressing {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[1]+1]),
+              "You don't need to respond on these trials.",
               'Pay attention for this rare target!\n'+\
-              'COLLECT the targets and win points by pressing {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[0]+1]),
-              'Beware of distracters like this!\nThey are rare, and will sound different every time.\n'+\
-              'Just like standard stimuli, REJECT these by pressing {0} {1}.'.format(resp_str_prefix,resp_strs[r_idx[1]+1]),
-              'To summarize, press the correct response for each stimulus:',
+              'You win points by pressing {0} on the {1} to collect these targets.'.format(key, resp_method_str),
+              "Watch out!\nDo NOT press anything for distracters like this!\nThey are also rare, but will sound different every time.\n",
+              'To summarize, press {0} when a target appears:'.format(key),
               "Let's try a few examples..."]
 # Strings for instruction summary reminder
 instr_sound_names = ['','',std_name,tar_name,'','','']
-instr_pic_names = ['',resp_pic,outcome_pics[v_idx[0]],outcome_pics[v_idx[1]],outcome_pics[v_idx[2]],'combo','']
-instr_cond_strs = ['Standard (REJECT)','Target (COLLECT)','Distracter (REJECT)']
-instr_resp_strs = [resp_strs[r_idx[1]+1], resp_strs[r_idx[0]+1], resp_strs[r_idx[1]+1]]
+instr_pic_names = ['','',outcome_pics[v_idx[0]],outcome_pics[v_idx[1]],outcome_pics[v_idx[2]],'combo','']
+instr_cond_strs = ['Standard','Target','Distracter']
+instr_resp_str  = 'Press {0}'.format(key)
 # Starting the task
 main_str = ["Ready to try the real deal?\nWe'll reset your score to 0 and start counting for real now.\n"+\
-            "You'll do {0} blocks, each lasting {1} trials.\n\n".format(n_blocks,n_trials)+\
+            "You'll do {0} blocks, each lasting {1} minutes.\n\n".format(n_blocks,block_len_min)+\
             'Press Q/escape to try more practice rounds, '+\
             'or press {0} to start playing!'.format(adv_key)]
 
@@ -214,54 +211,57 @@ end_game_str    = "Nice job!!! You finished this game. Thank you so much for par
 #---------------------------------------------------
 if paradigm_type == 'ecog':
     instr_txt_pos = (0,6)
+    main_str_sz = 0.8
+    small_str_sz = 0.6
+    adv_str_sz = 0.5
+    large_str_sz = 2
+    end_str_sz = 1.25
 else:
-    instr_txt_pos = (0,8)    
-instr_txt = visual.TextStim(win,text=instr_strs[0],height=0.8,units='cm', alignVert='center',
+    instr_txt_pos = (0,8)
+    main_str_sz = 1
+    small_str_sz = 0.8
+    adv_str_sz = 0.7
+    large_str_sz = 2.5
+    end_str_sz = 1.5
+
+instr_txt = visual.TextStim(win,text=instr_strs[0],height=main_str_sz,units='cm', alignVert='center',
                                 name='instr', color='black',pos=instr_txt_pos,wrapWidth=30)
-instr_condlab_txts = [visual.TextStim(win,text=instr_cond_strs[0],height=0.6,units='cm', alignVert='center',
+instr_condlab_txts = [visual.TextStim(win,text=instr_cond_strs[0],height=small_str_sz,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(-8,2),wrapWidth=10),
-                  visual.TextStim(win,text=instr_cond_strs[1],height=0.6,units='cm', alignVert='center',
+                  visual.TextStim(win,text=instr_cond_strs[1],height=small_str_sz,units='cm', alignVert='center',
                                 name='instr', color='black', bold=True, pos=(0,2), wrapWidth=10),
-                  visual.TextStim(win,text=instr_cond_strs[2],height=0.6,units='cm', alignVert='center',
+                  visual.TextStim(win,text=instr_cond_strs[2],height=small_str_sz,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(8,2),wrapWidth=10)]
-instr_resp_txts = [visual.TextStim(win,text=instr_resp_strs[0],height=0.6,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(-8,-5),wrapWidth=10),
-                  visual.TextStim(win,text=instr_resp_strs[1],height=0.6,units='cm', alignVert='center',
+instr_resp_txt =  visual.TextStim(win,text=instr_resp_str,height=small_str_sz,units='cm', alignVert='center',
                                 name='instr', color='black', bold=True, pos=(0,-5), wrapWidth=10),
-                  visual.TextStim(win,text=instr_resp_strs[2],height=0.6,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(8,-5),wrapWidth=10)]
-instr_action_txts = [visual.TextStim(win,text=actions[r_idx[0]],height=0.6,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(-2,3),wrapWidth=10),
-                  visual.TextStim(win,text=actions[r_idx[1]],height=0.6,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(2,3),wrapWidth=10)]
 
 if paradigm_type == 'ecog':
     adv_txt_pos = (0,-8)
 else:
     adv_txt_pos = (0,-12)
 adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(resp_strs[2]),
-                                height=0.5,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
+                                height=adv_str_sz,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
 
-block_start_txt = visual.TextStim(win,text=block_start_str,height=2,units='cm',alignHoriz='center',alignVert='center',
+block_start_txt = visual.TextStim(win,text=block_start_str,height=large_str_sz,units='cm',alignHoriz='center',alignVert='center',
                                 name='block_start', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap
 
-block_point_txt = visual.TextStim(win,text=block_point_str,height=0.8,units='cm', alignVert='center',
+block_point_txt = visual.TextStim(win,text=block_point_str,height=main_str_sz,units='cm', alignVert='center',
                                 name='block_points', color='black',pos=(0,3),wrapWidth=20)#short no need wrap
 
-score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=0.8,units='cm', alignVert='center',
+score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=main_str_sz,units='cm', alignVert='center',
                                 name='score_demo', color='green',pos=(0,6),wrapWidth=30)#short no need wrap
 
-point_instr_txt = visual.TextStim(win,text=point_instr_str, height=0.8,units='cm', alignVert='center',
+point_instr_txt = visual.TextStim(win,text=point_instr_str, height=main_str_sz,units='cm', alignVert='center',
                                 name='point_instr', color='black',pos=(0,0),wrapWidth=30)#built in line break
 
-total_point_txt = visual.TextStim(win,text=total_point_str,height=0.8,units='cm', alignVert='center',
+total_point_txt = visual.TextStim(win,text=total_point_str,height=main_str_sz,units='cm', alignVert='center',
                                 name='total_points', color='black', bold=True, pos=(0,0),wrapWidth=20)#short no need wrap
 
-pause_txt = visual.TextStim(win,text='Paused', height=2,units='cm',alignHoriz='center',alignVert='center',
+pause_txt = visual.TextStim(win,text='Paused', height=large_str_sz,units='cm',alignHoriz='center',alignVert='center',
                                 name='pause', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap
 
 endgame_txt = visual.TextStim(win,text=end_game_str,
-                            height=1.25,units='cm',alignHoriz='center',alignVert='center',
+                            height=end_str_sz,units='cm',alignHoriz='center',alignVert='center',
                             name='endgame', color='black', bold=False, pos=(0,-4),wrapWidth=30)
 
 #---------------------------------------------------
