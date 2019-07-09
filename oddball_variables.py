@@ -26,7 +26,7 @@ if paradigm_type == 'ecog':
 else:
     # Assign permutation based on SBJ #
     vis_opts = list(permutations(np.arange(len(conditions))))
-    v_idx = vis_opts[eeg_seq_num % len(vis_opts)]
+    v_idx = list(vis_opts[eeg_seq_num % len(vis_opts)])
 
 #-------------------------------------------------------------------
 # Randomize block order
@@ -98,8 +98,13 @@ std_name = 'oddball_sounds/440Hz_22050Hz_176kbs_pcmu8_200ms.wav'
 tar_name = 'oddball_sounds/1kHz_22050Hz_176kbs_pcmu8_200ms.wav'
 odd_names = glob.glob("oddball_sounds/P3A*.WAV")
 
-volumes = [0.8, 1.0]	# [tones, oddballs]
-block_szs = [256, 256]  # [tones (come on too fast), oddballs (come on slower)]
+eeg_delay = 0.15
+assert eeg_delay < resp_proc_dur
+volumes = [0.8, 1.0]    # [tones, oddballs]
+if paradigm_type == 'ecog':
+    block_szs = [256, 256]  # [tones (come on too fast), oddballs (come on slower)]
+else:
+    block_szs = [512, 512]
 sound_srate = 22050
 # Create a sound just so the stream gets initialized...
 tmp_sound = sound.Sound(value=tar_name, sampleRate=sound_srate, blockSize=block_szs[0], secs=stim_dur, stereo=1, volume=volumes[0])

@@ -20,7 +20,7 @@ def experiment_parameters(type):                        #function that selects c
     return n_training[type], n_blocks[type], n_trials[type], break_min_dur[type]
 
 n_training    = {'eeg':10,  'ecog':10}                  # number of training trials PER CONDITION
-n_blocks      = {'eeg':4,   'ecog':2}                   # number of blocks of trials PER CONDITION
+n_blocks      = {'eeg':3,   'ecog':2}                   # number of blocks of trials PER CONDITION
 n_trials      = {'eeg':130, 'ecog':130}                # number of trials PER BLOCK
 break_min_dur = {'eeg':15,  'ecog':15}                  # minimum length (in s) for the break between blocks
 n_training, n_blocks, n_trials, break_min_dur = experiment_parameters(paradigm_type)
@@ -32,7 +32,10 @@ point_amt = 100                                         # Amount to increase/dec
 #======================================
 stim_dur = 0.2                      # duration of visual and auditory stimuli
 ITIs     = [1.3, 1.5]              	# duration between stimuli
-resp_proc_dur    = 0.1              # duration of window to check for responses at end of trial
+if paradigm_type == 'ecog':
+    resp_proc_dur    = 0.1              # duration of window to check for responses at end of trial
+else:
+    resp_proc_dur = 0.3
 post_instr_delay = 1                # duration of delay (in s) after instructions/break to make sure they're ready
 block_start_dur  = 2                # duration (in s) to display block start text (e.g., "Level _: type")
 end_screen_dur   = 10               # duration (in s) of the ending "thank you all done" screen

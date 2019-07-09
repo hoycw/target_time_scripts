@@ -75,21 +75,21 @@ def present_stim(trial_type, next_trial_start):
     if conditions[trial_type]=='tar':
         sound_name = tar_name
         block_sz = block_szs[0]
-        volume = volumes[0]
+        vol = volumes[0]
     elif conditions[trial_type]=='std':
         sound_name = std_name
         block_sz = block_szs[0]
-        volume = volumes[0]
+        vol = volumes[0]
     else:                       # Oddball
         sound_name = odd_names[odd_idx.pop()]
         block_sz = block_szs[1]
-        volume = volumes[1]
+        vol = volumes[1]
     play_sound = sound.Sound(value=sound_name, sampleRate=sound_srate, blockSize=block_sz,
-                            secs=stim_dur, stereo=1, volume=volume)
+                            secs=stim_dur, stereo=1, volume=vol)
     
     # Send trigger, set up sound
     if paradigm_type=='eeg':
-        win.callOnFlip(port.setData, 1)  # sets just this pin to be high
+        win.callOnFlip(port.setData, trial_type+1)  # sets just this pin to be high
         sound_played = False
     else:
         win.callOnFlip(play_sound.play)
@@ -106,7 +106,7 @@ def present_stim(trial_type, next_trial_start):
         if frameN==0:
             while exp_clock.getTime() < next_trial_start - 0.5/frame_rate:
                 # Hard coded delay for EEG:
-                if not sound_played and exp_clock.getTime() > next_trial_start - 0.16:
+                if not sound_played and exp_clock.getTime() > next_trial_start - eeg_delay:
                     play_sound.play()
                     sound_played = True
                 core.wait(0.00002)
