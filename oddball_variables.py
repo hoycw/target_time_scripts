@@ -94,8 +94,8 @@ if frame_rate > 60:
 #======================================
 #           SOUND STIMULI
 #======================================
-std_name = 'oddball_sounds/440Hz_22050Hz_176kbs_pcmu8_200ms.wav'
-tar_name = 'oddball_sounds/1kHz_22050Hz_176kbs_pcmu8_200ms.wav'
+std_name = 'oddball_sounds/440Hz_22050Hz_200ms.wav'
+tar_name = 'oddball_sounds/1760Hz_22050Hz_200ms.wav'
 odd_names = glob.glob("oddball_sounds/P3A*.WAV")
 
 eeg_delay = 0.15
