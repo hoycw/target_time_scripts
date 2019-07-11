@@ -43,7 +43,7 @@ def instruction_loop(instrs, instrp, intro=False):
                 instr_img.draw()
         if intro and len(instr_sound_names[instr_ix])>0:
             instr_sound = sound.Sound(value=instr_sound_names[instr_ix], sampleRate=sound_srate,
-                            blockSize=block_szs[0], secs=stim_dur, stereo=1, volume=volumes[0])
+                            blockSize=block_szs[0], secs=stim_dur, stereo=stereo_val, volume=volumes[0])
             win.callOnFlip(instr_sound.play)
         adv_screen_txt.draw()
         win.flip()
@@ -85,7 +85,7 @@ def present_stim(trial_type, next_trial_start):
         block_sz = block_szs[1]
         vol = volumes[1]
     play_sound = sound.Sound(value=sound_name, sampleRate=sound_srate, blockSize=block_sz,
-                            secs=stim_dur, stereo=1, volume=vol)
+                            secs=stim_dur, stereo=stereo_val, volume=vol)
     
     # Send trigger, set up sound
     if paradigm_type=='eeg':

@@ -1,5 +1,5 @@
 paradigm_name = 'oddball'
-paradigm_version = '1.4'
+paradigm_version = '1.5'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -99,15 +99,18 @@ tar_name = 'oddball_sounds/1760Hz_22050Hz_200ms.wav'
 odd_names = glob.glob("oddball_sounds/P3A*.WAV")
 
 eeg_delay = 0.15
-assert eeg_delay < resp_proc_dur
-volumes = [0.8, 1.0]    # [tones, oddballs]
+if paradigm_type == 'eeg':
+    assert eeg_delay < resp_proc_dur
+volumes = [1.0, 1.0]    # [tones, oddballs]
 if paradigm_type == 'ecog':
     block_szs = [256, 256]  # [tones (come on too fast), oddballs (come on slower)]
 else:
     block_szs = [512, 512]
 sound_srate = 22050
+stereo_val = 1
 # Create a sound just so the stream gets initialized...
-tmp_sound = sound.Sound(value=tar_name, sampleRate=sound_srate, blockSize=block_szs[0], secs=stim_dur, stereo=1, volume=volumes[0])
+tmp_sound = sound.Sound(value=tar_name, sampleRate=sound_srate, blockSize=block_szs[0],
+			 secs=stim_dur, stereo=stereo_val, volume=volumes[0])
 
 #===================================================
 #           VISUAL STIMULI
@@ -161,14 +164,16 @@ outcome_pics = ['cropped green.jpg', 'cropped red.jpg', 'cropped blue.jpg']
 if use_rtbox:
     key = 'any button'
     resp_method_str = 'Response Time Box'
-    effector_str = 'the THUMB of whichever hand the experimenter tells you'
     rtbox_added_str = 'You can press any of the four buttons.'
 else:
     key = 'space'
     resp_method_str = 'keyboard'
-    effector_str = 'your RIGHT THUMB'
     rtbox_added_str = ''
     resp_str_prefix = 'the'
+if paradigm_type == 'ecog':
+    effector_str = 'the THUMB of whichever hand the experimenter tells you'
+else:
+    effector_str = 'your RIGHT THUMB'
 
 resp_instr_str = 'You will be responding using the {0}.\n'.format(resp_method_str) +\
                  'Please only use {0}.\n{1}'.format(effector_str, rtbox_added_str)
