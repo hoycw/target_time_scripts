@@ -30,7 +30,7 @@ else:
 
 #-------------------------------------------------------------------
 # Randomize block order
-block_order = np.random.permutation(np.arange(8))   # randomize amongst all 8 possible blocks
+block_order = np.random.permutation(np.arange(3))   # randomize amongst all 8 possible blocks
 block_order = block_order[:n_blocks]
 # Determine trial order
 odd_csv =  "oddball_trial_order_csvs/block_{0}_trial_randomized_orders.csv".format(str(n_trials))
