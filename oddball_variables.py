@@ -185,21 +185,21 @@ feedback_str = 'B{0}_T{1}: Outcome = {2}; RT = {3}; condition = {4}'
 #---------------------------------------------------
 # Main instructions
 instr_strs = ['Welcome! In this game, we will show you a series of pictures and sounds.'+\
-              'Your job is to earn points by responding when the rare target stimulus appears.',
+              'Your job is to respond when the rare target stimulus appears to earn points.',
+              'This is the target stimulus. Press {0} on the {1}\n'.format(key, resp_method_str)+\
+              "when it appears. You win {0} points for each correct target response.".format(point_amt),
               'Most of the time, this standard stimulus will appear.\n'+\
-              'It will always be the first stimulus in every block.\n'+\
               "You don't need to respond on these trials.",
-              'Pay attention for this rare target! When it appears,\n'+\
-              'press {0} on the {1} to win {2} points.'.format(key, resp_method_str, point_amt),
               "Watch out! Do NOT press anything for distracters like this!\nThey are also rare, but will sound different every time.\n",
               resp_instr_str,
-              "To summarize, press {0} when a target appears,\nbut otherwise don't respond".format(key),
+              "To summarize, press {0} only when a target appears,\nand otherwise don't respond.".format(key),
               "Let's try a few examples..."]
 # Strings for instruction summary reminder
-instr_sound_names = ['',std_name,tar_name,'','','','']
-instr_pic_names = ['',outcome_pics[v_idx[0]],outcome_pics[v_idx[1]],outcome_pics[v_idx[2]],'','combo','']
-instr_cond_strs = ['Standard','Target','Distracter']
+instr_sound_names = ['',tar_name,std_name,'','','','']
+instr_pic_names = ['',outcome_pics[v_idx[1]],outcome_pics[v_idx[0]],outcome_pics[v_idx[2]],'','combo','']
+instr_cond_strs = ['Target','Standard','Distracter']
 instr_resp_str  = 'Press {0}'.format(key)
+instr_no_resp_str = 'Do nothing'
 # Starting the task
 main_str = ["Ready to try the real deal?\nWe'll reset your score to 0 and start counting for real now.\n"+\
             "You'll do {0} blocks, each lasting {1:.1f} minutes.\n\n".format(n_blocks,block_len_min)+\
@@ -238,13 +238,17 @@ else:
 instr_txt = visual.TextStim(win,text=instr_strs[0],height=main_str_sz,units='cm', alignVert='center',
                                 name='instr', color='black',pos=instr_txt_pos,wrapWidth=30)
 instr_condlab_txts = [visual.TextStim(win,text=instr_cond_strs[0],height=small_str_sz,units='cm', alignVert='center',
-                                name='instr', color='black',pos=(-8,2),wrapWidth=10),
+                                name='instr', color='black', bold=True, pos=(-8,2),wrapWidth=10),
                   visual.TextStim(win,text=instr_cond_strs[1],height=small_str_sz,units='cm', alignVert='center',
-                                name='instr', color='black', bold=True, pos=(0,2), wrapWidth=10),
+                                name='instr', color='black', bold=False, pos=(0,2), wrapWidth=10),
                   visual.TextStim(win,text=instr_cond_strs[2],height=small_str_sz,units='cm', alignVert='center',
                                 name='instr', color='black',pos=(8,2),wrapWidth=10)]
-instr_resp_txt =  visual.TextStim(win,text=instr_resp_str,height=small_str_sz,units='cm', alignVert='center',
-                                name='instr', color='black', bold=True, pos=(0,-5), wrapWidth=10)
+instr_resp_txts = [visual.TextStim(win,text=instr_resp_str,height=small_str_sz,units='cm', alignVert='center',
+                                name='instr', color='black', bold=True, pos=(-8,-5), wrapWidth=10),
+		   visual.TextStim(win,text=instr_no_resp_str,height=small_str_sz,units='cm', alignVert='center',
+                                name='instr', color='black', bold=False, pos=(0,-5), wrapWidth=10),
+		   visual.TextStim(win,text=instr_no_resp_str,height=small_str_sz,units='cm', alignVert='center',
+                                name='instr', color='black', bold=False, pos=(8,-5), wrapWidth=10)]
 
 if paradigm_type == 'ecog':
     adv_txt_pos = (0,-8)

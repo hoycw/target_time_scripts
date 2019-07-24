@@ -37,7 +37,7 @@ def instruction_loop(instrs, instrp, intro=False):
                 for ix in range(len(conditions)):
                     instr_summ_imgs[ix].draw()
                     instr_condlab_txts[ix].draw()
-                instr_resp_txt.draw()
+                    instr_resp_txts[ix].draw()
             else:
                 instr_img.image = 'cyclone_pics/{0}'.format(instrp[instr_ix])
                 instr_img.draw()
