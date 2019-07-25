@@ -291,9 +291,9 @@ instr_summ_size = (6,6)
 instr_img = visual.ImageStim(win, image='cyclone_pics/'+outcome_pics[0], flipHoriz=False, 
                                 pos=instr_img_pos, size=instr_img_size, units='cm')
 
-instr_summ_imgs = [visual.ImageStim(win, image='cyclone_pics/'+outcome_pics[v_idx[0]], flipHoriz=False, 
+instr_summ_imgs = [visual.ImageStim(win, image='cyclone_pics/'+outcome_pics[v_idx[1]], flipHoriz=False, 
                                 pos=instr_summ_pos[0], size=instr_summ_size, units='cm'),
-                  visual.ImageStim(win, image='cyclone_pics/'+outcome_pics[v_idx[1]], flipHoriz=False, 
+                  visual.ImageStim(win, image='cyclone_pics/'+outcome_pics[v_idx[0]], flipHoriz=False, 
                                 pos=instr_summ_pos[1], size=instr_summ_size, units='cm'),
                   visual.ImageStim(win, image='cyclone_pics/'+outcome_pics[v_idx[2]], flipHoriz=False, 
                                 pos=instr_summ_pos[2], size=instr_summ_size, units='cm')]
