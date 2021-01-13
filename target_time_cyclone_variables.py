@@ -1,45 +1,41 @@
 #target_time_variable file 
-paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.8'
+paradigm_name = 'target_time_ratings'
+paradigm_version = '3.0'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
-prefs.general['audioLib'] = ['sounddevice']
-from psychopy import visual, event, core, gui, logging, data, sound
-#from psychopy import parallel
+prefs.general['audioLib'] = ['PTB']
+from psychopy import visual, event, core, gui, logging, data, sound, monitors
 import numpy as np
 import math, time, random, csv, glob, warnings
 from itertools import groupby
 from target_time_cyclone_log import * 
 from target_time_cyclone_parameters import*
 
-
-
 exp_datetime = time.strftime("%Y%m%d%H%M%S")
 
 #============================================================
 # EXPERIMENTAL VARIABLES
 #============================================================
-if paradigm_type == 'ecog':
-    monitor_name = 'Built_in'
-else:
-    monitor_name = '135D_monitor'
+#monitor_names = monitors.getAllMonitors()
+#for this_monitor in monitor_names:
+#    thisMon = monitors.Monitor(thisName)
+#    print(thisMon.getDistance())
 win = visual.Window(size=(1920,1080), fullscr=full_screen, color=(0,0,0),
-                    monitor=monitor_name,# screen=screen_to_show,
+                    monitor='testMonitor',#monitor_name,# screen=screen_to_show,
                     allowGUI=False, units=screen_units, waitBlanking=True);
 #NOTE: ThinkPad P51 (ECoG-1/Klay/etc.) = 34.5cm wide, 19.5cm tall
 #   ECoG-A laptop size = 36cm wide, 20sm tall
 
+mouse = event.Mouse()  #  will use win by default
+
 frame_dur = win.getMsPerFrame(msg='Please wait, testing frame rate...')
 frame_rate = win.getActualFrameRate()
-if frame_rate < 60:
-    warnings.warn('Frame rate less than 60hz: '+str(frame_rate))
-if frame_rate > 60:
-    warnings.warn('Frame rate greater than 60hz: '+str(frame_rate))
+if frame_rate < 59:
+    warnings.warn('Frame rate less than 59hz: '+str(frame_rate))
+if frame_rate > 61:
+    warnings.warn('Frame rate greater than 61hz: '+str(frame_rate))
 exp_clock = core.Clock()
-if paradigm_type == 'ecog':
-    block_order = np.array([0, 1, 0, 1])
-else:
-    block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])   #!!! consider counterbalancing future participants
+block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])   #!!! consider counterbalancing future participants
 def repeat_cnt(sequence):
     # count the number of equivalent neighbors in a sequence
     # e.g., repeat_cnt([4 2 3 3 6 10 7 7 7]) = [1 1 2 1 1 3]
@@ -55,7 +51,7 @@ while any([cnt>=3 for cnt in block_repeat_cnt]):
 # Determine surprise trial numbers
 # Draw surprise trial numbers from CSVs
 surprise_sequence = set(random.sample(range(len(block_order)), len(block_order)))
-surp_csv =  "surp_csvs/{0}_{1}_randomized_list.csv".format(paradigm_type, str(n_trials))
+surp_csv =  "surp_csvs/rating_{0}_randomized_list.csv".format(str(n_trials))
 if debug_mode:
     surp_csv = "surp_csvs/debug_randomized_list.csv"
 with open(surp_csv, 'r') as read:
@@ -63,6 +59,23 @@ with open(surp_csv, 'r') as read:
     desired_rows = [row for row_number, row in enumerate(reader)
                     if row_number in surprise_sequence]
 surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
+
+
+#============================================================
+# RATING SLIDER STIMULI
+#============================================================
+rating_instr_str = 'How likely is it that you responsed in the target zone?'
+rating_instr_txt = visual.TextStim(win,text=rating_instr_str,height=1,units='cm',
+                                name='feedback_timing', color='black',pos=(0,4),wrapWidth=14)
+rating_scale = visual.RatingScale(win, mouseOnly=True, pos=(0,-2),
+                    low=rating_ticks[0], high=rating_ticks[2], tickMarks=rating_ticks, labels=rating_labels, 
+                    showValue=False, acceptText='Submit Answer', acceptSize=accept_size, 
+                    size=rating_size, name='rating_scale')
+
+rating_str = 'B{0}_T{1}: Rating={2}; rating_RT = {3}; condition = {4}; tolerance = {5}'
+
+#rating_slider = visual.Slider(win, ticks=slider_ticks, labels=slider_labels, pos=(0,0), size=(slider_width, slider_height), 
+#                                    units='cm',granularity=slider_gran, style='rating', labelHeight=None, labelWrapWidth=None)
 
 
 #============================================================
@@ -126,7 +139,7 @@ turn_sound["None"].setVolume(0.8)
 #===================================================
 # CIRCLE & TARGET ZONE PARAMETERS
 #===================================================
-trial_dur = interval_dur + feedback_delay + feedback_dur
+min_trial_dur = interval_dur + rating_delay + feedback_delay + feedback_dur
 angle_ratio = 360/float(interval_dur)
 
 #---------------------------------------------------
@@ -134,6 +147,7 @@ angle_ratio = 360/float(interval_dur)
 circ_angles = np.linspace(-90,270,n_circ) #np.array([float(pos_ix)*(360/float(n_circ))-90 for pos_ix in range(n_circ)])
 circ_radius = [loop_radius] * n_circ
 circ_X, circ_Y = pol2cart(circ_angles,circ_radius)
+circ_xys = np.array([circ_X, circ_Y]).T
 circ_start = [circ_ix * (interval_dur/float(n_circ)) for circ_ix in range(n_circ)]  # onset time of each light
 hidden_pos = {True: [(circ_start[circ_xi] > (1-covered_portion)*interval_dur) for circ_xi in range(n_circ)],
               False: [(False) for circ_xi in range(n_circ)]}
@@ -152,11 +166,10 @@ re_fill_color = {False:fill_default, True:circ_fill_list}                 # Sets
 re_flip_color = {False:circ_default, True:circ_cover_list}                # Sets up flip colors for covered/uncovered trial 
 socket_colors = circ_colors
 
-
-circles = visual.ElementArrayStim(win, nElements=n_circ,sizes=circ_size,xys = zip(circ_X, circ_Y),       # Circle object inset ontop of sockets 
+circles = visual.ElementArrayStim(win, nElements=n_circ,sizes=circ_size,xys = circ_xys,       # Circle object inset ontop of sockets 
                            elementTex = None, elementMask = "circle",
                            colors=circ_colors)
-sockets = visual.ElementArrayStim(win, nElements=n_circ,sizes=socket_size,xys = zip(circ_X, circ_Y),     # "Sockets" providing outter black ring for circles.
+sockets = visual.ElementArrayStim(win, nElements=n_circ,sizes=socket_size,xys = circ_xys,     # "Sockets" providing outter black ring for circles.
                            elementTex = None, elementMask = "circle",                                   # always present behind circle stim
                            colors=socket_colors)
 
@@ -175,19 +188,9 @@ target_zone = visual.RadialStim(win, tex='sqrXsqr', color='dimgrey', size=(loop_
 target_zone_cover = visual.Circle(win, radius = loop_radius - target_width/2, edges=100,
                 lineColor=None, fillColor=[0, 0, 0]) # Covers center of wedge used to draw taret zone
 
-#---------------------------------------------------
-# Photodiode Trigger Rectangle
-trigger_rect = visual.Rect(win, width=trigger_rect_height, height=trigger_rect_height, units='pix',  #pos based on 1920x1080 pixel screen
-                            fillColor='white', pos=(trigger_rect_height/2-win.size[0]/2,trigger_rect_height/2-win.size[1]/2))
-#---------------------------------------------------
-
 #===================================================
 # INSTRUCTIONS
 #===================================================
-if paradigm_type=='ecog':
-    rtbox_strs = "You will be using the Response Time Box.\nPlease respond by using your THUMB to press any of the buttons on the box."
-else:
-    rtbox_strs = "You will be using the Response Time Box.\nPlease respond by using your RIGHT THUMB to press any of the buttons on the box."
 instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move around this circle.',
                'Your goal is to respond at the exact\nmoment when it completes the circle.',
                "The light always starts at the bottom and moves at the same speed, "+\
@@ -198,8 +201,6 @@ instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move 
                'Sometimes, the target zone will turn blue. Ignore this.\n' +\
                "These trials don't count, so you won't win or lose points.",
                "Let's get started with a few examples..."]
-if use_rtbox:
-    instr_strs.insert(-1,rtbox_strs)
 train_str = {'easy': ["Good job! From now on, only the first part of the circle will light up.",
                     "That means you need to time your response without seeing the light go all the way around.",
                     "Let's try some more examples..."],
@@ -210,7 +211,7 @@ train_str = {'easy': ["Good job! From now on, only the first part of the circle 
 main_str = "Ready to try the real deal? We'll reset your score to 0 and start counting for real now. "+\
             "You'll do {0} easy and {0} hard blocks, each lasting {1} trials.\n\n".format(n_blocks,n_trials)+\
             'Press Q/escape to try more practice rounds, '+\
-            'or press {0} to start playing Target Time!'.format(key)
+            'or click the mouse to start playing Target Time!'
 
 block_start_str = 'Level {0}/{1}: {2}'
 break_str       = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
@@ -221,43 +222,38 @@ point_instr_str = "After each block, you'll see your score from this round.\nPoi
 end_game_str    = "Fantastic!!! You're all done. Thank you so much for participating in this experiment!"
 times_demo_called = 1
 
-welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=2,units='cm',alignHoriz='center',alignVert='center',
+# Psychopy3 depricated alignHorz/alignVert for alignText + anchorHorz/anchorVert, but all are 'center' by default
+welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=2,units='cm',#alignHoriz='center',alignVert='center', 
                                 name='welcome', color='black', bold=True, pos=(0,2),wrapWidth=30)
 
-if paradigm_type == 'ecog':
-    instr_txt_pos = (0,6)
-else:
-    instr_txt_pos = (0,8)
-instr_txt = visual.TextStim(win,text=instr_strs[0],height=1,units='cm', alignVert='center',
+instr_txt_pos = (0,6)
+instr_txt = visual.TextStim(win,text=instr_strs[0],height=1,units='cm', #alignVert='center',
                                 name='instr', color='black',pos=instr_txt_pos,wrapWidth=30)
 
-if paradigm_type == 'ecog':
-    adv_txt_pos = (0,-7)
-else:
-    adv_txt_pos = (0,-12)
-adv_screen_txt = visual.TextStim(win,text='Press {0} to advance or Q/escape to quit...'.format(key),
+adv_txt_pos = (0,-7)
+adv_screen_txt = visual.TextStim(win,text='Click the mouse to advance or Q/escape to quit...',
                                 height=0.75,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
 
-block_start_txt = visual.TextStim(win,text=block_start_str,height=2,units='cm',alignHoriz='center',alignVert='center',
+block_start_txt = visual.TextStim(win,text=block_start_str,height=2,units='cm', #alignHoriz='center',alignVert='center',
                                 name='block_start', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap
 
-block_point_txt = visual.TextStim(win,text=block_point_str,height=1,units='cm', alignVert='center',
+block_point_txt = visual.TextStim(win,text=block_point_str,height=1,units='cm', #alignVert='center',
                                 name='block_points', color='black',pos=(0,6),wrapWidth=20)#short no need wrap
 
-score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=1,units='cm', alignVert='center',
+score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=1,units='cm', #alignVert='center',
                                 name='score_demo', color='green',pos=(0,6),wrapWidth=30)#short no need wrap
 
-point_instr_txt = visual.TextStim(win,text=point_instr_str, height=1,units='cm', alignVert='center',
+point_instr_txt = visual.TextStim(win,text=point_instr_str, height=1,units='cm', #alignVert='center',
                                 name='point_instr', color='black',pos=(0,0),wrapWidth=30)#built in line break
 
-total_point_txt = visual.TextStim(win,text=total_point_str,height=1,units='cm', alignVert='center',
+total_point_txt = visual.TextStim(win,text=total_point_str,height=1,units='cm', #alignVert='center',
                                 name='total_points', color='black', bold=True, pos=(0,4.5),wrapWidth=20)#short no need wrap
 
-pause_txt = visual.TextStim(win,text='Paused', height=2,units='cm',alignHoriz='center',alignVert='center',
+pause_txt = visual.TextStim(win,text='Paused', height=2,units='cm', #alignHoriz='center',alignVert='center',
                                 name='pause', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap
 
 endgame_txt = visual.TextStim(win,text=end_game_str,
-                            height=1.25,units='cm',alignHoriz='center',alignVert='center',
+                            height=1.25,units='cm', #alignHoriz='center',alignVert='center',
                             name='endgame', color='black', bold=False, pos=(0,-2),wrapWidth=30)
 
 instr_img = visual.ImageStim(win, image='cyclone_pics/grey.jpg', flipHoriz=False, 

@@ -1,6 +1,6 @@
 # target_time log suite
-paradigm_name = 'target_time_cyclone'
-paradigm_version = '2.4.8'
+paradigm_name = 'target_time_ratings'
+paradigm_version = '3.0'
 
 from psychopy import visual, event, core, gui, logging, data
 import numpy as np
@@ -26,29 +26,22 @@ for f in files:
 file_dlg = gui.Dlg(title="Run Information")
 file_dlg.addText('Paradigm Version: '+paradigm_version, color='Blue')
 file_dlg.addField(label='SBJ Code:')
-file_dlg.addField(label='Parameter Version:',choices=['ecog','eeg'])
-file_dlg.addField(label='Use RT Box:',initial=True)
 file_dlg.addField(label='Debug Mode:',initial=False)
 file_dlg.addField(label='Starting Block:',initial=1)
-#file_dlg.addField('Response Key:') # Ideally space bar? something more accurate?
 
 file_dlg.show()
 if file_dlg.OK:
     dlg_resp   = file_dlg.data
     log_prefix = dlg_resp[0]
-    paradigm_type  = dlg_resp[1]
-    use_rtbox = dlg_resp[2]
-    debug_mode = dlg_resp[3]
-    starting_block = dlg_resp[4]
+    debug_mode = dlg_resp[1]
+    starting_block = dlg_resp[2]
     log_filename = '../logs/{0}_response_log_{1}.txt'.format(log_prefix,exp_datetime)
 else: 
-    print 'User Cancelled'
+    print('User Cancelled')
 #    win.close()
     core.quit()
 
 from target_time_cyclone_parameters import*
-#try: key = pradigm_ver
-#actual= var_chanign[key]
 
 from target_time_cyclone_variables import*
 
@@ -66,8 +59,6 @@ win.saveFrameIntervals(fileName=log_filename, clear=False)           #write fram
 #Vars to log:
 win.logOnFlip('paradigm_name = '+str(paradigm_name), logging.DATA)
 win.logOnFlip('paradigm_version = '+str(paradigm_version), logging.DATA)
-win.logOnFlip('paradigm_type = '+str(paradigm_type), logging.DATA)
-win.logOnFlip('use_rtbox = '+str(use_rtbox), logging.DATA)
 win.logOnFlip('debug_mode = '+str(debug_mode), logging.DATA)
 win.logOnFlip('starting_block = '+str(starting_block), logging.DATA)
 win.logOnFlip('n_blocks = '+str(n_blocks), logging.DATA)
@@ -87,17 +78,20 @@ win.logOnFlip('block_start_dur = '+str(block_start_dur), logging.DATA)
 win.logOnFlip('tolerances = '+str(tolerances), logging.DATA)
 win.logOnFlip('tolerance_step = '+str(tolerance_step), logging.DATA)
 win.logOnFlip('tolerance_lim = '+str(tolerance_lim), logging.DATA)
-win.logOnFlip('Key = '+str(key), logging.DATA)
 win.logOnFlip('full_screen = '+str(full_screen), logging.DATA)
 win.logOnFlip('screen_units = '+str(screen_units), logging.DATA)
 win.logOnFlip('covered_portion = '+str(covered_portion), logging.DATA)
 win.logOnFlip('resp_marker_thickness = '+str(resp_marker_thickness), logging.DATA)
 win.logOnFlip('resp_marker_width = '+str(resp_marker_width), logging.DATA)
 win.logOnFlip('conditions = '+str(conditions), logging.DATA)
-win.logOnFlip('trigger_rect_height = '+str(trigger_rect_height), logging.DATA)
-win.logOnFlip('trigger_dur = '+str(trigger_dur), logging.DATA)
 win.logOnFlip('win.size = '+str(win.size), logging.DATA)
 win.logOnFlip('point_fn = '+str(point_fn), logging.DATA)
+
+win.logOnFlip('rating_ticks = '+str(rating_ticks), logging.DATA)
+win.logOnFlip('rating_labels = '+str(rating_labels), logging.DATA)
+win.logOnFlip('rating_width = '+str(rating_width), logging.DATA)
+win.logOnFlip('rating_size = '+str(rating_size), logging.DATA)
+win.logOnFlip('accept_size = '+str(accept_size), logging.DATA)
 
 exp_clock.reset()
 win.flip()
