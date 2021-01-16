@@ -45,6 +45,7 @@ tolerance_lim = [0.4, 0.015]
 #======================
 full_screen = True                  # Make the window full screen? (True/False)
 #screen_to_show = 1                 # Select which screen to display the window on
+#screen_units = 'cm'                 # Set visual object sizes in cm (constant across all screens)
 screen_units = 'height'                 # Set visual object sizes in "height" (relative to screen size)
 # Explaining "height" units:
 #   "...the dimensions of a screen with standard 4:3 aspect ratio will range (-0.6667,-0.5) in the bottom left
@@ -52,12 +53,18 @@ screen_units = 'height'                 # Set visual object sizes in "height" (r
 #   of the screen is (-0.8,-0.5) and top-right is (+0.8,+0.5)."
 
 n_circ = 30                         # number of "lights" in the loop
+#circ_size = .3                      # size of "lights"
+#socket_size = .5                    # size of empty "lights" (when covered)
+#loop_radius = 7                     # size of loop of "lights"
+#target_width = 1.25                    # thickness of target zone IN CM 
 circ_size = .015                      # size of "lights"
 socket_size = .02                    # size of empty "lights" (when covered)
 loop_radius = 0.25                     # size of loop of "lights"
 target_width = 0.04                    # thickness of target zone
 
 covered_portion = 0.6               # % of interval time obscured when covered=True
+#resp_marker_width = 2               # Width of the response marker (marks where they pressed the button)
+#resp_marker_thickness = 4           # Thickness of the response marker
 resp_marker_width = 0.1               # Width of the response marker (marks where they pressed the button)
 resp_marker_thickness = 4           # Thickness of the response marker
 conditions = ['easy', 'hard']       # labels of the trial conditions
@@ -65,9 +72,9 @@ point_fn = [100, -100]              # reward function determining points awarded
 
 rating_ticks = [0, 100]     # 50,
 rating_labels = ['Definitely Lost', 'Definitely Won']   # ''
-rating_width = 10
-rating_size = 1
-accept_size = 1
+# use PsychoPy defaults for ratingScale size
+#rating_size = 0.5
+#accept_size = 0.2
 
 #========================
 #  SURPRISE PARAMETERS

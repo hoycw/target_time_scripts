@@ -30,9 +30,9 @@ def instruction_loop(instrs, intro=False):
     # displays instructions for current trial type
     # If intro=True, instrs won't be used (can just be '') 
     if instrs == rating_intro_str:
-        print('Rating instr loop: ', instrs)
         instr_txt.text = instrs[0]
         instr_pic.image = 'cyclone_pics/rating_scale.png'
+        instr_pic.size = rating_img_size
         instr_pic.draw()
         instr_txt.draw()
         adv_btn.draw()
@@ -44,10 +44,12 @@ def instruction_loop(instrs, intro=False):
             instr_txt.text = instr_str
             if image_index <= 6 and intro:
                 instr_pic.image = 'cyclone_pics/{0}'.format(instr_pic_dict[image_index])
+                instr_pic.size = instr_img_size
                 instr_pic.draw()
                 image_index += 1
             if not intro:
                 instr_pic.image = 'cyclone_pics/{0}'.format(instr_pic_dict[condition])
+                instr_pic.size = instr_img_size
                 instr_pic.draw()
             
             instr_txt.draw()
@@ -56,9 +58,8 @@ def instruction_loop(instrs, intro=False):
             win.flip()
             instr_key_check()
     else:
-        print('Main instr loop: ', instrs)
         instr_txt.text = instrs[0]
-        instr_txt.pos = (0,2)
+        instr_txt.pos = (0,0.1)
         instr_txt.draw()
         adv_btn.draw()
         adv_screen_txt.draw()
@@ -70,7 +71,7 @@ def instruction_loop(instrs, intro=False):
 def instr_key_check(check_time=0.05):
     event.clearEvents()
     mouse.clickReset()
-    mouse.setPos([0,-8])    # move mouse off the button so they can't just click through super fast
+    mouse.setPos(mouse_reset_pos)    # move mouse off the button so they can't just click through super fast
     while not mouse.isPressedIn(adv_btn):
         # Check for quit keys
         for press in event.getKeys(keyList=['escape','q']):
@@ -113,10 +114,10 @@ def moving_ball(block_n, trial_n, training=False):
             curr_btn_status, tmp_rt = mouse.getPressed(getTime=True)
             if curr_btn_status != prev_btn_status:    # Check if button status changed
                 # Log which button and RT only if clicked down (not released)
-                for b_ix, b in enumerate(curr_btn_status):
-                    if b == 1 and b != prev_btn_status[b_ix]:
-                        buttons.append(b_ix)
-                        rts.append(tmp_rt)
+                for btn_ix, b in enumerate(curr_btn_status):
+                    if b == 1 and b != prev_btn_status[btn_ix]:
+                        buttons.append(btn_ix)
+                        rts.append(tmp_rt[btn_ix])
                 prev_btn_status = curr_btn_status
     
     #========================================================
@@ -128,52 +129,50 @@ def moving_ball(block_n, trial_n, training=False):
         curr_btn_status, tmp_rt = mouse.getPressed(getTime=True)
         if curr_btn_status != prev_btn_status:    # Check if button status changed
             # Log which button and RT only if clicked down (not released)
-            for b_ix, b in enumerate(curr_btn_status):
-                if b == 1 and b != prev_btn_status[b_ix]:
-                    buttons.append(b_ix)
-                    rts.append(tmp_rt)
+            for btn_ix, b in enumerate(curr_btn_status):
+                if b == 1 and b != prev_btn_status[btn_ix]:
+                    buttons.append(btn_ix)
+                    rts.append(tmp_rt[btn_ix])
             prev_btn_status = curr_btn_status
     
-    print('mouse data for B{0} T {1}:'.format(block_n, trial_n), buttons, rts)
     return trial_start, buttons, rts
 
 #===================================================
 def subjective_rating(block_n, trial_n, condition, trial_start, training=False):
-#    event.clearEvents()
-#    mouse.clickReset()
-#    rating_scale.reset()
-#    
-#    # Show scale & update until a response has been made or max_rating_time
-#    rating_scale.draw()
-#    rating_instr_txt.draw()
-#    win.flip()
-#    
-#    rating_time_out = False
-#    while rating_scale.noResponse and not rating_time_out:
-#        core.wait(0.1)
-#        if exp_clock.getTime() > trial_start + interval_dur + rating_delay + max_rating_time:
-#            rating_time_out = True
-#        for press in event.getKeys(keyList=['escape','q']):
-#            if press:
-#                clean_quit()
-#    
-#    # Check for responses
-#    rating_data = rating_scale.getRating()
-#    rating_rt = rating_scale.getRT()
-#    if rating_time_out:
-#        rating_rt = max_rating_time
-#        if training:
-#            win.logOnFlip(rating_time_out_str.format('T',trial_n),logging.DATA)
-#        else:
-#            win.logOnFlip(rating_time_out_str.format(block_n,trial_n),logging.DATA)
-#    
-#    # Log rating data
-#    if training:
-#        win.logOnFlip(rating_str.format('T',trial_n,rating_data,rating_rt,condition,tolerances[condition]),logging.DATA)
-#    else:
-#        win.logOnFlip(rating_str.format(block_n,trial_n,rating_data,rating_rt,condition,tolerances[condition]),logging.DATA)
-#    win.flip()
-    rating_rt = 1
+    event.clearEvents()
+    rating_scale.reset()
+    win.callOnFlip(mouse.clickReset)
+    
+    # Show scale & update until a response has been made or max_rating_time
+    rating_time_out = False
+    while rating_scale.noResponse and not rating_time_out:
+        rating_scale.draw()
+        rating_instr_txt.draw()
+        win.flip()
+        
+        # Check for time out or quit key
+        if exp_clock.getTime() > trial_start + interval_dur + rating_delay + max_rating_time:
+            rating_time_out = True
+        for press in event.getKeys(keyList=['escape','q']):
+            if press:
+                clean_quit()
+    
+    # Check for responses
+    rating_data = rating_scale.getRating()
+    rating_rt = rating_scale.getRT()
+    if rating_time_out:
+        rating_rt = max_rating_time
+        if training:
+            win.logOnFlip(rating_time_out_str.format('T',trial_n),logging.DATA)
+        else:
+            win.logOnFlip(rating_time_out_str.format(block_n,trial_n),logging.DATA)
+    
+    # Log rating data
+    if training:
+        win.logOnFlip(rating_str.format('T',trial_n,rating_data,rating_rt,condition,tolerances[condition]),logging.DATA)
+    else:
+        win.logOnFlip(rating_str.format(block_n,trial_n,rating_data,rating_rt,condition,tolerances[condition]),logging.DATA)
+    win.flip()
     return rating_rt
 
 #===================================================
@@ -402,11 +401,12 @@ for trial_n in range(n_fullvis+2*n_training):
     
     #========================================================
     # Collect Responses and Subjective Rating
-    rating_rt = subjective_rating(None, trial_n, condition, trial_start, training=True)
+#    rating_rt = subjective_rating(None, trial_n, condition, trial_start, training=True)
+    rating_rt = 0
     
     #========================================================
-    # Feedback Delay
-    while exp_clock.getTime() < trial_start + interval_dur + rating_delay + rating_rt + feedback_delay - feedback_compute_dur:
+    # Feedback Delay: does not wait for rating_delay + rating_rt
+    while exp_clock.getTime() < trial_start + interval_dur + feedback_delay - feedback_compute_dur:
         core.wait(0.001)
     
     #========================================================

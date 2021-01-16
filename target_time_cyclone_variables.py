@@ -16,10 +16,11 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #============================================================
 # EXPERIMENTAL VARIABLES
 #============================================================
-#monitor_names = monitors.getAllMonitors()
-#for this_monitor in monitor_names:
-#    thisMon = monitors.Monitor(thisName)
-#    print(thisMon.getDistance())
+monitor_names = monitors.getAllMonitors()
+for this_monitor in monitor_names:
+    thisMon = monitors.Monitor(thisName)
+    win.logOnFlip('monitor {0}: dist = {1}; width = {2}; res = {3}'.format(this_monitor,
+        thisMon.getDistance(),thisMon.getWidth(),thisMon.getSizePix()))
 win = visual.Window(size=(1920,1080), fullscr=full_screen, color=(0,0,0),
                     monitor='testMonitor',#monitor_name,# screen=screen_to_show,
                     allowGUI=False, units=screen_units, waitBlanking=True);
@@ -65,12 +66,14 @@ surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
 # RATING SCALE STIMULI
 #============================================================
 rating_instr_str = 'How likely is it that you won on this trial by responding in the target zone?'
-rating_instr_txt = visual.TextStim(win,text=rating_instr_str,height=1,units=screen_units,
-                                name='feedback_timing', color='black',pos=(0,-0.3),wrapWidth=18)
-rating_scale = visual.RatingScale(win, mouseOnly=True, pos=(0,0),
+rating_instr_txt = visual.TextStim(win,text=rating_instr_str,height=0.05,units=screen_units,
+                                name='feedback_timing', color='black',pos=(0,0.3),wrapWidth=1)
+# rating scale pos is center of the line
+rating_scale = visual.RatingScale(win, mouseOnly=True, pos=(0,-0.1),
                     low=rating_ticks[0], high=rating_ticks[1], tickMarks=rating_ticks, labels=rating_labels, 
-                    showValue=False, acceptText='Submit Answer', acceptSize=accept_size, 
-                    size=rating_size, name='rating_scale')
+                    showValue=False, acceptText='Submit Answer', name='rating_scale')
+                    #size=rating_size, acceptSize=accept_size, 
+                    
 
 rating_str = 'B{0}_T{1}: Rating={2}; rating_RT = {3}; condition = {4}; tolerance = {5}'
 rating_time_out_str = 'B{0}_T{1}: Rating time out!'
@@ -86,27 +89,13 @@ points = np.zeros(len(block_order))       # point total for each block
 resp_marker = visual.Line(win, start=(-resp_marker_width/2, 0),
                                 end=(resp_marker_width/2, 0),
                                 lineColor='black', lineWidth=resp_marker_thickness)
-outcome_win = visual.TextStim(win,text='Win!',height=2,units='cm',
+outcome_win = visual.TextStim(win,text='Win!',height=0.2,units=screen_units,
                                 name='feedback_win', color='green',pos=(0,0))
-outcome_loss = visual.TextStim(win,text='Lose!',height=2,units='cm',
+outcome_loss = visual.TextStim(win,text='Lose!',height=2,units=screen_units,
                                 name='feedback_loss', color='red',pos=(0,0))#wrapWidth=550,
 feedback_str = 'B{0}_T{1}: Outcome={2}; RT = {3}; condition = {4}; tolerance = {5}'
-feedback_txt = visual.TextStim(win,text='',height=1,units='cm',
+feedback_txt = visual.TextStim(win,text='',height=1,units=screen_units,
                                 name='feedback_timing', color='black',pos=(0,-3),wrapWidth=14)
-
-instr_pic_dict = {0:'grey.jpg', 
-                  1:'target_arrow.jpg',
-                  2:'direction_arrow.jpg',
-                  3:'target_arrow.jpg',
-                  4:'win.jpg', 
-                  5:'loss.jpg',
-                  6:'surprise.png',
-                  'easy':'easy.jpg',
-                  'hard':'hard.jpg'}
-instr_img_size = (13,10)
-instr_img_pos = (5, -2)
-instr_pic = visual.ImageStim(win, image='cyclone_pics/{0}'.format(instr_pic_dict[0]), flipHoriz=False, pos=(0, -2), units='cm')
-#rating_pic = visual.ImageStim(win, image='cyclone_pics/rating_scale.png', flipHoriz=False, pos=(0, -2), units='cm')
 
 training_score = { "easy" : 0, "hard": 0 }
 
@@ -188,88 +177,111 @@ target_origin = {'easy': 180 - (tolerances['easy'] * angle_ratio),   # zero star
 
 target_zone = visual.RadialStim(win, tex='sqrXsqr', color='dimgrey', size=(loop_radius*2) + target_width, # size = diameter
     visibleWedge=[0, target_upper_bound['easy']], radialCycles=1, angularCycles=0, interpolate=False,   # radialCycles=1 to avoid color flip
-    autoLog=False, units='cm', angularRes=1000)
+    autoLog=False, units=screen_units, angularRes=1000)
 target_zone_cover = visual.Circle(win, radius = loop_radius - target_width/2, edges=100,
                 lineColor=None, fillColor=[0, 0, 0]) # Covers center of wedge used to draw taret zone
 
 #===================================================
 # INSTRUCTIONS
 #===================================================
-instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move around this circle.',
-               'Your goal is to click the left mouse button at the exact\nmoment when it completes the circle.',
+instr_strs = ['This is a simple (but not easy!) timing game. A light will move around this circle.',
+               'Your goal is to click the left mouse button at the exact moment when it completes the circle.',
                "The light always starts at the bottom and moves at the same speed, "+\
                'so the perfect response is always at the same time: the Target Time!',
                'The gray bar at the bottom is the target zone.',
                'If you respond in the target zone, it turns green and you win points!',
                'If you miss the target zone, it turns red and you lose points.',
-               'Sometimes, the target zone will turn blue. Ignore this.\n' +\
+               'Sometimes, the target zone will turn blue. Ignore this. ' +\
                "These trials don't count, so you won't win or lose points.",
                "Let's get started with a few examples..."]
 train_str = {'easy': ["Good job! From now on, only the first part of the circle will light up.",
                     "That means you need to time your response without seeing the light go all the way around.",
                     "Let's try some more examples..."],
              'hard': ["Great! Now you're ready to try the hard level.",
-                    "Don't get discouraged - hard levels are designed to make you miss most of the time.\n"+\
+                    "Don't get discouraged - hard levels are designed to make you miss most of the time. "+\
                     "Try your best to see how much you can win!",
                     "Let's try some examples..."]}
-rating_intro_str = ['Nice work! We are about to start the real deal, but with one difference.\n'+\
-            'Every {0} trials, you will be asked to click on this line\n'.format(rating_trial_ratio)+
+rating_intro_str = ['Nice work! We are about to start the real deal, but with one difference. '+\
+            'Every {0} trials, you will be asked to click on this line '.format(rating_trial_ratio)+
             'to rate how likely it is that you won, then accept the answer by clicking the button below.']
 main_str = ["You're ready to start! We'll reset your score to 0 and start counting for real now. "+\
             "You'll do {0} easy and {0} hard blocks, each lasting {1} trials.\n\n".format(n_blocks,n_trials)+\
             "Press Q/escape to restart the task and try more practice rounds, "+\
-            "or click the mouse to start playing Target Time!"]
+            "or click below to start playing Target Time!"]
 
 block_start_str = 'Level {0}/{1}: {2}'
 break_str       = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
 block_point_str = 'Level {0} Score: {1}'
 total_point_str = 'Total Score: {0}'
 score_demo_str  = 'You scored {0} points this round.'
-point_instr_str = "After each block, you'll see your score from this round.\nPoints also add up across rounds."
+point_instr_str = "After each block, you'll see your score from this round. Points also add up across rounds."
 end_game_str    = "Fantastic!!! You're all done. Thank you so much for participating in this experiment!"
 times_demo_called = 1
 
+instr_pic_dict = {0:'grey.jpg', 
+                  1:'target_arrow.jpg',
+                  2:'direction_arrow.jpg',
+                  3:'target_arrow.jpg',
+                  4:'win.jpg', 
+                  5:'loss.jpg',
+                  6:'surprise.png',
+                  'easy':'easy.jpg',
+                  'hard':'hard.jpg'}
+instr_img_size = 0.7    #(0.4,0.3)
+rating_img_size = 1.2  #(0.2,0.15)
+instr_img_pos = (0, -0.1)
+instr_pic = visual.ImageStim(win, image='cyclone_pics/{0}'.format(instr_pic_dict[0]), 
+        flipHoriz=False, pos=instr_img_pos, units=screen_units)
+#rating_pic = visual.ImageStim(win, image='cyclone_pics/rating_scale.png', flipHoriz=False, pos=(0, -2), units='cm')
+
+std_txt_sz = 0.05
+std_txt_wrap = 1
+sml_txt_sz = 0.03
+sml_txt_wrap = 1
+big_txt_sz = 0.15
+big_txt_wrap = 1.2
 # Psychopy3 depricated alignHorz/alignVert for alignText + anchorHorz/anchorVert, but all are 'center' by default
-welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=2,units='cm',#alignHoriz='center',alignVert='center', 
-                                name='welcome', color='black', bold=True, pos=(0,2),wrapWidth=30)
+welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=big_txt_sz,units=screen_units,#alignHoriz='center',alignVert='center', 
+                                name='welcome', color='black', bold=True, pos=(0,0.2),wrapWidth=std_txt_wrap)
 
-instr_txt_pos = (0,6)
-instr_txt = visual.TextStim(win,text=instr_strs[0],height=1,units='cm', #alignVert='center',
-                                name='instr', color='black',pos=instr_txt_pos,wrapWidth=30)
+instr_txt_pos = (0,0.3)
+instr_txt = visual.TextStim(win,text=instr_strs[0],height=std_txt_sz,units=screen_units, #alignVert='center',
+                                name='instr', color='black',pos=instr_txt_pos,wrapWidth=std_txt_wrap)
 
-adv_btn_pos = (0,-7)
-adv_btn = visual.Rect(win, size=(20,1.5),pos=adv_btn_pos, #size=(0.1,0.05), pos=(0.0,0.4), 
-                         fillColor=(1,1,1),lineColor=(0,0,0), units='cm')
-print(adv_btn.vertices)
+adv_btn_pos = (0,-0.4)
+mouse_reset_pos = (0,-0.3)
+adv_btn = visual.Rect(win, size=(0.8,sml_txt_sz+0.02),pos=adv_btn_pos, #size=(0.1,0.05), pos=(0.0,0.4), 
+                         fillColor=(1,1,1),lineColor=(0,0,0), units=screen_units)
 
-adv_txt_pos = (0,-10)
+adv_txt_pos = adv_btn_pos
 adv_screen_txt = visual.TextStim(win,text='Click here to advance or press Q/escape to quit...',
-                                height=0.75,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
+                                height=sml_txt_sz,units=screen_units,name='adv_screen', color='black',
+                                pos=adv_txt_pos,wrapWidth=sml_txt_wrap)#short no need wrap
 
-block_start_txt = visual.TextStim(win,text=block_start_str,height=2,units='cm', #alignHoriz='center',alignVert='center',
-                                name='block_start', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap
+block_start_txt = visual.TextStim(win,text=block_start_str,height=big_txt_sz,units=screen_units, #alignHoriz='center',alignVert='center',
+                                name='block_start', color='black', bold=True, pos=(0,0.1),wrapWidth=big_txt_wrap)#short no need wrap
 
-block_point_txt = visual.TextStim(win,text=block_point_str,height=1,units='cm', #alignVert='center',
-                                name='block_points', color='black',pos=(0,6),wrapWidth=20)#short no need wrap
+block_point_txt = visual.TextStim(win,text=block_point_str,height=std_txt_sz,units=screen_units, #alignVert='center',
+                                name='block_points', color='black',pos=(0,0.3),wrapWidth=std_txt_wrap)#short no need wrap
 
-score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=1,units='cm', #alignVert='center',
-                                name='score_demo', color='green',pos=(0,6),wrapWidth=30)#short no need wrap
+score_demo_txt =  visual.TextStim(win,text=score_demo_str,height=std_txt_sz,units=screen_units, #alignVert='center',
+                                name='score_demo', color='green',pos=(0,0.3),wrapWidth=std_txt_wrap)#short no need wrap
 
-point_instr_txt = visual.TextStim(win,text=point_instr_str, height=1,units='cm', #alignVert='center',
-                                name='point_instr', color='black',pos=(0,0),wrapWidth=30)#built in line break
+point_instr_txt = visual.TextStim(win,text=point_instr_str, height=std_txt_sz,units=screen_units, #alignVert='center',
+                                name='point_instr', color='black',pos=(0,0),wrapWidth=std_txt_wrap)#built in line break
 
-total_point_txt = visual.TextStim(win,text=total_point_str,height=1,units='cm', #alignVert='center',
-                                name='total_points', color='black', bold=True, pos=(0,4.5),wrapWidth=20)#short no need wrap
+total_point_txt = visual.TextStim(win,text=total_point_str,height=std_txt_sz,units=screen_units, #alignVert='center',
+                                name='total_points', color='black', bold=True, pos=(0,0.25),wrapWidth=std_txt_wrap)#short no need wrap
 
-pause_txt = visual.TextStim(win,text='Paused', height=2,units='cm', #alignHoriz='center',alignVert='center',
-                                name='pause', color='black', bold=True, pos=(0,2),wrapWidth=30)#short no need wrap
+pause_txt = visual.TextStim(win,text='Paused', height=big_txt_sz,units=screen_units, #alignHoriz='center',alignVert='center',
+                                name='pause', color='black', bold=True, pos=(0,0.1),wrapWidth=big_txt_wrap)#short no need wrap
 
 endgame_txt = visual.TextStim(win,text=end_game_str,
-                            height=1.25,units='cm', #alignHoriz='center',alignVert='center',
-                            name='endgame', color='black', bold=False, pos=(0,-2),wrapWidth=30)
+                            height=std_txt_sz,units=screen_units, #alignHoriz='center',alignVert='center',
+                            name='endgame', color='black', bold=False, pos=(0,-0.2),wrapWidth=big_txt_wrap)
 
 instr_img = visual.ImageStim(win, image='cyclone_pics/grey.jpg', flipHoriz=False, 
-                                pos=instr_img_pos, size=instr_img_size, units='cm')
+                                pos=instr_img_pos, size=instr_img_size, units=screen_units)
 
 train_img = visual.ImageStim(win, image='cyclone_pics/easy.jpg', flipHoriz=False, 
-                                pos=instr_img_pos, size=instr_img_size, units='cm')
+                                pos=instr_img_pos, size=instr_img_size, units=screen_units)
