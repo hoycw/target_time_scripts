@@ -29,7 +29,17 @@ def instruction_loop(instrs, intro=False):
     image_index = 0
     # displays instructions for current trial type
     # If intro=True, instrs won't be used (can just be '') 
-    if instrs!= main_str:
+    if instrs == rating_intro_str:
+        print('Rating instr loop: ', instrs)
+        instr_txt.text = instrs[0]
+        instr_pic.image = 'cyclone_pics/rating_scale.png'
+        instr_pic.draw()
+        instr_txt.draw()
+        adv_btn.draw()
+        adv_screen_txt.draw()
+        win.flip()
+        instr_key_check()
+    elif instrs!= main_str:
         for instr_str in instrs:
             instr_txt.text = instr_str
             if image_index <= 6 and intro:
@@ -39,34 +49,45 @@ def instruction_loop(instrs, intro=False):
             if not intro:
                 instr_pic.image = 'cyclone_pics/{0}'.format(instr_pic_dict[condition])
                 instr_pic.draw()
-
+            
             instr_txt.draw()
+            adv_btn.draw()
             adv_screen_txt.draw()
             win.flip()
             instr_key_check()
     else:
-        instr_txt.text = instrs
+        print('Main instr loop: ', instrs)
+        instr_txt.text = instrs[0]
         instr_txt.pos = (0,2)
         instr_txt.draw()
+        adv_btn.draw()
         adv_screen_txt.draw()
         win.flip()
         instr_key_check()
         core.wait(post_instr_delay)     # let them prep before hitting them with interval_dur
 
 #===================================================
-def instr_key_check(check_time=0.2):
+def instr_key_check(check_time=0.05):
+    event.clearEvents()
     mouse.clickReset()
-    while not any(mouse.getPressed()):
+    mouse.setPos([0,-8])    # move mouse off the button so they can't just click through super fast
+    while not mouse.isPressedIn(adv_btn):
+        # Check for quit keys
+        for press in event.getKeys(keyList=['escape','q']):
+            if press:
+                clean_quit()
         core.wait(check_time)
-    for press in event.getKeys(keyList=['escape','q']):
-        if press:
-            clean_quit()
     core.wait(check_time)
 
 #===================================================
 def moving_ball(block_n, trial_n, training=False):
     # Reset mouse times on stim onset
     win.callOnFlip(mouse.clickReset)
+    win.callOnFlip(event.clearEvents)
+    buttons = []
+    rts = []
+    prev_btn_status = [0, 0, 0]
+    curr_btn_status = [0, 0, 0]
     
     # Draw Stimuli
     for circ_xi in range(n_circ-1):# - sum(hidden_pos[covered])):
@@ -86,59 +107,88 @@ def moving_ball(block_n, trial_n, training=False):
         circ_colors[n_circ-1] = (-1,-1,-1)
         circ_colors[circ_xi] = flip_list[circ_xi]  # Turn light back off
         circles.colors = circ_colors
-        while exp_clock.getTime() < trial_start + circ_start[circ_xi]:  # wait until this light should turn off
-            core.wait(0.001)
+        
+        # Check for responses until this light should turn off
+        while exp_clock.getTime() < trial_start + circ_start[circ_xi]:
+            curr_btn_status, tmp_rt = mouse.getPressed(getTime=True)
+            if curr_btn_status != prev_btn_status:    # Check if button status changed
+                # Log which button and RT only if clicked down (not released)
+                for b_ix, b in enumerate(curr_btn_status):
+                    if b == 1 and b != prev_btn_status[b_ix]:
+                        buttons.append(b_ix)
+                        rts.append(tmp_rt)
+                prev_btn_status = curr_btn_status
     
+    #========================================================
+    # Rating Delay- wait to capture as many responses as possible before starting rating
     # Turn off stimuli for feedback_delay
     target_zone_draw()
     win.flip()
-    return trial_start
+    while exp_clock.getTime() < trial_start + interval_dur + rating_delay - feedback_compute_dur:
+        curr_btn_status, tmp_rt = mouse.getPressed(getTime=True)
+        if curr_btn_status != prev_btn_status:    # Check if button status changed
+            # Log which button and RT only if clicked down (not released)
+            for b_ix, b in enumerate(curr_btn_status):
+                if b == 1 and b != prev_btn_status[b_ix]:
+                    buttons.append(b_ix)
+                    rts.append(tmp_rt)
+            prev_btn_status = curr_btn_status
+    
+    print('mouse data for B{0} T {1}:'.format(block_n, trial_n), buttons, rts)
+    return trial_start, buttons, rts
 
 #===================================================
 def subjective_rating(block_n, trial_n, condition, trial_start, training=False):
-    # Collect responses
-    buttons, rts = mouse.getPressed(getTime=True)
-    
-    mouse.clickReset()
-    rating_scale.reset()
 #    event.clearEvents()
-    
-    # Show scale & update until a response has been made
-    while rating_scale.noResponse and exp_clock.getTime() < trial_start + interval_dur + rating_delay + max_rating_time:
-        rating_txt.draw()
-        rating_scale.draw()
-        win.flip()
-        for press in event.getKeys(keyList=['escape','q']):
-            if press:
-                clean_quit()
-    
-    # Check for responses
-    rating_data = rating_scale.getRating()
-    rating_rt = rating_scale.getRT()
-    if rating_data == None:
-        rating_rt = max_rating_time
-    
-    # Log rating data
-    if training:
-        win.logOnFlip(rating_str.format('T',trial_n,rating_data,rating_rt,condition,tolerances[condition]),logging.DATA)
-    else:
-        win.logOnFlip(rating_str.format(block_n,trial_n,rating_data,rating_rt,condition,tolerances[condition]),logging.DATA)
-    return rating_rt, rts
+#    mouse.clickReset()
+#    rating_scale.reset()
+#    
+#    # Show scale & update until a response has been made or max_rating_time
+#    rating_scale.draw()
+#    rating_instr_txt.draw()
+#    win.flip()
+#    
+#    rating_time_out = False
+#    while rating_scale.noResponse and not rating_time_out:
+#        core.wait(0.1)
+#        if exp_clock.getTime() > trial_start + interval_dur + rating_delay + max_rating_time:
+#            rating_time_out = True
+#        for press in event.getKeys(keyList=['escape','q']):
+#            if press:
+#                clean_quit()
+#    
+#    # Check for responses
+#    rating_data = rating_scale.getRating()
+#    rating_rt = rating_scale.getRT()
+#    if rating_time_out:
+#        rating_rt = max_rating_time
+#        if training:
+#            win.logOnFlip(rating_time_out_str.format('T',trial_n),logging.DATA)
+#        else:
+#            win.logOnFlip(rating_time_out_str.format(block_n,trial_n),logging.DATA)
+#    
+#    # Log rating data
+#    if training:
+#        win.logOnFlip(rating_str.format('T',trial_n,rating_data,rating_rt,condition,tolerances[condition]),logging.DATA)
+#    else:
+#        win.logOnFlip(rating_str.format(block_n,trial_n,rating_data,rating_rt,condition,tolerances[condition]),logging.DATA)
+#    win.flip()
+    rating_rt = 1
+    return rating_rt
 
 #===================================================
-def feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, rts, training=False):
+def feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, buttons, rts, training=False):
     global training_score
     global bad_fb_onset_cnt
     surp = False
     
     # Process responses
-    if len(rts)>0:
+    if any(rts):
         if len(rts)>1:          # Warning if more than one button was pressed
             win.logOnFlip('WARNING!!! More than one response detected (taking first) on B{0}_T{1}: responses = {2}'.format(
                             block_n, trial_n, rts),logging.WARNING)
         
-        rt = rts[0]-trial_start             # take only first response
-        btn = btns[0]
+        rt = rts[0]             # take only first response
         error = rt - interval_dur
         error_angle = error*angle_ratio
         if not training and trial_n in surprise_trials[block_n]:          # Surprise on if not in training and if in list of surprise trials  
@@ -172,26 +222,10 @@ def feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, rts, traini
     
     # Present feedback
 #    preflip = exp_clock.getTime()-trial_start
-    if paradigm_type=='eeg': 
-        win.callOnFlip(port.setData, 2)
-        sound_played = False
-    else:
-        win.callOnFlip(outcome_sound.play)
-        sound_played = True
-    
-    for frameN in range(feedback_dur * 60): #assuming frame_rate is close enough it would round to 60 (this must be an int)
+    win.callOnFlip(outcome_sound.play)
+    for frameN in range(round(feedback_dur * 60)): #assuming frame_rate is close enough it would round to 60 (this must be an int)
         target_zone_draw()                      # Using our defined target_zone_draw, not .draw to have correct visual.  
         resp_marker.draw()
-        # Wait until 1.5 frames before desired presentation time, then create fixed timing between this flip and sound/draw onsets
-        if frameN==0:
-#            prewait = exp_clock.getTime()-trial_start
-#            desired = interval_dur + feedback_delay - 0.5/frame_rate
-            while exp_clock.getTime() < trial_start + interval_dur + feedback_delay - 0.5/frame_rate:
-                # Hard coded delay for EEG:
-                if not sound_played and exp_clock.getTime() > trial_start + interval_dur + rating_delay + rating_rt + feedback_delay - 0.16:
-                    outcome_sound.play()
-                    sound_played = True
-                core.wait(0.00002)
         win.flip()
         if frameN==0:
             feedback_onset = exp_clock.getTime()-trial_start
@@ -212,13 +246,15 @@ def feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, rts, traini
             
         elif not training:
             points[block_n]+= point_fn[win_flag]
+    
+    # Log outcomes and behavioral data
     if training:
         win.logOnFlip(feedback_str.format('T',trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
-        win.logOnFlip('B{0}_T{1} responses/times = {2} / {3}'.format('T', trial_n, btns, rts),logging.DATA)
+        win.logOnFlip('B{0}_T{1} responses/times = {2} / {3}'.format('T', trial_n, buttons, rts),logging.DATA)
         win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format('T', trial_n, sound_file, feedback_onset),logging.DATA)
     else:
         win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,rt,condition,tolerances[condition]),logging.DATA)
-        win.logOnFlip('B{0}_T{1} responses/times = {2} / {3}'.format(block_n, trial_n, btns, rts),logging.DATA)
+        win.logOnFlip('B{0}_T{1} responses/times = {2} / {3}'.format(block_n, trial_n, buttons, rts),logging.DATA)
         win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format(block_n, trial_n, sound_file, feedback_onset),logging.DATA)
     resp_marker.setLineColor('black')
     target_zone.setColor('dimgrey')
@@ -246,6 +282,7 @@ def block_break(block_n, training=False):
         block_point_txt.draw()
         total_point_txt.draw()
         instr_txt.draw()
+        adv_btn.draw()
         adv_screen_txt.draw()
         win.flip()
         instr_key_check()
@@ -269,7 +306,7 @@ def point_calc(block_n):
 def score_instr():
     global training_score
     score_demo_txt.text = score_demo_str.format(training_score[condition])
-    total_point_txt.text = total_point_str.format(np.sum(training_score.values()))
+    total_point_txt.text = total_point_str.format(sum(training_score.values()))
     if training_score[condition] >= 0:
         score_demo_txt.color = 'green'
         total_point_txt.color = 'green'
@@ -281,6 +318,7 @@ def score_instr():
     total_point_txt.draw()
     if trial_n==n_fullvis+n_training-1:
         point_instr_txt.draw()
+    adv_btn.draw()    
     adv_screen_txt.draw()
     win.flip()
     instr_key_check()
@@ -294,7 +332,7 @@ def target_zone_draw():
 
 #===================================================
 def select_surp_sound():
-    sound_type = np.random.choice(block_sounds.keys())                      # Selects the subfolder to draw sounds from (ie. 'breaks').
+    sound_type = np.random.choice(list(block_sounds.keys()))                      # Selects the subfolder to draw sounds from (ie. 'breaks').
     sound_file = block_sounds[sound_type][block_n]                 # Selects the specific wav file from the subfolder.
     block_sounds.pop(sound_type)                                            # Don't use this sound type again in this block
     return sound_file
@@ -302,6 +340,10 @@ def select_surp_sound():
 #===================================================
 def clean_quit():
 #    os.system("sudo /home/knight_lab/Startup_Scripts/python_priority_rush_off.sh")     # If using core.rush in Linux
+    print('====================== CLEAN QUIT CALLED ======================')
+    win.logOnFlip('---------- CLEAN QUIT CALLED ----------',logging.DATA)
+    win.flip()
+    
     win.close()
     core.quit()
 
@@ -310,6 +352,7 @@ def clean_quit():
 # INSTRUCTIONS
 #============================================================
 welcome_txt.draw()
+adv_btn.draw()
 adv_screen_txt.draw()
 win.flip()
 instr_key_check()
@@ -351,21 +394,15 @@ for trial_n in range(n_fullvis+2*n_training):
     
     #========================================================
     # Moving Ball
-    trial_start = moving_ball(None, trial_n, training=True)
+    trial_start, buttons, rts = moving_ball(None, trial_n, training=True)
     
     #========================================================
     # Get Trial Timing
     win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,trial_start),logging.DATA)
-
-    
-    #========================================================
-    # Rating Delay- wait to capture as many responses as possible before starting rating
-    while exp_clock.getTime() < trial_start + interval_dur + rating_delay - feedback_compute_dur:
-        core.wait(0.001)
     
     #========================================================
     # Collect Responses and Subjective Rating
-    rating_rt, rts = subjective_rating(block_n, trial_n, condition, trial_start, training=True)
+    rating_rt = subjective_rating(None, trial_n, condition, trial_start, training=True)
     
     #========================================================
     # Feedback Delay
@@ -375,7 +412,7 @@ for trial_n in range(n_fullvis+2*n_training):
     #========================================================
     # Feedback
     #print 'about to call feedback_fn; time into trial =  {0}'.format(exp_clock.getTime()-trial_start) #!!! remove after testing
-    feedback_fn(None, condition, trial_n, trial_start, rating_rt, rts, training=True)
+    feedback_fn(None, condition, trial_n, trial_start, rating_rt, buttons, rts, training=True)
     
     #========================================================
     # ITI
@@ -403,6 +440,7 @@ for trial_n in range(n_fullvis+2*n_training):
 #============================================================
 # EXPERIMENT
 #============================================================
+instruction_loop(rating_intro_str)                    # Rating instruction call 
 instruction_loop(main_str)                    # Main instruction call 
 # Constant Reward Function (start awarding points)
 outcome_win.text = '+{0}'.format(point_fn[0])
@@ -428,16 +466,11 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
         
         #========================================================
         # Moving Ball
-        trial_start = moving_ball(block_n, trial_n, training=False)
-        
-        #========================================================
-        # Rating Delay- wait to capture as many responses as possible before starting rating
-        while exp_clock.getTime() < trial_start + interval_dur + rating_delay - feedback_compute_dur:
-            core.wait(0.001)
+        trial_start, buttons, rts = moving_ball(block_n, trial_n, training=False)
         
         #========================================================
         # Collect Responses and Subjective Rating
-        rating_rt, rts = subjective_rating(block_n, trial_n, condition, trial_start, training=True)
+        rating_rt = subjective_rating(block_n, trial_n, condition, trial_start, training=True)
         
         #========================================================
         # Feedback Delay
@@ -447,7 +480,7 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
         #========================================================
         # Feedback
         #print 'about to call calc_feedback; time into trial =  {0}'.format(exp_clock.getTime()-trial_start)
-        feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, rts, False)
+        feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, buttons, rts, False)
         
         #========================================================
         # ITI

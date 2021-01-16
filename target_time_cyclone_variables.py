@@ -62,17 +62,18 @@ surprise_trials = [[int(float(trl)) for trl in row] for row in desired_rows]
 
 
 #============================================================
-# RATING SLIDER STIMULI
+# RATING SCALE STIMULI
 #============================================================
-rating_instr_str = 'How likely is it that you responsed in the target zone?'
-rating_instr_txt = visual.TextStim(win,text=rating_instr_str,height=1,units='cm',
-                                name='feedback_timing', color='black',pos=(0,4),wrapWidth=14)
-rating_scale = visual.RatingScale(win, mouseOnly=True, pos=(0,-2),
-                    low=rating_ticks[0], high=rating_ticks[2], tickMarks=rating_ticks, labels=rating_labels, 
+rating_instr_str = 'How likely is it that you won on this trial by responding in the target zone?'
+rating_instr_txt = visual.TextStim(win,text=rating_instr_str,height=1,units=screen_units,
+                                name='feedback_timing', color='black',pos=(0,-0.3),wrapWidth=18)
+rating_scale = visual.RatingScale(win, mouseOnly=True, pos=(0,0),
+                    low=rating_ticks[0], high=rating_ticks[1], tickMarks=rating_ticks, labels=rating_labels, 
                     showValue=False, acceptText='Submit Answer', acceptSize=accept_size, 
                     size=rating_size, name='rating_scale')
 
 rating_str = 'B{0}_T{1}: Rating={2}; rating_RT = {3}; condition = {4}; tolerance = {5}'
+rating_time_out_str = 'B{0}_T{1}: Rating time out!'
 
 #rating_slider = visual.Slider(win, ticks=slider_ticks, labels=slider_labels, pos=(0,0), size=(slider_width, slider_height), 
 #                                    units='cm',granularity=slider_gran, style='rating', labelHeight=None, labelWrapWidth=None)
@@ -99,10 +100,13 @@ instr_pic_dict = {0:'grey.jpg',
                   3:'target_arrow.jpg',
                   4:'win.jpg', 
                   5:'loss.jpg',
-                  6:'surprise.jpg',
+                  6:'surprise.png',
                   'easy':'easy.jpg',
                   'hard':'hard.jpg'}
+instr_img_size = (13,10)
+instr_img_pos = (5, -2)
 instr_pic = visual.ImageStim(win, image='cyclone_pics/{0}'.format(instr_pic_dict[0]), flipHoriz=False, pos=(0, -2), units='cm')
+#rating_pic = visual.ImageStim(win, image='cyclone_pics/rating_scale.png', flipHoriz=False, pos=(0, -2), units='cm')
 
 training_score = { "easy" : 0, "hard": 0 }
 
@@ -192,7 +196,7 @@ target_zone_cover = visual.Circle(win, radius = loop_radius - target_width/2, ed
 # INSTRUCTIONS
 #===================================================
 instr_strs = ['This is a simple (but not easy!) timing game.\nA light will move around this circle.',
-               'Your goal is to respond at the exact\nmoment when it completes the circle.',
+               'Your goal is to click the left mouse button at the exact\nmoment when it completes the circle.',
                "The light always starts at the bottom and moves at the same speed, "+\
                'so the perfect response is always at the same time: the Target Time!',
                'The gray bar at the bottom is the target zone.',
@@ -208,10 +212,13 @@ train_str = {'easy': ["Good job! From now on, only the first part of the circle 
                     "Don't get discouraged - hard levels are designed to make you miss most of the time.\n"+\
                     "Try your best to see how much you can win!",
                     "Let's try some examples..."]}
-main_str = "Ready to try the real deal? We'll reset your score to 0 and start counting for real now. "+\
+rating_intro_str = ['Nice work! We are about to start the real deal, but with one difference.\n'+\
+            'Every {0} trials, you will be asked to click on this line\n'.format(rating_trial_ratio)+
+            'to rate how likely it is that you won, then accept the answer by clicking the button below.']
+main_str = ["You're ready to start! We'll reset your score to 0 and start counting for real now. "+\
             "You'll do {0} easy and {0} hard blocks, each lasting {1} trials.\n\n".format(n_blocks,n_trials)+\
-            'Press Q/escape to try more practice rounds, '+\
-            'or click the mouse to start playing Target Time!'
+            "Press Q/escape to restart the task and try more practice rounds, "+\
+            "or click the mouse to start playing Target Time!"]
 
 block_start_str = 'Level {0}/{1}: {2}'
 break_str       = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
@@ -230,8 +237,13 @@ instr_txt_pos = (0,6)
 instr_txt = visual.TextStim(win,text=instr_strs[0],height=1,units='cm', #alignVert='center',
                                 name='instr', color='black',pos=instr_txt_pos,wrapWidth=30)
 
-adv_txt_pos = (0,-7)
-adv_screen_txt = visual.TextStim(win,text='Click the mouse to advance or Q/escape to quit...',
+adv_btn_pos = (0,-7)
+adv_btn = visual.Rect(win, size=(20,1.5),pos=adv_btn_pos, #size=(0.1,0.05), pos=(0.0,0.4), 
+                         fillColor=(1,1,1),lineColor=(0,0,0), units='cm')
+print(adv_btn.vertices)
+
+adv_txt_pos = (0,-10)
+adv_screen_txt = visual.TextStim(win,text='Click here to advance or press Q/escape to quit...',
                                 height=0.75,units='cm',name='adv_screen', color='black', pos=adv_txt_pos,wrapWidth=20)#short no need wrap
 
 block_start_txt = visual.TextStim(win,text=block_start_str,height=2,units='cm', #alignHoriz='center',alignVert='center',

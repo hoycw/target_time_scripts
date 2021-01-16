@@ -2,12 +2,12 @@
 from psychopy import visual, event, core, logging
 import os
 
-win = visual.Window(fullscr=False, size=[800, 600], units='pix', monitor='testMonitor')
+win = visual.Window(fullscr=True, size=[800, 600], units='pix', monitor='testMonitor')
 
 # Create slider instructions
-rating_str = 'How likely is it that you responses in the target zone?'
-rating_txt = visual.TextStim(win,text=rating_str,height=1,units='cm',
-                                name='feedback_timing', color='black',pos=(0,4),wrapWidth=14)
+rating_str = 'How likely is it that you won on this trial by responding in the target zone?'
+rating_txt = visual.TextStim(win,text=rating_str,height=2,units='cm',
+                                name='feedback_timing', color='black',pos=(0,5),wrapWidth=36)
 
 # Create slider stimuli
 slider_ticks = [0, 50, 100]
@@ -16,8 +16,8 @@ slider_width = 10
 slider_height = 1
 slider_gran = 0             # 0 for continuous
 
-rating_scale = visual.RatingScale(win, mouseOnly=True, pos=(0,-3),
-    low=0, high=100, tickMarks=[0, 50, 100], labels=['Definitely Lost','','Definitely Won'], 
+rating_scale = visual.RatingScale(win, mouseOnly=True, pos=(0,-6),
+    low=0, high=100, tickMarks=[0, 100], labels=['Definitely Lost','Definitely Won'], 
     showValue=False, acceptText='Submit Answer', acceptSize=1.5, size=1, name='rating_scale')
 
 #low=0, high=100, marker='slider',

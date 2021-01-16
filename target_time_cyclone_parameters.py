@@ -18,6 +18,7 @@ n_blocks      = 2                   # number of blocks of trials PER CONDITION
 n_trials      = 75                  # number of trials PER BLOCK
 break_min_dur = 15                  # minimum length (in s) for the break between blocks
 #!!! check if n_trials/N-blocks==integer
+rating_trial_ratio = 2              # ask for ratings after every X trials
 
 #======================================
 #  TOLERANCE AND INTERVAL PARAMETERS  
@@ -27,7 +28,7 @@ rating_delay = 1                  # duration (in s) of delay between end of inte
 max_rating_time = 20                # max time allowed for rating response
 feedback_delay = 0.8                # duration (in s) of delay between rating response and feedback onset
 feedback_compute_dur = 0.2          # time (in s) given to compute feedback before being ready to present (will not collect responses in this time!)
-feedback_dur = 0.8                    # duration (in s) of feedback presentation
+feedback_dur = 1                    # duration (in s) of feedback presentation
 ITIs = [0.7, 1.0]         # length of inter-trial intervals (in s)
 post_instr_delay = 1                # duration of delay (in s) after instructions/break to make sure they're ready
 block_start_dur = 2                 # duration (in s) to display block start text (e.g., "Level _: type")
@@ -39,34 +40,31 @@ tolerance_step = {'easy': [-0.003,0.012],
                     'hard': [-0.012,0.003]} # adjustment (in s) for [correct,incorrect] responses
 tolerance_lim = [0.4, 0.015]
 
-n_flicker   = 10                     # number of times to flicker the photodiode on at initial task start
-flicker_dur = 0.1                   # duration of each flicker in start sequence
-flicker_brk = 5                     # break the sequence after this many flickers (breaks up continuous flickering)
-
-instr_img_size = (13,10)
-instr_img_pos = (5, -2)
-
 #======================
 # STIMULUS PARAMETERS  
 #======================
 full_screen = True                  # Make the window full screen? (True/False)
 #screen_to_show = 1                 # Select which screen to display the window on
-screen_units = 'cm'                 # Set visual object sizes in cm (constant across all screens)
+screen_units = 'height'                 # Set visual object sizes in "height" (relative to screen size)
+# Explaining "height" units:
+#   "...the dimensions of a screen with standard 4:3 aspect ratio will range (-0.6667,-0.5) in the bottom left
+#   to (+0.6667,+0.5) in the top right. For a standard widescreen (16:10 aspect ratio) the bottom left 
+#   of the screen is (-0.8,-0.5) and top-right is (+0.8,+0.5)."
 
 n_circ = 30                         # number of "lights" in the loop
-circ_size = .3                      # size of "lights"
-socket_size = .5                    # size of empty "lights" (when covered)
-loop_radius = 7                     # size of loop of "lights"
-target_width = 1.25                    # thickness of target zone IN CM 
+circ_size = .015                      # size of "lights"
+socket_size = .02                    # size of empty "lights" (when covered)
+loop_radius = 0.25                     # size of loop of "lights"
+target_width = 0.04                    # thickness of target zone
 
 covered_portion = 0.6               # % of interval time obscured when covered=True
-resp_marker_width = 2               # Width of the response marker (marks where they pressed the button)
+resp_marker_width = 0.1               # Width of the response marker (marks where they pressed the button)
 resp_marker_thickness = 4           # Thickness of the response marker
 conditions = ['easy', 'hard']       # labels of the trial conditions
 point_fn = [100, -100]              # reward function determining points awarded for [correct, incorrect, surprise]
 
-rating_ticks = [0, 50, 100]
-rating_labels = ['Definitely Lost', '', 'Definitely Won']
+rating_ticks = [0, 100]     # 50,
+rating_labels = ['Definitely Lost', 'Definitely Won']   # ''
 rating_width = 10
 rating_size = 1
 accept_size = 1

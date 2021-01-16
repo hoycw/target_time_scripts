@@ -87,6 +87,7 @@ win.logOnFlip('conditions = '+str(conditions), logging.DATA)
 win.logOnFlip('win.size = '+str(win.size), logging.DATA)
 win.logOnFlip('point_fn = '+str(point_fn), logging.DATA)
 
+win.logOnFlip('rating_trial_ratio = '+str(rating_trial_ratio), logging.DATA)
 win.logOnFlip('rating_ticks = '+str(rating_ticks), logging.DATA)
 win.logOnFlip('rating_labels = '+str(rating_labels), logging.DATA)
 win.logOnFlip('rating_width = '+str(rating_width), logging.DATA)
