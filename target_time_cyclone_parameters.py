@@ -32,7 +32,7 @@ feedback_dur = 1                    # duration (in s) of feedback presentation
 ITIs = [0.7, 1.0]         # length of inter-trial intervals (in s)
 post_instr_delay = 1                # duration of delay (in s) after instructions/break to make sure they're ready
 block_start_dur = 2                 # duration (in s) to display block start text (e.g., "Level _: type")
-end_screen_dur = 10                 # duration (in s) of the ending "thank you all done" screen
+end_screen_dur = 7                 # duration (in s) of the ending "thank you all done" screen
 
 tolerances = {'easy':0.125,           # Tolerance (in s) on either side of the target interval 
              'hard':0.05}            # e.g., interval-tolerance < correct_RT < interval+ tolerance
@@ -51,6 +51,10 @@ screen_units = 'height'                 # Set visual object sizes in "height" (r
 #   "...the dimensions of a screen with standard 4:3 aspect ratio will range (-0.6667,-0.5) in the bottom left
 #   to (+0.6667,+0.5) in the top right. For a standard widescreen (16:10 aspect ratio) the bottom left 
 #   of the screen is (-0.8,-0.5) and top-right is (+0.8,+0.5)."
+
+# audio latency: 1 = share low-latency acces; 2 = exclusive low-latency acces; 3 = aggressive exclusive mode (rec)
+audio_latency_mode = '3'
+bad_fb_tolerance = 0.01 # 10 ms is okay
 
 n_circ = 30                         # number of "lights" in the loop
 #circ_size = .3                      # size of "lights"

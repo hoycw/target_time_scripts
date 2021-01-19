@@ -16,11 +16,6 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #============================================================
 # EXPERIMENTAL VARIABLES
 #============================================================
-monitor_names = monitors.getAllMonitors()
-for this_monitor in monitor_names:
-    thisMon = monitors.Monitor(thisName)
-    win.logOnFlip('monitor {0}: dist = {1}; width = {2}; res = {3}'.format(this_monitor,
-        thisMon.getDistance(),thisMon.getWidth(),thisMon.getSizePix()))
 win = visual.Window(size=(1920,1080), fullscr=full_screen, color=(0,0,0),
                     monitor='testMonitor',#monitor_name,# screen=screen_to_show,
                     allowGUI=False, units=screen_units, waitBlanking=True);
@@ -29,11 +24,15 @@ win = visual.Window(size=(1920,1080), fullscr=full_screen, color=(0,0,0),
 
 mouse = event.Mouse()  #  will use win by default
 
+sound.prefs.hardware['audioLatencyMode'] = audio_latency_mode
+
 frame_dur = win.getMsPerFrame(msg='Please wait, testing frame rate...')
 frame_rate = win.getActualFrameRate()
-if frame_rate < 59:
+if frame_rate is None:
+    warnings.warn('Frame rate is None type!')
+elif frame_rate < 59:
     warnings.warn('Frame rate less than 59hz: '+str(frame_rate))
-if frame_rate > 61:
+elif frame_rate > 61:
     warnings.warn('Frame rate greater than 61hz: '+str(frame_rate))
 exp_clock = core.Clock()
 block_order = np.random.permutation([b for b in [0, 1] for _ in range(n_blocks)])   #!!! consider counterbalancing future participants
@@ -193,7 +192,7 @@ instr_strs = ['This is a simple (but not easy!) timing game. A light will move a
                'If you miss the target zone, it turns red and you lose points.',
                'Sometimes, the target zone will turn blue. Ignore this. ' +\
                "These trials don't count, so you won't win or lose points.",
-               "Let's get started with a few examples..."]
+               "You can press 'P' to pause/restart the experiment. Let's get started with a few examples..."]
 train_str = {'easy': ["Good job! From now on, only the first part of the circle will light up.",
                     "That means you need to time your response without seeing the light go all the way around.",
                     "Let's try some more examples..."],
@@ -249,7 +248,7 @@ instr_txt = visual.TextStim(win,text=instr_strs[0],height=std_txt_sz,units=scree
                                 name='instr', color='black',pos=instr_txt_pos,wrapWidth=std_txt_wrap)
 
 adv_btn_pos = (0,-0.4)
-mouse_reset_pos = (0,-0.3)
+mouse_reset_pos = (0,-0.35)
 adv_btn = visual.Rect(win, size=(0.8,sml_txt_sz+0.02),pos=adv_btn_pos, #size=(0.1,0.05), pos=(0.0,0.4), 
                          fillColor=(1,1,1),lineColor=(0,0,0), units=screen_units)
 

@@ -21,6 +21,7 @@ from target_time_cyclone_parameters import*
 from target_time_cyclone_variables import*
 print('Using {0}(with {1}) for audioLib(with audioDriver)'.format(sound.audioLib, sound.audioDriver))
 bad_fb_onset_cnt = 0
+fb_latencies = []
 
 #============================
 # DEFINE PARADIGM FUNCTIONS
@@ -76,7 +77,7 @@ def instr_key_check(check_time=0.05):
         # Check for quit keys
         for press in event.getKeys(keyList=['escape','q']):
             if press:
-                clean_quit()
+                clean_quit(fb_latencies,bad_fb_onset_cnt)
         core.wait(check_time)
     core.wait(check_time)
 
@@ -155,7 +156,7 @@ def subjective_rating(block_n, trial_n, condition, trial_start, training=False):
             rating_time_out = True
         for press in event.getKeys(keyList=['escape','q']):
             if press:
-                clean_quit()
+                clean_quit(fb_latencies,bad_fb_onset_cnt)
     
     # Check for responses
     rating_data = rating_scale.getRating()
@@ -220,18 +221,26 @@ def feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, buttons, rt
     outcome_sound.setVolume(0.8)
     
     # Present feedback
-#    preflip = exp_clock.getTime()-trial_start
+    if training:
+        desired_fb_onset = interval_dur + feedback_delay
+    else:
+        desired_fb_onset = interval_dur + rating_delay + rating_rt + feedback_delay
     win.callOnFlip(outcome_sound.play)
     for frameN in range(round(feedback_dur * 60)): #assuming frame_rate is close enough it would round to 60 (this must be an int)
         target_zone_draw()                      # Using our defined target_zone_draw, not .draw to have correct visual.  
         resp_marker.draw()
+        if frameN==0:
+            while exp_clock.getTime() < trial_start + desired_fb_onset - 0.5/frame_rate:
+                core.wait(0.0005)
         win.flip()
         if frameN==0:
             feedback_onset = exp_clock.getTime()-trial_start
-#            if feedback_onset > 1.793 or feedback_onset < 1.792:
-#                bad_fb_onset_cnt += 1
-#                print '{0} --> B{1}T{2} times:\n\tpreflip    {3}\n\tprewait    {4}\n\tdesired    {5}\n\tfeedback = {6}'.format(
-#                    bad_fb_onset_cnt,block_n,trial_n,preflip,prewait,desired,feedback_onset)
+            onset_latency = feedback_onset - desired_fb_onset
+            fb_latencies.append(onset_latency)
+            if abs(onset_latency) > bad_fb_tolerance:
+                bad_fb_onset_cnt += 1
+#                print('{0} bad_FB_onsets --> B{1}T{2} times:\n\tdesired = {3};\tfeedback = {4} \n\tdifference = {5}'.format(
+#                    bad_fb_onset_cnt,block_n,trial_n,desired_fb_onset,feedback_onset,onset_latency))
     win.flip()
     
     if not surp and outcome_str != 'None':
@@ -260,7 +269,7 @@ def feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, buttons, rt
     while exp_clock.getTime() < trial_start + min_trial_dur + rating_rt:
         for press in event.getKeys(keyList=['escape','q']):
             if press:
-                clean_quit()
+                clean_quit(fb_latencies,bad_fb_onset_cnt)
 
 #===================================================
 def staircase(condition): 
@@ -337,9 +346,13 @@ def select_surp_sound():
     return sound_file
 
 #===================================================
-def clean_quit():
+def clean_quit(fb_latencies,bad_fb_onset_cnt):
 #    os.system("sudo /home/knight_lab/Startup_Scripts/python_priority_rush_off.sh")     # If using core.rush in Linux
     print('====================== CLEAN QUIT CALLED ======================')
+    if fb_latencies == []:
+        fb_latencies = [0]
+    win.logOnFlip('feedback_latencies (M, SD, max) = {0} +/- {1}; abs(max)={2}; n_bad={3}'.format(
+        np.mean(fb_latencies),np.std(fb_latencies),np.max(np.abs(fb_latencies)),bad_fb_onset_cnt),logging.DATA)
     win.logOnFlip('---------- CLEAN QUIT CALLED ----------',logging.DATA)
     win.flip()
     
@@ -432,7 +445,7 @@ for trial_n in range(n_fullvis+2*n_training):
                 win.logOnFlip('PAUSE ENDED: B{0}_T{1}, TIME = {2}'.format('T', trial_n, exp_clock.getTime()),logging.DATA)
                 core.wait(block_start_dur)
             else:
-                clean_quit()
+                clean_quit(fb_latencies,bad_fb_onset_cnt)
     if (trial_n==n_fullvis+n_training-1) or (trial_n==n_fullvis+2*n_training-1):    #Score instructions with score after easy training
         score_instr()
 
@@ -499,7 +512,7 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
                     win.logOnFlip('PAUSE ENDED: B{0}_T{1}, TIME = {2}'.format(block_n, trial_n, exp_clock.getTime()),logging.DATA)
                     core.wait(block_start_dur)
                 else: 
-                    clean_quit()
+                    clean_quit(fb_latencies,bad_fb_onset_cnt)
     
     #========================================================
     # Break Between Blocks
@@ -511,4 +524,4 @@ endgame_txt.draw()
 win.flip()
 core.wait(end_screen_dur)
 
-clean_quit()
+clean_quit(fb_latencies,bad_fb_onset_cnt)

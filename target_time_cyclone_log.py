@@ -68,6 +68,7 @@ win.logOnFlip('n_training = '+str(n_training), logging.DATA)
 win.logOnFlip('surp_rate = '+str(surp_rate), logging.DATA)
 win.logOnFlip('n_surp = '+str(n_surp), logging.DATA)
 win.logOnFlip('surprise_sequence = '+str(surprise_sequence), logging.DATA)
+win.logOnFlip('bad_fb_tolerance = '+str(bad_fb_tolerance), logging.DATA)
 win.logOnFlip('interval_dur = '+str(interval_dur), logging.DATA)
 win.logOnFlip('feedback_delay = '+str(feedback_delay), logging.DATA)
 win.logOnFlip('feedback_dur = '+str(feedback_dur), logging.DATA)
@@ -93,6 +94,15 @@ win.logOnFlip('rating_labels = '+str(rating_labels), logging.DATA)
 #win.logOnFlip('rating_width = '+str(rating_width), logging.DATA)
 #win.logOnFlip('rating_size = '+str(rating_size), logging.DATA)
 #win.logOnFlip('accept_size = '+str(accept_size), logging.DATA)
+
+# Hardware Settings
+monitor_names = monitors.getAllMonitors()
+for this_monitor in monitor_names:
+    thisMon = monitors.Monitor(this_monitor)
+    win.logOnFlip('monitor {0}: dist = {1}; width = {2}; res = {3}'.format(this_monitor,
+        thisMon.getDistance(),thisMon.getWidth(),thisMon.getSizePix()),logging.DATA)
+
+win.logOnFlip('audio latency mode = {0}'.format(audio_latency_mode),logging.DATA)
 
 exp_clock.reset()
 win.flip()
