@@ -202,7 +202,8 @@ train_str = {'easy': ["Good job! From now on, only the first part of the circle 
                     "Let's try some examples..."]}
 rating_intro_str = ['Nice work! We are about to start the real deal, but with one difference. '+\
             'Every {0} trials, you will be asked to click on this line '.format(rating_trial_ratio)+
-            'to rate how likely it is that you won, then accept the answer by clicking the button below.']
+            'to rate how likely it is that you won, then accept the answer by clicking the button below.',
+            'The accuracy of the ratings is important, so please take your time to rate each individual trial!']
 main_str = ["You're ready to start! We'll reset your score to 0 and start counting for real now. "+\
             "You'll do {0} easy and {0} hard blocks, each lasting {1} trials.\n\n".format(n_blocks,n_trials)+\
             "Press Q/escape to restart the task and try more practice rounds, "+\
@@ -210,6 +211,7 @@ main_str = ["You're ready to start! We'll reset your score to 0 and start counti
 
 block_start_str = 'Level {0}/{1}: {2}'
 break_str       = 'Great work! {0} blocks left. Take a break to stretch and refresh yourself for at least {1} seconds.'
+break_done_str = 'Okay, only {0} blocks left, so please remember to provide accurate ratings! Click below to start again.'
 block_point_str = 'Level {0} Score: {1}'
 total_point_str = 'Total Score: {0}'
 score_demo_str  = 'You scored {0} points this round.'

@@ -30,16 +30,17 @@ def instruction_loop(instrs, intro=False):
     image_index = 0
     # displays instructions for current trial type
     # If intro=True, instrs won't be used (can just be '') 
-    if instrs == rating_intro_str:
-        instr_txt.text = instrs[0]
-        instr_pic.image = 'cyclone_pics/rating_scale.png'
-        instr_pic.size = rating_img_size
-        instr_pic.draw()
-        instr_txt.draw()
-        adv_btn.draw()
-        adv_screen_txt.draw()
-        win.flip()
-        instr_key_check()
+    if instrs[0] == rating_intro_str[0]:
+        for instr_str in instrs:
+            instr_txt.text = instr_str
+            instr_pic.image = 'cyclone_pics/rating_scale.png'
+            instr_pic.size = rating_img_size
+            instr_pic.draw()
+            instr_txt.draw()
+            adv_btn.draw()
+            adv_screen_txt.draw()
+            win.flip()
+            instr_key_check()
     elif instrs!= main_str:
         for instr_str in instrs:
             instr_txt.text = instr_str
@@ -283,12 +284,19 @@ def block_break(block_n, training=False):
     point_calc(block_n)
     # If not the last block, print feedback
     if block_n<len(block_order)-1:
-        instr_txt.text = break_str.format(len(block_order)-block_n-1,break_min_dur)
+        show_str = break_str.format(len(block_order)-block_n-1,break_min_dur)
+        show_done_str = break_done_str.format(len(block_order)-block_n-1)
+        # fix grammar for "only 1 block" before last block
+        if block_n == len(block_order)-2:
+            show_str = show_str.replace('blocks','block')
+            show_done_str = show_done_str.replace('blocks','block')
+        instr_txt.text = show_str
         instr_txt.draw()
         win.flip()
         core.wait(break_min_dur)
         block_point_txt.draw()
         total_point_txt.draw()
+        instr_txt.text = show_done_str
         instr_txt.draw()
         adv_btn.draw()
         adv_screen_txt.draw()
@@ -483,11 +491,17 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
         
         #========================================================
         # Collect Responses and Subjective Rating
-        rating_rt = subjective_rating(block_n, trial_n, condition, trial_start, training=True)
+        if np.remainder(trial_n+1, rating_trial_ratio) == 0:    # avoid rating on first trial of a block
+            rating_rt = subjective_rating(block_n, trial_n, condition, trial_start, training=True)
+            fb_start_time = trial_start + interval_dur + rating_delay + rating_rt + feedback_delay - feedback_compute_dur
+        else:
+            # No rating on this trial
+            rating_rt = 0
+            fb_start_time = trial_start + interval_dur + rating_rt + feedback_delay - feedback_compute_dur
         
         #========================================================
         # Feedback Delay
-        while exp_clock.getTime() < trial_start + interval_dur + rating_delay + rating_rt + feedback_delay - feedback_compute_dur:
+        while exp_clock.getTime() < fb_start_time:
             core.wait(0.001)
         
         #========================================================

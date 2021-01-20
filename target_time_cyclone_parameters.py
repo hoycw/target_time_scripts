@@ -18,7 +18,7 @@ n_blocks      = 2                   # number of blocks of trials PER CONDITION
 n_trials      = 75                  # number of trials PER BLOCK
 break_min_dur = 15                  # minimum length (in s) for the break between blocks
 #!!! check if n_trials/N-blocks==integer
-rating_trial_ratio = 2              # ask for ratings after every X trials
+rating_trial_ratio = 3              # ask for ratings after every X trials
 
 #======================================
 #  TOLERANCE AND INTERVAL PARAMETERS  
