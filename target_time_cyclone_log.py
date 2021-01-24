@@ -1,6 +1,6 @@
 # target_time log suite
 paradigm_name = 'target_time_ratings'
-paradigm_version = '3.0'
+paradigm_version = '3.1'
 
 from psychopy import visual, event, core, gui, logging, data
 import numpy as np
@@ -91,6 +91,8 @@ win.logOnFlip('point_fn = '+str(point_fn), logging.DATA)
 win.logOnFlip('rating_trial_ratio = '+str(rating_trial_ratio), logging.DATA)
 win.logOnFlip('rating_ticks = '+str(rating_ticks), logging.DATA)
 win.logOnFlip('rating_labels = '+str(rating_labels), logging.DATA)
+win.logOnFlip('rating_delay = '+str(rating_delay), logging.DATA)
+win.logOnFlip('max_rating_time = '+str(max_rating_time), logging.DATA)
 #win.logOnFlip('rating_width = '+str(rating_width), logging.DATA)
 #win.logOnFlip('rating_size = '+str(rating_size), logging.DATA)
 #win.logOnFlip('accept_size = '+str(accept_size), logging.DATA)

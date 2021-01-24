@@ -1,6 +1,6 @@
 #target_time_variable file 
 paradigm_name = 'target_time_ratings'
-paradigm_version = '3.0'
+paradigm_version = '3.1'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['PTB']
@@ -74,7 +74,7 @@ rating_scale = visual.RatingScale(win, mouseOnly=True, pos=(0,-0.1),
                     #size=rating_size, acceptSize=accept_size, 
                     
 
-rating_str = 'B{0}_T{1}: Rating={2}; rating_RT = {3}; condition = {4}; tolerance = {5}'
+rating_str = 'B{0}_T{1}: Rating = {2}; rating_RT = {3}; condition = {4}; tolerance = {5}'
 rating_time_out_str = 'B{0}_T{1}: Rating time out!'
 
 #rating_slider = visual.Slider(win, ticks=slider_ticks, labels=slider_labels, pos=(0,0), size=(slider_width, slider_height), 
@@ -131,7 +131,6 @@ turn_sound["None"].setVolume(0.8)
 #===================================================
 # CIRCLE & TARGET ZONE PARAMETERS
 #===================================================
-min_trial_dur = interval_dur + rating_delay + feedback_delay + feedback_dur
 angle_ratio = 360/float(interval_dur)
 
 #---------------------------------------------------
@@ -203,7 +202,7 @@ train_str = {'easy': ["Good job! From now on, only the first part of the circle 
 rating_intro_str = ['Nice work! We are about to start the real deal, but with one difference. '+\
             'Every {0} trials, you will be asked to click on this line '.format(rating_trial_ratio)+
             'to rate how likely it is that you won, then accept the answer by clicking the button below.',
-            'The accuracy of the ratings is important, so please take your time to rate each individual trial!']
+            'The accuracy of the ratings is important for this experiment, so please take your time to rate each individual trial!']
 main_str = ["You're ready to start! We'll reset your score to 0 and start counting for real now. "+\
             "You'll do {0} easy and {0} hard blocks, each lasting {1} trials.\n\n".format(n_blocks,n_trials)+\
             "Press Q/escape to restart the task and try more practice rounds, "+\
@@ -216,7 +215,8 @@ block_point_str = 'Level {0} Score: {1}'
 total_point_str = 'Total Score: {0}'
 score_demo_str  = 'You scored {0} points this round.'
 point_instr_str = "After each block, you'll see your score from this round. Points also add up across rounds."
-end_game_str    = "Fantastic!!! You're all done. Thank you so much for participating in this experiment!"
+end_game_str    = "Fantastic!!! You're all done. Thank you so much for participating in this experiment!" + \
+                                " Please wait for PsychoPy to finish writing the log file before closing the program, which may take a minute or two."
 times_demo_called = 1
 
 instr_pic_dict = {0:'grey.jpg', 

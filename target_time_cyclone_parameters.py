@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'target_time_ratings'
-paradigm_version = '3.0'
+paradigm_version = '3.1'
 
 from psychopy import visual, event, core, gui, logging, data
 from target_time_cyclone_log import*
@@ -14,7 +14,7 @@ exp_datetime = time.strftime("%Y%m%d%H%M%S")
 #============================================================
 n_fullvis     = 5                   # number of EASY examples to start (large tolerance, full window)
 n_training    = 15                  # number of training trials PER CONDITION
-n_blocks      = 2                   # number of blocks of trials PER CONDITION
+n_blocks      = 3                   # number of blocks of trials PER CONDITION
 n_trials      = 75                  # number of trials PER BLOCK
 break_min_dur = 15                  # minimum length (in s) for the break between blocks
 #!!! check if n_trials/N-blocks==integer

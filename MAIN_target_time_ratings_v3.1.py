@@ -178,7 +178,7 @@ def subjective_rating(block_n, trial_n, condition, trial_start, training=False):
     return rating_rt
 
 #===================================================
-def feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, buttons, rts, training=False):
+def feedback_fn(block_n, condition, trial_n, trial_start, desired_fb_onset, buttons, rts, training=False):
     global training_score
     global bad_fb_onset_cnt
     surp = False
@@ -222,10 +222,6 @@ def feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, buttons, rt
     outcome_sound.setVolume(0.8)
     
     # Present feedback
-    if training:
-        desired_fb_onset = interval_dur + feedback_delay
-    else:
-        desired_fb_onset = interval_dur + rating_delay + rating_rt + feedback_delay
     win.callOnFlip(outcome_sound.play)
     for frameN in range(round(feedback_dur * 60)): #assuming frame_rate is close enough it would round to 60 (this must be an int)
         target_zone_draw()                      # Using our defined target_zone_draw, not .draw to have correct visual.  
@@ -267,7 +263,7 @@ def feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, buttons, rt
         win.logOnFlip('B{0}_T{1} SOUND = {2} feedback start: TIME = {3}'.format(block_n, trial_n, sound_file, feedback_onset),logging.DATA)
     resp_marker.setLineColor('black')
     target_zone.setColor('dimgrey')
-    while exp_clock.getTime() < trial_start + min_trial_dur + rating_rt:
+    while exp_clock.getTime() < trial_start + desired_fb_onset + feedback_dur:
         for press in event.getKeys(keyList=['escape','q']):
             if press:
                 clean_quit(fb_latencies,bad_fb_onset_cnt)
@@ -421,19 +417,21 @@ for trial_n in range(n_fullvis+2*n_training):
     win.logOnFlip('TRAINING T{0} start: FRAME TIME = {1}'.format(trial_n,trial_start),logging.DATA)
     
     #========================================================
-    # Collect Responses and Subjective Rating
-#    rating_rt = subjective_rating(None, trial_n, condition, trial_start, training=True)
-    rating_rt = 0
+    # Collect Responses (no Subjective Rating for training)
+    rating_rt = 0 # subjective_rating(None, trial_n, condition, trial_start, training=True)
+    # Log no rating data
+#    win.logOnFlip(rating_str.format('T',trial_n,-1,-1,condition,tolerances[condition]),logging.DATA)
+    desired_fb_onset = interval_dur + feedback_delay
     
     #========================================================
-    # Feedback Delay: does not wait for rating_delay + rating_rt
-    while exp_clock.getTime() < trial_start + interval_dur + feedback_delay - feedback_compute_dur:
+    # Feedback Delay:
+    while exp_clock.getTime() < trial_start + desired_fb_onset - feedback_compute_dur:
         core.wait(0.001)
     
     #========================================================
     # Feedback
     #print 'about to call feedback_fn; time into trial =  {0}'.format(exp_clock.getTime()-trial_start) #!!! remove after testing
-    feedback_fn(None, condition, trial_n, trial_start, rating_rt, buttons, rts, training=True)
+    feedback_fn(None, condition, trial_n, trial_start, desired_fb_onset, buttons, rts, training=True)
     
     #========================================================
     # ITI
@@ -443,7 +441,7 @@ for trial_n in range(n_fullvis+2*n_training):
     
     # Staircase Tolerance
     staircase(condition)
-    while exp_clock.getTime() < trial_start + min_trial_dur + rating_rt + ITI:
+    while exp_clock.getTime() < trial_start + desired_fb_onset + feedback_dur + ITI:
         for press in event.getKeys(keyList=['escape','q', 'p']):
             if press in ['p']:
                 pause_txt.draw()
@@ -492,22 +490,23 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
         #========================================================
         # Collect Responses and Subjective Rating
         if np.remainder(trial_n+1, rating_trial_ratio) == 0:    # avoid rating on first trial of a block
-            rating_rt = subjective_rating(block_n, trial_n, condition, trial_start, training=True)
-            fb_start_time = trial_start + interval_dur + rating_delay + rating_rt + feedback_delay - feedback_compute_dur
+            rating_rt = subjective_rating(block_n, trial_n, condition, trial_start, training=False)
+            desired_fb_onset = interval_dur + rating_delay + rating_rt + feedback_delay
         else:
             # No rating on this trial
+            win.logOnFlip(rating_str.format(block_n,trial_n,-1,-1,condition,tolerances[condition]),logging.DATA)
             rating_rt = 0
-            fb_start_time = trial_start + interval_dur + rating_rt + feedback_delay - feedback_compute_dur
+            desired_fb_onset = interval_dur + feedback_delay
         
         #========================================================
         # Feedback Delay
-        while exp_clock.getTime() < fb_start_time:
+        while exp_clock.getTime() < trial_start + desired_fb_onset - feedback_compute_dur:
             core.wait(0.001)
         
         #========================================================
         # Feedback
         #print 'about to call calc_feedback; time into trial =  {0}'.format(exp_clock.getTime()-trial_start)
-        feedback_fn(block_n, condition, trial_n, trial_start, rating_rt, buttons, rts, False)
+        feedback_fn(block_n, condition, trial_n, trial_start, desired_fb_onset, buttons, rts, training=False)
         
         #========================================================
         # ITI
@@ -516,7 +515,7 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
         win.flip()
         
         staircase(condition)
-        while exp_clock.getTime() < trial_start + min_trial_dur + rating_rt + ITI:
+        while exp_clock.getTime() < trial_start + desired_fb_onset + feedback_dur + ITI:
             for press in event.getKeys(keyList=['escape','q', 'p']):
                 if press in ['p']:
                     pause_txt.draw()
