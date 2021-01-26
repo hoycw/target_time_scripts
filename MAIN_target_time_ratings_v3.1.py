@@ -368,6 +368,7 @@ def clean_quit(fb_latencies,bad_fb_onset_cnt):
 # INSTRUCTIONS
 #============================================================
 welcome_txt.draw()
+audio_warn_txt.draw()
 adv_btn.draw()
 adv_screen_txt.draw()
 win.flip()

@@ -244,6 +244,10 @@ big_txt_wrap = 1.2
 # Psychopy3 depricated alignHorz/alignVert for alignText + anchorHorz/anchorVert, but all are 'center' by default
 welcome_txt = visual.TextStim(win,text='Welcome to\nTarget Time!',height=big_txt_sz,units=screen_units,#alignHoriz='center',alignVert='center', 
                                 name='welcome', color='black', bold=True, pos=(0,0.2),wrapWidth=std_txt_wrap)
+audio_warn_str = 'If you have any programs running in the background that can generate audio (Spotify, iTunes, internet, etc.), '+\
+                            'please press Q/escape to exit, quit those programs, and restart the task.'
+audio_warn_txt = visual.TextStim(win,text=audio_warn_str,height=sml_txt_sz,units=screen_units, #alignVert='center',
+                                name='instr', color='black',pos=(0,-0.1),wrapWidth=sml_txt_wrap)
 
 instr_txt_pos = (0,0.3)
 instr_txt = visual.TextStim(win,text=instr_strs[0],height=std_txt_sz,units=screen_units, #alignVert='center',
