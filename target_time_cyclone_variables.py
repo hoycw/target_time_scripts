@@ -51,7 +51,7 @@ while any([cnt>=3 for cnt in block_repeat_cnt]):
 # Determine surprise trial numbers
 # Draw surprise trial numbers from CSVs
 surprise_sequence = set(random.sample(range(len(block_order)), len(block_order)))
-surp_csv =  "surp_csvs/rating_{0}_randomized_list.csv".format(str(n_trials))
+surp_csv =  "surp_csvs/eeg_{0}_randomized_list.csv".format(str(n_trials))
 if debug_mode:
     surp_csv = "surp_csvs/debug_randomized_list.csv"
 with open(surp_csv, 'r') as read:
