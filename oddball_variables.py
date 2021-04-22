@@ -1,5 +1,5 @@
 paradigm_name = 'oddball'
-paradigm_version = '1.5'
+paradigm_version = '1.6'
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import prefs
 prefs.general['audioLib'] = ['sounddevice']
@@ -179,6 +179,7 @@ resp_instr_str = 'You will be responding using the {0}.\n'.format(resp_method_st
                  'Please only use {0}.\n{1}'.format(effector_str, rtbox_added_str)
 
 feedback_str = 'B{0}_T{1}: Outcome = {2}; RT = {3}; condition = {4}'
+outcome_sound_str = 'B{0}_T{1}: condition = {2}; sound={3}'
 
 #---------------------------------------------------
 # Instruction Strings

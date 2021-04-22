@@ -119,10 +119,10 @@ def present_stim(trial_type, next_trial_start):
         win.callOnFlip(port.setData, 0)
     win.flip()
     
-    return trial_start
+    return trial_start, sound_name
 
 #===================================================
-def check_resp(block_n, trial_n, block_score, training=False):
+def check_resp(block_n, trial_n, block_score, sound_name, training=False):
     if training:
         condition = conditions[train_cond_n[trial_n]]
     else:
@@ -157,6 +157,8 @@ def check_resp(block_n, trial_n, block_score, training=False):
     
     win.logOnFlip('B{0}_T{1} responses/times = {2} / {3}'.format(block_n, trial_n, btns, rts),logging.DATA)
     win.logOnFlip(feedback_str.format(block_n,trial_n,outcome_str,rt,condition),logging.DATA)
+    
+    win.logOnFlip(outcome_sound_str.format(block_n,trial_n,condition,sound_name),logging.DATA)
     
     return block_score
 
@@ -293,7 +295,7 @@ for trial_n in range(n_training):
     
     #========================================================
     # Present stimuli
-    trial_start = present_stim(train_cond_n[trial_n], next_trial_start)
+    trial_start, sound_name = present_stim(train_cond_n[trial_n], next_trial_start)
     iti = np.random.choice(ITIs)
     next_trial_start = trial_start + stim_dur + iti
     win.logOnFlip('B{0}_T{1} condition = {2}; onset = {3}; ITI = {4}'.format(
@@ -306,7 +308,7 @@ for trial_n in range(n_training):
     
     #========================================================
     # Get responses
-    block_score = check_resp('T', trial_n, block_score, training=True)
+    block_score = check_resp('T', trial_n, block_score, sound_name, training=True)
 
 # Present Score feedback
 total_score = block_break('T', block_score, total_score, training=True)
@@ -333,7 +335,7 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
         
         #========================================================
         # Present stimuli
-        trial_start = present_stim(block_cond_n[block_n][trial_n], next_trial_start)
+        trial_start, sound_name = present_stim(block_cond_n[block_n][trial_n], next_trial_start)
         iti = np.random.choice(ITIs)
         next_trial_start = trial_start + stim_dur + iti
         win.logOnFlip('B{0}_T{1} condition = {2}; onset = {3}; ITI = {4}'.format(
@@ -346,7 +348,7 @@ for block_n, block_type in enumerate(block_order[starting_block-1:],starting_blo
         
         #========================================================
         # Get responses
-        block_score = check_resp(block_n, trial_n, block_score)
+        block_score = check_resp(block_n, trial_n, block_score, sound_name)
     
     #========================================================
     # Break Between Blocks

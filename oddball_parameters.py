@@ -1,6 +1,6 @@
 #target_time parameter file 
 paradigm_name = 'oddball'
-paradigm_version = '1.5'
+paradigm_version = '1.6'
 
 from psychopy import visual, event, core, gui, logging, data
 from oddball_log import*
